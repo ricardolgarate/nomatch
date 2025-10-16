@@ -2,6 +2,10 @@ import * as functions from 'firebase-functions';
 import * as admin from 'firebase-admin';
 import Stripe from 'stripe';
 import nodemailer from 'nodemailer';
+import * as dotenv from 'dotenv';
+
+// Load environment variables
+dotenv.config();
 
 // Export coupon management functions
 export { createCoupon, listCoupons, deleteCoupon } from './coupons';
@@ -11,19 +15,19 @@ admin.initializeApp();
 const db = admin.firestore();
 
 // Initialize Stripe
-const stripe = new Stripe(functions.config().stripe.secret_key, {
-  apiVersion: '2025-09-30.clover',
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || '', {
+  apiVersion: '2025-02-24.acacia',
 });
 
 // Email transporter
 const getEmailTransporter = () => {
-  return nodemailer.createTransporter({
-    host: functions.config().smtp.host || 'smtp.gmail.com',
-    port: parseInt(functions.config().smtp.port || '587'),
+  return nodemailer.createTransport({
+    host: process.env.SMTP_HOST || 'smtp.gmail.com',
+    port: parseInt(process.env.SMTP_PORT || '587'),
     secure: false,
     auth: {
-      user: functions.config().smtp.user,
-      pass: functions.config().smtp.pass,
+      user: process.env.SMTP_USER,
+      pass: process.env.SMTP_PASS,
     },
   });
 };
@@ -31,8 +35,10 @@ const getEmailTransporter = () => {
 // ============================================
 // 1. CREATE CHECKOUT SESSION
 // ============================================
-export const createCheckoutSession = functions.https.onCall(async (data, context) => {
-  const { items, couponCode, customerEmail } = data;
+export const createCheckoutSession = functions.https.onCall(async (data: any, context: any) => {
+  const items: any[] = data.items;
+  const couponCode: string | undefined = data.couponCode;
+  const customerEmail: string = data.customerEmail;
 
   try {
     // Convert cart items to Stripe line items
@@ -63,8 +69,8 @@ export const createCheckoutSession = functions.https.onCall(async (data, context
       payment_method_types: ['card'],
       line_items: lineItems,
       mode: 'payment',
-      success_url: `${functions.config().website.url}/success?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${functions.config().website.url}/checkout`,
+      success_url: `${process.env.WEBSITE_URL}/success?session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: `${process.env.WEBSITE_URL}/checkout`,
       customer_email: customerEmail,
       shipping_address_collection: {
         allowed_countries: ['US', 'CA'],
@@ -120,8 +126,8 @@ export const createCheckoutSession = functions.https.onCall(async (data, context
 // ============================================
 // 2. VALIDATE COUPON
 // ============================================
-export const validateCoupon = functions.https.onCall(async (data, context) => {
-  const { code } = data;
+export const validateCoupon = functions.https.onCall(async (data: any, context: any) => {
+  const code: string = data.code;
 
   if (!code) {
     throw new functions.https.HttpsError('invalid-argument', 'Coupon code is required');
@@ -149,7 +155,7 @@ export const validateCoupon = functions.https.onCall(async (data, context) => {
 // ============================================
 export const stripeWebhook = functions.https.onRequest(async (req, res) => {
   const sig = req.headers['stripe-signature'] as string;
-  const endpointSecret = functions.config().stripe.webhook_secret;
+  const endpointSecret = process.env.STRIPE_WEBHOOK_SECRET || '';
 
   let event: Stripe.Event;
 
@@ -342,35 +348,39 @@ async function sendOrderConfirmationEmail(orderId: string, session: Stripe.Check
     </html>
   `;
 
-  await transporter.sendMail({
-    from: `"NoMatch" <${functions.config().smtp.user}>`,
-    to: session.customer_details?.email,
-    subject: `Order Confirmation - ${orderId}`,
-    html: emailHtml,
-  });
+  if (session.customer_details?.email) {
+    await transporter.sendMail({
+      from: `"NoMatch" <${process.env.SMTP_USER}>`,
+      to: session.customer_details.email,
+      subject: `Order Confirmation - ${orderId}`,
+      html: emailHtml,
+    });
+  }
 }
 
 async function sendPaymentFailedNotification(session: Stripe.Checkout.Session, paymentIntent: Stripe.PaymentIntent, items: any[]) {
   const transporter = getEmailTransporter();
   
   // Email to customer
-  await transporter.sendMail({
-    from: `"NoMatch" <${functions.config().smtp.user}>`,
-    to: session.customer_details?.email,
-    subject: 'Payment Failed - Please Try Again',
-    html: `
-      <h2>⚠️ Payment Failed</h2>
-      <p>We were unable to process your payment.</p>
-      <p><strong>Reason:</strong> ${paymentIntent.last_payment_error?.message || 'Unknown error'}</p>
-      <p>Your items are still available. <a href="${functions.config().website.url}/checkout">Try again</a></p>
-    `,
-  });
+  if (session.customer_details?.email) {
+    await transporter.sendMail({
+      from: `"NoMatch" <${process.env.SMTP_USER}>`,
+      to: session.customer_details.email,
+      subject: 'Payment Failed - Please Try Again',
+      html: `
+        <h2>⚠️ Payment Failed</h2>
+        <p>We were unable to process your payment.</p>
+        <p><strong>Reason:</strong> ${paymentIntent.last_payment_error?.message || 'Unknown error'}</p>
+        <p>Your items are still available. <a href="${process.env.WEBSITE_URL}/checkout">Try again</a></p>
+      `,
+    });
+  }
   
   // Alert admin if high value (over $100)
   if (paymentIntent.amount >= 10000) {
     await transporter.sendMail({
       from: `"NoMatch System" <${functions.config().smtp.user}>`,
-      to: functions.config().admin.email,
+      to: process.env.ADMIN_EMAIL,
       subject: `🚨 High-Value Payment Failed: $${(paymentIntent.amount / 100).toFixed(2)}`,
       html: `
         <h2>Failed Payment Alert</h2>

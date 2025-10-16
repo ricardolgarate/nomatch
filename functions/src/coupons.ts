@@ -1,30 +1,32 @@
 import * as functions from 'firebase-functions';
 import Stripe from 'stripe';
+import * as dotenv from 'dotenv';
 
-const stripe = new Stripe(functions.config().stripe.secret_key, {
-  apiVersion: '2025-09-30.clover',
+// Load environment variables
+dotenv.config();
+
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || '', {
+  apiVersion: '2025-02-24.acacia',
 });
 
 // Create a new coupon
-export const createCoupon = functions.https.onCall(async (data, context) => {
+export const createCoupon = functions.https.onCall(async (data: any, context: any) => {
   // Check if user is authenticated (admin)
   if (!context.auth) {
     throw new functions.https.HttpsError('unauthenticated', 'Must be logged in');
   }
 
-  const { 
-    code, 
-    type, // 'percent' or 'amount'
-    value, // percentage (10 for 10%) or amount in dollars (20 for $20)
-    duration, // 'once', 'repeating', or 'forever'
-    maxRedemptions,
-    expiresAt // optional: timestamp
-  } = data;
+  const code: string = data.code;
+  const type: string = data.type;
+  const value: number = data.value;
+  const duration: string = data.duration;
+  const maxRedemptions: number | undefined = data.maxRedemptions;
+  const expiresAt: number | undefined = data.expiresAt;
 
   try {
     const couponParams: Stripe.CouponCreateParams = {
       id: code.toUpperCase(),
-      duration: duration || 'once',
+      duration: (duration || 'once') as Stripe.CouponCreateParams.Duration,
     };
 
     if (type === 'percent') {
@@ -64,7 +66,7 @@ export const createCoupon = functions.https.onCall(async (data, context) => {
 });
 
 // List all coupons
-export const listCoupons = functions.https.onCall(async (data, context) => {
+export const listCoupons = functions.https.onCall(async (data: any, context: any) => {
   if (!context.auth) {
     throw new functions.https.HttpsError('unauthenticated', 'Must be logged in');
   }
@@ -92,12 +94,12 @@ export const listCoupons = functions.https.onCall(async (data, context) => {
 });
 
 // Delete a coupon
-export const deleteCoupon = functions.https.onCall(async (data, context) => {
+export const deleteCoupon = functions.https.onCall(async (data: any, context: any) => {
   if (!context.auth) {
     throw new functions.https.HttpsError('unauthenticated', 'Must be logged in');
   }
 
-  const { couponId } = data;
+  const couponId: string = data.couponId;
 
   try {
     await stripe.coupons.del(couponId);
