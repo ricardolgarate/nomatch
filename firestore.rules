@@ -1,22 +1,35 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
+    // Helper function to check if user is admin
+    function isAdmin() {
+      return request.auth != null && 
+             request.auth.token.email in ['admin@nomatch.com', 'ricardolgarate@gmail.com'];
+    }
+    
     // Products - public read, admin write
     match /products/{productId} {
       allow read: if true;
       allow write: if request.auth != null;
+      allow create: if request.auth != null;
+      allow update: if request.auth != null;
+      allow delete: if request.auth != null;
     }
     
-    // Orders - admin only
+    // Orders - read/write for authenticated users (more permissive for now)
     match /orders/{orderId} {
       allow read: if request.auth != null;
       allow write: if request.auth != null;
+      allow create: if true; // Allow Cloud Functions to create orders
+      allow update: if true; // Allow Cloud Functions to update orders
     }
     
-    // Analytics - admin only
+    // Analytics - allow tracking
     match /analytics/{sessionId} {
       allow read: if request.auth != null;
       allow write: if true; // Allow tracking from client
+      allow create: if true;
+      allow update: if true;
     }
   }
 }
