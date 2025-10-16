@@ -3,6 +3,9 @@ import * as admin from 'firebase-admin';
 import Stripe from 'stripe';
 import nodemailer from 'nodemailer';
 
+// Export coupon management functions
+export { createCoupon, listCoupons, deleteCoupon } from './coupons';
+
 // Initialize Firebase Admin
 admin.initializeApp();
 const db = admin.firestore();
