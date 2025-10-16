@@ -1,4 +1,5 @@
 import * as functions from 'firebase-functions';
+import {onCall} from 'firebase-functions/v2/https';
 import Stripe from 'stripe';
 import * as dotenv from 'dotenv';
 
@@ -10,7 +11,9 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || '', {
 });
 
 // Create a new coupon
-export const createCoupon = functions.https.onCall(async (data: any, context: any) => {
+export const createCoupon = onCall({cors: true}, async (request) => {
+  const data = request.data;
+  const context = request;
   // Check if user is authenticated (admin)
   if (!context.auth) {
     throw new functions.https.HttpsError('unauthenticated', 'Must be logged in');
@@ -66,7 +69,8 @@ export const createCoupon = functions.https.onCall(async (data: any, context: an
 });
 
 // List all coupons
-export const listCoupons = functions.https.onCall(async (data: any, context: any) => {
+export const listCoupons = onCall({cors: true}, async (request) => {
+  const context = request;
   if (!context.auth) {
     throw new functions.https.HttpsError('unauthenticated', 'Must be logged in');
   }
@@ -94,7 +98,9 @@ export const listCoupons = functions.https.onCall(async (data: any, context: any
 });
 
 // Delete a coupon
-export const deleteCoupon = functions.https.onCall(async (data: any, context: any) => {
+export const deleteCoupon = onCall({cors: true}, async (request) => {
+  const data = request.data;
+  const context = request;
   if (!context.auth) {
     throw new functions.https.HttpsError('unauthenticated', 'Must be logged in');
   }

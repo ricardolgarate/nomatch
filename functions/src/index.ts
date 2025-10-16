@@ -1,4 +1,5 @@
 import * as functions from 'firebase-functions';
+import {onCall, onRequest} from 'firebase-functions/v2/https';
 import * as admin from 'firebase-admin';
 import Stripe from 'stripe';
 import nodemailer from 'nodemailer';
@@ -35,7 +36,8 @@ const getEmailTransporter = () => {
 // ============================================
 // 1. CREATE CHECKOUT SESSION
 // ============================================
-export const createCheckoutSession = functions.https.onCall(async (data: any, context: any) => {
+export const createCheckoutSession = onCall({cors: true}, async (request) => {
+  const data = request.data as any;
   const items: any[] = data.items;
   const couponCode: string | undefined = data.couponCode;
   const customerEmail: string = data.customerEmail;
@@ -126,7 +128,8 @@ export const createCheckoutSession = functions.https.onCall(async (data: any, co
 // ============================================
 // 2. VALIDATE COUPON
 // ============================================
-export const validateCoupon = functions.https.onCall(async (data: any, context: any) => {
+export const validateCoupon = onCall({cors: true}, async (request) => {
+  const data = request.data as any;
   const code: string = data.code;
 
   if (!code) {
@@ -153,7 +156,7 @@ export const validateCoupon = functions.https.onCall(async (data: any, context: 
 // ============================================
 // 3. STRIPE WEBHOOK HANDLER
 // ============================================
-export const stripeWebhook = functions.https.onRequest(async (req, res) => {
+export const stripeWebhook = onRequest({cors: true}, async (req, res) => {
   const sig = req.headers['stripe-signature'] as string;
   const endpointSecret = process.env.STRIPE_WEBHOOK_SECRET || '';
 
