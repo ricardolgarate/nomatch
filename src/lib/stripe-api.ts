@@ -1,8 +1,8 @@
 import { CartItem, CheckoutSessionData, CouponData } from './stripe';
-import { getFunctions, httpsCallable } from 'firebase/functions';
+import { getFunctions, httpsCallable, connectFunctionsEmulator } from 'firebase/functions';
 import app from '../firebase/config';
 
-const functions = getFunctions(app);
+const functions = getFunctions(app, 'us-central1');
 
 // Convert price string to cents (e.g., "$170" -> 17000)
 export function priceTocents(priceString: string): number {

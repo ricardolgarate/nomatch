@@ -13,7 +13,7 @@ import { LogOut, Save, Package, TrendingUp, ShoppingCart, Eye, Users, CreditCard
 import { getFunctions, httpsCallable } from 'firebase/functions';
 import app from '../firebase/config';
 
-const functions = getFunctions(app);
+const functions = getFunctions(app, 'us-central1');
 
 // Hardcoded products from the website
 const WEBSITE_PRODUCTS = [
