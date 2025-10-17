@@ -79,6 +79,8 @@ export default function Checkout() {
       const subtotal = parseFloat(getCartTotal().replace('$', ''));
       const subtotalCents = Math.round(subtotal * 100);
 
+      console.log('Validating coupon:', couponCode, 'Subtotal:', subtotalCents);
+
       const response = await fetch('/api/validate-coupon', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -88,7 +90,19 @@ export default function Checkout() {
         }),
       });
 
+      console.log('Validation response status:', response.status);
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        console.error('Validation error:', errorData);
+        setCouponError(errorData.message || 'Invalid coupon code');
+        setAppliedCoupon(null);
+        setValidatingCoupon(false);
+        return;
+      }
+
       const result = await response.json();
+      console.log('Validation result:', result);
 
       if (result.valid) {
         setAppliedCoupon({
@@ -97,11 +111,13 @@ export default function Checkout() {
           message: result.message,
         });
         setCouponError('');
+        setShowCoupons(false); // Close the coupon input
       } else {
         setCouponError(result.message || 'Invalid coupon code');
         setAppliedCoupon(null);
       }
     } catch (error: any) {
+      console.error('Coupon validation error:', error);
       setCouponError('Error validating coupon. Please try again.');
       setAppliedCoupon(null);
     } finally {

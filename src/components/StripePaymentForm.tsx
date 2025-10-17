@@ -265,7 +265,11 @@ export default function StripePaymentForm(props: PaymentFormProps) {
   };
 
   return (
-    <Elements stripe={stripePromise} options={options}>
+    <Elements 
+      stripe={stripePromise} 
+      options={options}
+      key={clientSecret} // Force remount when clientSecret changes
+    >
       <CheckoutForm {...props} />
     </Elements>
   );
