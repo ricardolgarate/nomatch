@@ -7,25 +7,40 @@ if (!getApps().length) {
   try {
     const projectId = process.env.VITE_FIREBASE_PROJECT_ID || process.env.FIREBASE_PROJECT_ID;
     const clientEmail = process.env.FIREBASE_CLIENT_EMAIL;
-    const privateKey = process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, '\n');
+    let privateKey = process.env.FIREBASE_PRIVATE_KEY;
+
+    // Handle different private key formats
+    if (privateKey) {
+      // Remove quotes if present
+      privateKey = privateKey.replace(/^["']|["']$/g, '');
+      // Replace literal \n with actual newlines
+      privateKey = privateKey.replace(/\\n/g, '\n');
+    }
 
     if (!projectId || !clientEmail || !privateKey) {
       console.error('Missing Firebase Admin credentials:', {
         hasProjectId: !!projectId,
         hasClientEmail: !!clientEmail,
         hasPrivateKey: !!privateKey,
+        privateKeyLength: privateKey?.length,
       });
+      throw new Error('Missing Firebase Admin credentials');
     }
+
+    console.log('Initializing Firebase Admin with project:', projectId);
 
     initializeApp({
       credential: cert({
-        projectId: projectId!,
-        clientEmail: clientEmail!,
-        privateKey: privateKey!,
+        projectId: projectId,
+        clientEmail: clientEmail,
+        privateKey: privateKey,
       }),
     });
+    
+    console.log('Firebase Admin initialized successfully');
   } catch (error) {
     console.error('Error initializing Firebase Admin:', error);
+    throw error;
   }
 }
 
