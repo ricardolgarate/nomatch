@@ -35,41 +35,39 @@ function computeSubtotal(items: CartItem[]): number {
   return items.reduce((sum, item) => sum + (item.unitAmount * item.quantity), 0);
 }
 
-// Calculate discount based on promo code
-async function getDiscountCents(promoCode: string | undefined, subtotal: number): Promise<number> {
-  if (!promoCode) return 0;
+// Validate coupon using our custom system (not Stripe)
+async function validateCustomCoupon(code: string, subtotal: number): Promise<{
+  valid: boolean;
+  discount: number;
+  couponId?: string;
+}> {
+  if (!code) {
+    return { valid: false, discount: 0 };
+  }
 
   try {
-    // Option A: Validate against your own promo table in Firestore
-    // (recommended for full control)
-    
-    // Option B: Validate with Stripe promotion codes
-    const promos = await stripe.promotionCodes.list({
-      code: promoCode,
-      active: true,
-      limit: 1,
+    // Call our validation endpoint
+    const response = await fetch(`${process.env.APP_URL || 'https://nomatch.vercel.app'}/api/validate-coupon`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ code, subtotal }),
     });
 
-    if (!promos.data.length) {
-      console.log('Promo code not found:', promoCode);
-      return 0;
+    const result = await response.json();
+    
+    if (!result.valid) {
+      console.log('Invalid coupon:', result.message);
+      return { valid: false, discount: 0 };
     }
 
-    const promo = promos.data[0];
-    const coupon = promo.coupon;
-
-    // Calculate discount
-    if (coupon.percent_off) {
-      return Math.floor(subtotal * (coupon.percent_off / 100));
-    }
-    if (coupon.amount_off) {
-      return coupon.amount_off; // already in cents
-    }
-
-    return 0;
+    return {
+      valid: true,
+      discount: result.discount,
+      couponId: result.couponId,
+    };
   } catch (error) {
-    console.error('Error validating promo code:', error);
-    return 0;
+    console.error('Error validating coupon:', error);
+    return { valid: false, discount: 0 };
   }
 }
 
@@ -96,7 +94,8 @@ export default async function handler(
 
     // Calculate amounts
     const subtotal = computeSubtotal(items);
-    const discount = await getDiscountCents(promoCode, subtotal);
+    const couponResult = await validateCustomCoupon(promoCode || '', subtotal);
+    const discount = couponResult.discount;
     const shipping = 0;  // Free shipping or calculate based on your logic
     const tax = 0;       // Calculate if needed
     const total = Math.max(subtotal - discount + shipping + tax, 0);
@@ -111,6 +110,9 @@ export default async function handler(
       metadata: {
         orderNumber,
         promoCode: promoCode || '',
+        couponId: couponResult.couponId || '',
+        discount: discount.toString(),
+        subtotal: subtotal.toString(),
         cartItems: JSON.stringify(items.map(item => ({
           id: item.id,
           name: item.name,

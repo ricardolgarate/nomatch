@@ -49,6 +49,28 @@ async function saveOrder(orderData: any) {
   }
 }
 
+// Increment coupon usage count
+async function incrementCouponUsage(couponId: string) {
+  if (!couponId) return;
+  
+  try {
+    const couponRef = db.collection('coupons').doc(couponId);
+    const couponDoc = await couponRef.get();
+    
+    if (couponDoc.exists) {
+      const currentCount = couponDoc.data()?.usageCount || 0;
+      await couponRef.update({
+        usageCount: currentCount + 1,
+        updatedAt: new Date(),
+      });
+      console.log('✅ Coupon usage incremented:', couponId);
+    }
+  } catch (error) {
+    console.error('❌ Error incrementing coupon usage:', error);
+    // Don't throw - coupon increment shouldn't block order
+  }
+}
+
 // Update inventory after purchase
 async function updateInventory(items: any[]) {
   try {
@@ -195,6 +217,11 @@ export default async function handler(
           // Update inventory
           await updateInventory(cartItems);
           
+          // Increment coupon usage if a coupon was used
+          if (session.metadata?.couponId) {
+            await incrementCouponUsage(session.metadata.couponId);
+          }
+          
           // Send confirmation email
           await sendSuccessEmail(email, orderNumber, cartItems, session.amount_total || 0);
           
@@ -240,6 +267,11 @@ export default async function handler(
           
           // Update inventory
           await updateInventory(cartItems);
+          
+          // Increment coupon usage if a coupon was used
+          if (paymentIntent.metadata?.couponId) {
+            await incrementCouponUsage(paymentIntent.metadata.couponId);
+          }
           
           // Send confirmation email
           await sendSuccessEmail(customerInfo.email || '', orderNumber, cartItems, paymentIntent.amount);

@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { ChevronLeft, ChevronDown, ChevronUp, ShoppingBag } from 'lucide-react';
+import { ChevronDown, ChevronUp, ShoppingBag } from 'lucide-react';
 import { useCart } from '../context/CartContext';
 import { trackEvent } from '../firebase/analytics';
 import StripePaymentForm from '../components/StripePaymentForm';
@@ -20,7 +20,6 @@ export default function Checkout() {
   const [showCoupons, setShowCoupons] = useState(false);
   const [sameAsBilling, setSameAsBilling] = useState(true);
   const [showOrderNote, setShowOrderNote] = useState(false);
-  const [showPayment, setShowPayment] = useState(false);
   const [orderNumber] = useState(generateOrderNumber());
 
   const [formData, setFormData] = useState({
@@ -58,23 +57,6 @@ export default function Checkout() {
     });
   };
 
-  const handleContinueToPayment = (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    // Validate required fields
-    if (!formData.email || !formData.firstName || !formData.lastName || !formData.address || !formData.city || !formData.zipCode || !formData.phone) {
-      alert('Please fill in all required fields');
-      return;
-    }
-
-    // Show payment form
-    setShowPayment(true);
-    
-    // Scroll to payment section
-    setTimeout(() => {
-      document.getElementById('payment-section')?.scrollIntoView({ behavior: 'smooth' });
-    }, 100);
-  };
 
   const subtotal = parseFloat(getCartTotal().replace('$', ''));
   const shipping = 0; // Free shipping
@@ -109,7 +91,6 @@ export default function Checkout() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 max-w-7xl mx-auto">
           {/* Left Column - Forms */}
           <div className="bg-white rounded-2xl shadow-lg p-8">
-            <form onSubmit={handleContinueToPayment}>
               {/* Contact Information */}
               <div className="mb-8">
                 <h2 className="text-2xl font-serif font-medium text-gray-900 mb-2">
@@ -277,18 +258,6 @@ export default function Checkout() {
                 </p>
               </div>
 
-              {/* Payment Info Message */}
-              <div className="mb-8">
-                <div className="bg-purple-50 border-2 border-purple-200 rounded-lg p-4">
-                  <p className="text-sm text-purple-900 font-medium">
-                    💳 Payment will be processed securely on the next step
-                  </p>
-                  <p className="text-xs text-purple-700 mt-1">
-                    We accept all major credit cards, Apple Pay, Google Pay, and more.
-                  </p>
-                </div>
-              </div>
-
               {/* Order Note */}
               <div className="mb-8">
                 <label className="flex items-center gap-2 cursor-pointer">
@@ -312,44 +281,37 @@ export default function Checkout() {
                 )}
               </div>
 
+              {/* Payment Section */}
+              <div className="border-t border-gray-200 pt-8">
+                <StripePaymentForm
+                  items={cart}
+                  customerInfo={{
+                    email: formData.email,
+                    firstName: formData.firstName,
+                    lastName: formData.lastName,
+                    address: formData.address,
+                    apartment: formData.apartment,
+                    city: formData.city,
+                    state: formData.state,
+                    zipCode: formData.zipCode,
+                    phone: formData.phone,
+                    country: formData.country,
+                  }}
+                  orderNumber={orderNumber}
+                />
+              </div>
+
               {/* Terms */}
-              <p className="text-sm text-gray-600 mb-6">
+              <p className="text-xs text-gray-600 mt-6 text-center">
                 By proceeding with your purchase you agree to our{' '}
                 <Link to="/terms" className="text-purple-600 hover:underline">
                   Terms and Conditions
-                </Link>{' '}
-                and{' '}
+                </Link>
+                {' '}and{' '}
                 <Link to="/privacy" className="text-purple-600 hover:underline">
                   Privacy Policy
                 </Link>
               </p>
-
-              {/* Buttons */}
-              <div className="flex flex-col sm:flex-row gap-4">
-                <Link
-                  to="/"
-                  className="flex items-center justify-center gap-2 px-6 py-3 border-2 border-gray-300 text-gray-700 font-semibold rounded-lg hover:bg-gray-50 transition-colors"
-                >
-                  <ChevronLeft className="w-5 h-5" />
-                  Return to Cart
-                </Link>
-                <button
-                  type="submit"
-                  disabled={showPayment}
-                  className={`flex-1 px-8 py-4 font-semibold rounded-lg transition-colors shadow-lg ${
-                    showPayment
-                      ? 'bg-green-500 cursor-default'
-                      : 'bg-pink-500 hover:bg-pink-600 hover:shadow-xl'
-                  } text-white flex items-center justify-center gap-2`}
-                >
-                  {showPayment ? (
-                    '✓ Continue to Payment Below'
-                  ) : (
-                    'Continue to Payment'
-                  )}
-                </button>
-              </div>
-            </form>
           </div>
 
           {/* Right Column - Order Summary */}
@@ -435,36 +397,6 @@ export default function Checkout() {
           </div>
         </div>
 
-        {/* Payment Section - Shows after form is validated */}
-        {showPayment && (
-          <div id="payment-section" className="mt-8 max-w-2xl mx-auto">
-            <div className="bg-white rounded-2xl shadow-xl p-8">
-              <h2 className="text-2xl font-serif font-medium text-gray-900 mb-2">
-                Payment Information
-              </h2>
-              <p className="text-sm text-gray-600 mb-6">
-                Complete your purchase securely. Your payment information is encrypted and secure.
-              </p>
-
-              <StripePaymentForm
-                items={cart}
-                customerInfo={{
-                  email: formData.email,
-                  firstName: formData.firstName,
-                  lastName: formData.lastName,
-                  address: formData.address,
-                  apartment: formData.apartment,
-                  city: formData.city,
-                  state: formData.state,
-                  zipCode: formData.zipCode,
-                  phone: formData.phone,
-                  country: formData.country,
-                }}
-                orderNumber={orderNumber}
-              />
-            </div>
-          </div>
-        )}
       </div>
     </div>
   );
