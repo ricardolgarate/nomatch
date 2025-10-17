@@ -1,10 +1,9 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { ChevronLeft, ChevronDown, ChevronUp, ShoppingBag, Tag } from 'lucide-react';
+import { ChevronLeft, ChevronDown, ChevronUp, ShoppingBag } from 'lucide-react';
 import { useCart } from '../context/CartContext';
 import { trackEvent } from '../firebase/analytics';
-import { createCheckoutSession, validateCoupon, calculateCartTotals } from '../lib/stripe-api';
-import { CouponData } from '../lib/stripe';
+import { createCheckoutSession } from '../lib/stripe';
 
 export default function Checkout() {
   const { cart, getCartTotal } = useCart();
@@ -13,9 +12,6 @@ export default function Checkout() {
   const [paymentMethod, setPaymentMethod] = useState('card');
   const [showOrderNote, setShowOrderNote] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
-  const [couponCode, setCouponCode] = useState('');
-  const [appliedCoupon, setAppliedCoupon] = useState<CouponData | null>(null);
-  const [couponError, setCouponError] = useState('');
 
   const [formData, setFormData] = useState({
     email: '',
@@ -52,66 +48,62 @@ export default function Checkout() {
     });
   };
 
-  // Handle coupon application
-  const handleApplyCoupon = async () => {
-    if (!couponCode.trim()) return;
-
-    setCouponError('');
-    const coupon = await validateCoupon(couponCode);
-    
-    if (coupon && coupon.valid) {
-      setAppliedCoupon(coupon);
-      setCouponError('');
-    } else {
-      setCouponError('Invalid coupon code');
-      setAppliedCoupon(null);
-    }
-  };
-
-  // Remove applied coupon
-  const handleRemoveCoupon = () => {
-    setAppliedCoupon(null);
-    setCouponCode('');
-    setCouponError('');
-  };
-
-  // Handle Stripe checkout
-  const handleStripeCheckout = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // Validate required fields
+    if (!formData.email || !formData.firstName || !formData.lastName || !formData.address || !formData.city || !formData.zipCode || !formData.phone) {
+      alert('Please fill in all required fields');
+      return;
+    }
+
     setIsProcessing(true);
 
     try {
-      const checkoutData = {
-        items: cart,
-        couponCode: appliedCoupon?.id,
-        customerEmail: formData.email,
+      // Prepare customer information
+      const customerInfo = {
+        email: formData.email,
+        firstName: formData.firstName,
+        lastName: formData.lastName,
+        address: formData.address,
+        apartment: formData.apartment,
+        city: formData.city,
+        state: formData.state,
+        zipCode: formData.zipCode,
+        phone: formData.phone,
+        country: formData.country,
       };
 
-      const result = await createCheckoutSession(checkoutData) as { url: string; sessionId: string };
+      // Create Stripe Checkout Session and redirect to payment
+      await createCheckoutSession(cart, customerInfo);
       
-      // Track checkout attempt
-      trackEvent('checkout_attempted', {
-        cartTotal: totals.total,
-        itemCount: cart.length,
-        couponUsed: !!appliedCoupon,
-      });
-
-      // Redirect to Stripe checkout
-      if (result.url) {
-        window.location.href = result.url;
-      } else {
-        throw new Error('No checkout URL returned');
-      }
-    } catch (error) {
+      // Note: Stock will be updated in the webhook after successful payment
+      // The user will be redirected to Stripe, so no code after this will run
+    } catch (error: any) {
       console.error('Checkout error:', error);
-      alert('Something went wrong. Please try again.');
+      alert(error.message || 'Failed to process checkout. Please try again.');
+      
+      // Track failed checkout
+      trackEvent('payment_failed', {
+        cartTotal: getCartTotal(),
+        itemCount: cart.length,
+        email: formData.email,
+        error: error.message,
+        items: cart.map(item => ({
+          id: item.id,
+          name: item.name,
+          quantity: item.quantity,
+          price: item.price
+        }))
+      });
+      
       setIsProcessing(false);
     }
   };
 
-
-  // Calculate totals with coupon
-  const totals = calculateCartTotals(cart, appliedCoupon);
+  const subtotal = parseFloat(getCartTotal().replace('$', ''));
+  const shipping = 0; // Free shipping
+  const total = subtotal + shipping;
 
   // Empty cart state
   if (cart.length === 0) {
@@ -142,7 +134,7 @@ export default function Checkout() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 max-w-7xl mx-auto">
           {/* Left Column - Forms */}
           <div className="bg-white rounded-2xl shadow-lg p-8">
-            <form onSubmit={handleStripeCheckout}>
+            <form onSubmit={handleSubmit}>
               {/* Contact Information */}
               <div className="mb-8">
                 <h2 className="text-2xl font-serif font-medium text-gray-900 mb-2">
@@ -524,45 +516,15 @@ export default function Checkout() {
                   )}
                 </button>
                 {showCoupons && (
-                  <div className="mt-3">
-                    <div className="flex gap-2">
-                      <input
-                        type="text"
-                        placeholder="Coupon code"
-                        value={couponCode}
-                        onChange={(e) => setCouponCode(e.target.value)}
-                        className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                      />
-                      <button 
-                        type="button"
-                        onClick={handleApplyCoupon}
-                        className="px-6 py-2 bg-purple-600 text-white font-semibold rounded-lg hover:bg-purple-700 transition-colors"
-                      >
-                        Apply
-                      </button>
-                    </div>
-                    {couponError && (
-                      <p className="mt-2 text-sm text-red-600">{couponError}</p>
-                    )}
-                    {appliedCoupon && (
-                      <div className="mt-2 flex items-center justify-between bg-green-50 border border-green-200 rounded-lg p-3">
-                        <div className="flex items-center gap-2">
-                          <Tag className="w-4 h-4 text-green-600" />
-                          <span className="text-sm font-medium text-green-800">
-                            {appliedCoupon.id} applied
-                            {appliedCoupon.percent_off && ` (${appliedCoupon.percent_off}% off)`}
-                            {appliedCoupon.amount_off && ` ($${(appliedCoupon.amount_off / 100).toFixed(2)} off)`}
-                          </span>
-                        </div>
-                        <button
-                          type="button"
-                          onClick={handleRemoveCoupon}
-                          className="text-green-600 hover:text-green-800 text-sm font-medium"
-                        >
-                          Remove
-                        </button>
-                      </div>
-                    )}
+                  <div className="mt-3 flex gap-2">
+                    <input
+                      type="text"
+                      placeholder="Coupon code"
+                      className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                    />
+                    <button className="px-6 py-2 bg-purple-600 text-white font-semibold rounded-lg hover:bg-purple-700 transition-colors">
+                      Apply
+                    </button>
                   </div>
                 )}
               </div>
@@ -571,21 +533,15 @@ export default function Checkout() {
               <div className="space-y-3 border-t border-gray-200 pt-4">
                 <div className="flex justify-between text-gray-700">
                   <span>Subtotal</span>
-                  <span className="font-semibold">${totals.subtotal.toFixed(2)}</span>
+                  <span className="font-semibold">${subtotal.toFixed(2)}</span>
                 </div>
-                {appliedCoupon && totals.discount > 0 && (
-                  <div className="flex justify-between text-green-600">
-                    <span>Discount ({appliedCoupon.id})</span>
-                    <span className="font-semibold">-${totals.discount.toFixed(2)}</span>
-                  </div>
-                )}
                 <div className="flex justify-between text-gray-700">
                   <span>Free shipping</span>
                   <span className="font-semibold text-green-600">FREE</span>
                 </div>
                 <div className="flex justify-between text-xl font-bold text-gray-900 pt-3 border-t border-gray-200">
                   <span>Total</span>
-                  <span className="text-purple-600">${totals.total.toFixed(2)}</span>
+                  <span className="text-purple-600">${total.toFixed(2)}</span>
                 </div>
               </div>
             </div>

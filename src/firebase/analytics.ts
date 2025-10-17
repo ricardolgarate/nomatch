@@ -22,7 +22,7 @@ export interface UserSession {
 }
 
 export interface UserEvent {
-  type: 'page_visit' | 'shop_visit' | 'product_view' | 'add_to_cart' | 'checkout_initiated' | 'checkout_attempted' | 'payment_failed' | 'purchase_completed';
+  type: 'page_visit' | 'shop_visit' | 'product_view' | 'add_to_cart' | 'checkout_initiated' | 'payment_failed' | 'purchase_completed';
   timestamp: Date;
   metadata?: any;
 }

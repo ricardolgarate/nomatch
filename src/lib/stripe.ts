@@ -1,33 +1,83 @@
-import { loadStripe } from '@stripe/stripe-js';
+import { toStripeCartItem, type StripeCartItem } from './types';
 
-// Initialize Stripe with your publishable key
-const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY);
+export type CustomerInfo = {
+  email: string;
+  firstName: string;
+  lastName: string;
+  address: string;
+  apartment?: string;
+  city: string;
+  state: string;
+  zipCode: string;
+  phone: string;
+  country: string;
+};
 
-export { stripePromise };
+/**
+ * Create a Stripe Checkout Session and redirect to payment
+ */
+export async function createCheckoutSession(
+  cartItems: Array<{
+    id: string;
+    name: string;
+    price: string;
+    image: string;
+    quantity: number;
+    size?: string;
+    category: string;
+    sku?: string;
+  }>,
+  customerInfo?: CustomerInfo
+): Promise<{ orderNumber: string; url: string }> {
+  try {
+    // Convert cart items to Stripe format
+    const stripeItems: StripeCartItem[] = cartItems.map(item => toStripeCartItem(item));
 
-// Types for our Stripe integration
-export interface CartItem {
-  id: string;
-  name: string;
-  price: string; // e.g., "$170"
-  image: string;
-  size?: string;
-  category: string;
-  quantity: number;
+    // Create checkout session
+    const response = await fetch('/api/create-checkout-session', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        items: stripeItems,
+        customerInfo,
+      }),
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.message || 'Failed to create checkout session');
+    }
+
+    const { url, orderNumber } = await response.json();
+
+    // Redirect to Stripe Checkout
+    if (url) {
+      window.location.href = url;
+      return { orderNumber, url };
+    } else {
+      throw new Error('No checkout URL returned');
+    }
+  } catch (error) {
+    console.error('Error creating checkout session:', error);
+    throw error;
+  }
 }
 
-export interface CheckoutSessionData {
-  items: CartItem[];
-  couponCode?: string;
-  customerEmail?: string;
+/**
+ * Calculate total amount in cents
+ */
+export function calculateTotal(items: StripeCartItem[]): number {
+  return items.reduce((total, item) => total + (item.unitAmount * item.quantity), 0);
 }
 
-export interface CouponData {
-  id: string;
-  percent_off?: number; // 10 for 10%
-  amount_off?: number; // 1000 for $10.00 (in cents)
-  currency?: string;
-  valid: boolean;
-  max_redemptions?: number;
-  times_redeemed?: number;
+/**
+ * Format cents to currency string
+ */
+export function formatAmount(cents: number, currency: 'usd' | 'mxn' = 'usd'): string {
+  const dollars = cents / 100;
+  const symbol = currency === 'usd' ? '$' : 'MX$';
+  return `${symbol}${dollars.toFixed(2)}`;
 }
+

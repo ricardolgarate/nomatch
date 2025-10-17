@@ -110,12 +110,12 @@ export async function deleteProduct(productId: string): Promise<void> {
   }
 }
 
-// Update stock for a specific size and return new stock level
+// Update stock for a specific size
 export async function updateStock(
   productId: string, 
   size: string | undefined, 
   quantity: number
-): Promise<number> {
+): Promise<void> {
   try {
     const productRef = doc(db, PRODUCTS_COLLECTION, productId);
     
@@ -132,18 +132,6 @@ export async function updateStock(
         updatedAt: new Date(),
       });
     }
-
-    // Get and return the new stock level
-    const updatedProduct = await getProduct(productId);
-    if (updatedProduct) {
-      if (size && updatedProduct.sizes) {
-        return updatedProduct.sizes[size] || 0;
-      } else {
-        return updatedProduct.stock || 0;
-      }
-    }
-    
-    return 0;
   } catch (error) {
     console.error('Error updating stock:', error);
     throw error;

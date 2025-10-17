@@ -10,7 +10,7 @@ import AboutUs from './pages/AboutUs';
 import Contact from './pages/Contact';
 import ProductDetail from './pages/ProductDetail';
 import Checkout from './pages/Checkout';
-import Success from './pages/Success';
+import CheckoutSuccess from './pages/CheckoutSuccess';
 import AdminLogin from './pages/AdminLogin';
 import AdminDashboard from './pages/AdminDashboard';
 import { CartProvider } from './context/CartContext';
@@ -61,12 +61,9 @@ function App() {
                 <CartSidebar />
               </div>
             } />
-            <Route path="/success" element={
+            <Route path="/checkout/success" element={
               <div className="min-h-screen bg-white">
-                <Header />
-                <Success />
-                <Footer />
-                <CartSidebar />
+                <CheckoutSuccess />
               </div>
             } />
             <Route path="/about" element={
