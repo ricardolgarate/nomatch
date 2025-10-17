@@ -4,13 +4,29 @@ import { getFirestore } from 'firebase-admin/firestore';
 
 // Initialize Firebase Admin (only once)
 if (!getApps().length) {
-  initializeApp({
-    credential: cert({
-      projectId: process.env.VITE_FIREBASE_PROJECT_ID,
-      clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
-      privateKey: process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, '\n'),
-    }),
-  });
+  try {
+    const projectId = process.env.VITE_FIREBASE_PROJECT_ID || process.env.FIREBASE_PROJECT_ID;
+    const clientEmail = process.env.FIREBASE_CLIENT_EMAIL;
+    const privateKey = process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, '\n');
+
+    if (!projectId || !clientEmail || !privateKey) {
+      console.error('Missing Firebase Admin credentials:', {
+        hasProjectId: !!projectId,
+        hasClientEmail: !!clientEmail,
+        hasPrivateKey: !!privateKey,
+      });
+    }
+
+    initializeApp({
+      credential: cert({
+        projectId: projectId!,
+        clientEmail: clientEmail!,
+        privateKey: privateKey!,
+      }),
+    });
+  } catch (error) {
+    console.error('Error initializing Firebase Admin:', error);
+  }
 }
 
 const db = getFirestore();
@@ -31,9 +47,23 @@ export default async function handler(
       return res.status(400).json({ error: 'Coupon code required' });
     }
 
+    console.log('Validating coupon:', code, 'for subtotal:', subtotal);
+
+    // Check if Firestore is initialized
+    if (!db) {
+      console.error('Firestore not initialized');
+      return res.status(500).json({ 
+        valid: false, 
+        discount: 0, 
+        message: 'Database connection error' 
+      });
+    }
+
     // Get coupon from Firestore
     const couponsRef = db.collection('coupons');
     const snapshot = await couponsRef.where('code', '==', code.toUpperCase()).limit(1).get();
+
+    console.log('Coupon query result:', snapshot.empty ? 'not found' : 'found');
 
     if (snapshot.empty) {
       return res.status(404).json({ 
@@ -112,10 +142,12 @@ export default async function handler(
     });
   } catch (err: any) {
     console.error('Error validating coupon:', err);
+    console.error('Error details:', err.message, err.stack);
     res.status(500).json({ 
       valid: false,
       discount: 0,
-      message: 'Error validating coupon' 
+      message: 'Error validating coupon',
+      error: err.message 
     });
   }
 }
