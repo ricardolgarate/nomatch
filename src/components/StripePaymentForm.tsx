@@ -52,7 +52,16 @@ function CheckoutForm({ items, customerInfo, orderNumber, appliedCouponCode, onS
     setMessage(null);
 
     try {
-      // Create/update payment intent with promo code from sidebar
+      // Step 1: Submit the form elements first (required by Stripe)
+      const { error: submitError } = await elements.submit();
+      
+      if (submitError) {
+        setMessage(submitError.message || 'Please check your payment details.');
+        setLoading(false);
+        return;
+      }
+
+      // Step 2: Create/update payment intent with promo code from sidebar
       const response = await fetch('/api/create-payment-intent', {
         method: 'POST',
         headers: {
@@ -85,7 +94,7 @@ function CheckoutForm({ items, customerInfo, orderNumber, appliedCouponCode, onS
         return;
       }
 
-      // Confirm the payment
+      // Step 3: Confirm the payment
       const { error: confirmError } = await stripe.confirmPayment({
         elements,
         clientSecret,
