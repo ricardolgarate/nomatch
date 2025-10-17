@@ -30,16 +30,16 @@ interface PaymentFormProps {
     country: string;
   };
   orderNumber: string;
+  appliedCouponCode?: string;
   onSuccess?: () => void;
 }
 
 // Inner form component that uses Stripe hooks
-function CheckoutForm({ items, customerInfo, orderNumber, onSuccess }: PaymentFormProps) {
+function CheckoutForm({ items, customerInfo, orderNumber, appliedCouponCode, onSuccess }: PaymentFormProps) {
   const stripe = useStripe();
   const elements = useElements();
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
-  const [promoCode, setPromoCode] = useState('');
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -52,7 +52,7 @@ function CheckoutForm({ items, customerInfo, orderNumber, onSuccess }: PaymentFo
     setMessage(null);
 
     try {
-      // Create/update payment intent with promo code
+      // Create/update payment intent with promo code from sidebar
       const response = await fetch('/api/create-payment-intent', {
         method: 'POST',
         headers: {
@@ -70,7 +70,7 @@ function CheckoutForm({ items, customerInfo, orderNumber, onSuccess }: PaymentFo
             size: item.size,
             category: item.category,
           })),
-          promoCode: promoCode || undefined,
+          promoCode: appliedCouponCode || undefined,
           orderNumber,
           customerInfo,
           currency: 'usd',
@@ -125,25 +125,17 @@ function CheckoutForm({ items, customerInfo, orderNumber, onSuccess }: PaymentFo
         <p className="text-center text-sm text-gray-500 mt-3">Or continue below</p>
       </div>
 
-      {/* Promo Code Input */}
-      <div>
-        <label className="block text-sm font-semibold text-gray-900 mb-2">
-          Promo Code (Optional)
-        </label>
-        <input
-          type="text"
-          value={promoCode}
-          onChange={(e) => setPromoCode(e.target.value.toUpperCase())}
-          placeholder="Enter promo code"
-          className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all"
-          disabled={loading}
-        />
-        {promoCode && (
-          <p className="text-sm text-purple-600 mt-1">
-            💰 Promo code will be applied at checkout
+      {/* Show applied coupon info */}
+      {appliedCouponCode && (
+        <div className="bg-green-50 border-2 border-green-200 rounded-lg p-3">
+          <p className="text-sm font-semibold text-green-900">
+            🎟️ Coupon {appliedCouponCode} applied!
           </p>
-        )}
-      </div>
+          <p className="text-xs text-green-700 mt-1">
+            Discount will be reflected in the final amount
+          </p>
+        </div>
+      )}
 
       {/* Payment Element */}
       <div>
@@ -192,9 +184,10 @@ export default function StripePaymentForm(props: PaymentFormProps) {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    // Get initial client secret
+    // Get initial client secret (re-initialize when coupon changes)
     const initializePayment = async () => {
       try {
+        setLoadingSecret(true);
         const response = await fetch('/api/create-payment-intent', {
           method: 'POST',
           headers: {
@@ -212,6 +205,7 @@ export default function StripePaymentForm(props: PaymentFormProps) {
               size: item.size,
               category: item.category,
             })),
+            promoCode: props.appliedCouponCode || undefined,
             orderNumber: props.orderNumber,
             customerInfo: props.customerInfo,
             currency: 'usd',
@@ -235,7 +229,7 @@ export default function StripePaymentForm(props: PaymentFormProps) {
     };
 
     initializePayment();
-  }, [props.items, props.orderNumber, props.customerInfo]);
+  }, [props.items, props.orderNumber, props.customerInfo, props.appliedCouponCode]);
 
   if (loadingSecret) {
     return (

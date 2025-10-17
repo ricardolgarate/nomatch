@@ -21,6 +21,14 @@ export default function Checkout() {
   const [sameAsBilling, setSameAsBilling] = useState(true);
   const [showOrderNote, setShowOrderNote] = useState(false);
   const [orderNumber] = useState(generateOrderNumber());
+  const [couponCode, setCouponCode] = useState('');
+  const [appliedCoupon, setAppliedCoupon] = useState<{
+    code: string;
+    discount: number;
+    message: string;
+  } | null>(null);
+  const [couponError, setCouponError] = useState('');
+  const [validatingCoupon, setValidatingCoupon] = useState(false);
 
   const [formData, setFormData] = useState({
     email: '',
@@ -57,10 +65,61 @@ export default function Checkout() {
     });
   };
 
+  // Apply coupon
+  const handleApplyCoupon = async () => {
+    if (!couponCode.trim()) {
+      setCouponError('Please enter a coupon code');
+      return;
+    }
+
+    setValidatingCoupon(true);
+    setCouponError('');
+
+    try {
+      const subtotal = parseFloat(getCartTotal().replace('$', ''));
+      const subtotalCents = Math.round(subtotal * 100);
+
+      const response = await fetch('/api/validate-coupon', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          code: couponCode,
+          subtotal: subtotalCents,
+        }),
+      });
+
+      const result = await response.json();
+
+      if (result.valid) {
+        setAppliedCoupon({
+          code: couponCode.toUpperCase(),
+          discount: result.discount,
+          message: result.message,
+        });
+        setCouponError('');
+      } else {
+        setCouponError(result.message || 'Invalid coupon code');
+        setAppliedCoupon(null);
+      }
+    } catch (error: any) {
+      setCouponError('Error validating coupon. Please try again.');
+      setAppliedCoupon(null);
+    } finally {
+      setValidatingCoupon(false);
+    }
+  };
+
+  // Remove coupon
+  const handleRemoveCoupon = () => {
+    setAppliedCoupon(null);
+    setCouponCode('');
+    setCouponError('');
+  };
 
   const subtotal = parseFloat(getCartTotal().replace('$', ''));
+  const discount = appliedCoupon ? appliedCoupon.discount / 100 : 0;
   const shipping = 0; // Free shipping
-  const total = subtotal + shipping;
+  const total = subtotal - discount + shipping;
 
   // Empty cart state
   if (cart.length === 0) {
@@ -298,6 +357,7 @@ export default function Checkout() {
                     country: formData.country,
                   }}
                   orderNumber={orderNumber}
+                  appliedCouponCode={appliedCoupon?.code}
                 />
               </div>
 
@@ -353,28 +413,63 @@ export default function Checkout() {
 
               {/* Add Coupons */}
               <div className="border-t border-gray-200 pt-4 mb-4">
-                <button
-                  onClick={() => setShowCoupons(!showCoupons)}
-                  className="flex items-center justify-between w-full text-left text-gray-700 hover:text-purple-600 transition-colors"
-                >
-                  <span className="font-medium">Add coupons</span>
-                  {showCoupons ? (
-                    <ChevronUp className="w-5 h-5" />
-                  ) : (
-                    <ChevronDown className="w-5 h-5" />
-                  )}
-                </button>
-                {showCoupons && (
-                  <div className="mt-3 flex gap-2">
-                    <input
-                      type="text"
-                      placeholder="Coupon code"
-                      className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                    />
-                    <button className="px-6 py-2 bg-purple-600 text-white font-semibold rounded-lg hover:bg-purple-700 transition-colors">
-                      Apply
-                    </button>
+                {appliedCoupon ? (
+                  <div className="bg-green-50 border-2 border-green-200 rounded-lg p-3">
+                    <div className="flex items-center justify-between mb-1">
+                      <span className="font-semibold text-green-900">
+                        🎟️ {appliedCoupon.code}
+                      </span>
+                      <button
+                        onClick={handleRemoveCoupon}
+                        className="text-red-600 hover:text-red-700 text-sm font-medium"
+                      >
+                        Remove
+                      </button>
+                    </div>
+                    <p className="text-sm text-green-700">{appliedCoupon.message}</p>
                   </div>
+                ) : (
+                  <>
+                    <button
+                      onClick={() => setShowCoupons(!showCoupons)}
+                      className="flex items-center justify-between w-full text-left text-gray-700 hover:text-purple-600 transition-colors"
+                    >
+                      <span className="font-medium">Add coupons</span>
+                      {showCoupons ? (
+                        <ChevronUp className="w-5 h-5" />
+                      ) : (
+                        <ChevronDown className="w-5 h-5" />
+                      )}
+                    </button>
+                    {showCoupons && (
+                      <div className="mt-3">
+                        <div className="flex gap-2">
+                          <input
+                            type="text"
+                            value={couponCode}
+                            onChange={(e) => {
+                              setCouponCode(e.target.value.toUpperCase());
+                              setCouponError('');
+                            }}
+                            onKeyPress={(e) => e.key === 'Enter' && handleApplyCoupon()}
+                            placeholder="Coupon code"
+                            className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                            disabled={validatingCoupon}
+                          />
+                          <button
+                            onClick={handleApplyCoupon}
+                            disabled={validatingCoupon || !couponCode.trim()}
+                            className="px-6 py-2 bg-purple-600 text-white font-semibold rounded-lg hover:bg-purple-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                          >
+                            {validatingCoupon ? 'Checking...' : 'Apply'}
+                          </button>
+                        </div>
+                        {couponError && (
+                          <p className="text-sm text-red-600 mt-2">{couponError}</p>
+                        )}
+                      </div>
+                    )}
+                  </>
                 )}
               </div>
 
@@ -384,6 +479,12 @@ export default function Checkout() {
                   <span>Subtotal</span>
                   <span className="font-semibold">${subtotal.toFixed(2)}</span>
                 </div>
+                {appliedCoupon && discount > 0 && (
+                  <div className="flex justify-between text-green-600">
+                    <span>Discount ({appliedCoupon.code})</span>
+                    <span className="font-semibold">-${discount.toFixed(2)}</span>
+                  </div>
+                )}
                 <div className="flex justify-between text-gray-700">
                   <span>Free shipping</span>
                   <span className="font-semibold text-green-600">FREE</span>
