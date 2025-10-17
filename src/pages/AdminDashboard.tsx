@@ -161,18 +161,28 @@ export default function AdminDashboard() {
         return;
       }
 
-      const coupon: Omit<Coupon, 'createdAt' | 'updatedAt'> = {
+      const coupon: any = {
         id: newCoupon.code.toLowerCase().replace(/\s+/g, '-'),
         code: newCoupon.code.toUpperCase(),
         type: newCoupon.type,
         value: newCoupon.type === 'percentage' ? newCoupon.value : Math.round(newCoupon.value * 100), // Convert dollars to cents for fixed
-        minPurchase: newCoupon.minPurchase > 0 ? Math.round(newCoupon.minPurchase * 100) : undefined,
-        maxDiscount: newCoupon.maxDiscount > 0 ? Math.round(newCoupon.maxDiscount * 100) : undefined,
-        usageLimit: newCoupon.usageLimit > 0 ? newCoupon.usageLimit : undefined,
         usageCount: 0,
         active: newCoupon.active,
-        expiresAt: newCoupon.expiresAt ? new Date(newCoupon.expiresAt) : undefined,
       };
+
+      // Only add optional fields if they have values
+      if (newCoupon.minPurchase > 0) {
+        coupon.minPurchase = Math.round(newCoupon.minPurchase * 100);
+      }
+      if (newCoupon.maxDiscount > 0) {
+        coupon.maxDiscount = Math.round(newCoupon.maxDiscount * 100);
+      }
+      if (newCoupon.usageLimit > 0) {
+        coupon.usageLimit = newCoupon.usageLimit;
+      }
+      if (newCoupon.expiresAt) {
+        coupon.expiresAt = new Date(newCoupon.expiresAt);
+      }
 
       await saveCoupon(coupon);
       await loadCoupons();
