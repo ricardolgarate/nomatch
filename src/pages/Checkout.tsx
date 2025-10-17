@@ -3,15 +3,25 @@ import { Link } from 'react-router-dom';
 import { ChevronLeft, ChevronDown, ChevronUp, ShoppingBag } from 'lucide-react';
 import { useCart } from '../context/CartContext';
 import { trackEvent } from '../firebase/analytics';
-import { createCheckoutSession } from '../lib/stripe';
+import StripePaymentForm from '../components/StripePaymentForm';
+
+// Generate order number
+function generateOrderNumber(): string {
+  const date = new Date();
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  const random = Math.floor(Math.random() * 9999).toString().padStart(4, '0');
+  return `NM-${year}${month}${day}-${random}`;
+}
 
 export default function Checkout() {
   const { cart, getCartTotal } = useCart();
   const [showCoupons, setShowCoupons] = useState(false);
   const [sameAsBilling, setSameAsBilling] = useState(true);
-  const [paymentMethod, setPaymentMethod] = useState('card');
   const [showOrderNote, setShowOrderNote] = useState(false);
-  const [isProcessing, setIsProcessing] = useState(false);
+  const [showPayment, setShowPayment] = useState(false);
+  const [orderNumber] = useState(generateOrderNumber());
 
   const [formData, setFormData] = useState({
     email: '',
@@ -48,7 +58,7 @@ export default function Checkout() {
     });
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleContinueToPayment = (e: React.FormEvent) => {
     e.preventDefault();
     
     // Validate required fields
@@ -57,48 +67,13 @@ export default function Checkout() {
       return;
     }
 
-    setIsProcessing(true);
-
-    try {
-      // Prepare customer information
-      const customerInfo = {
-        email: formData.email,
-        firstName: formData.firstName,
-        lastName: formData.lastName,
-        address: formData.address,
-        apartment: formData.apartment,
-        city: formData.city,
-        state: formData.state,
-        zipCode: formData.zipCode,
-        phone: formData.phone,
-        country: formData.country,
-      };
-
-      // Create Stripe Checkout Session and redirect to payment
-      await createCheckoutSession(cart, customerInfo);
-      
-      // Note: Stock will be updated in the webhook after successful payment
-      // The user will be redirected to Stripe, so no code after this will run
-    } catch (error: any) {
-      console.error('Checkout error:', error);
-      alert(error.message || 'Failed to process checkout. Please try again.');
-      
-      // Track failed checkout
-      trackEvent('payment_failed', {
-        cartTotal: getCartTotal(),
-        itemCount: cart.length,
-        email: formData.email,
-        error: error.message,
-        items: cart.map(item => ({
-          id: item.id,
-          name: item.name,
-          quantity: item.quantity,
-          price: item.price
-        }))
-      });
-      
-      setIsProcessing(false);
-    }
+    // Show payment form
+    setShowPayment(true);
+    
+    // Scroll to payment section
+    setTimeout(() => {
+      document.getElementById('payment-section')?.scrollIntoView({ behavior: 'smooth' });
+    }, 100);
   };
 
   const subtotal = parseFloat(getCartTotal().replace('$', ''));
@@ -134,7 +109,7 @@ export default function Checkout() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 max-w-7xl mx-auto">
           {/* Left Column - Forms */}
           <div className="bg-white rounded-2xl shadow-lg p-8">
-            <form onSubmit={handleSubmit}>
+            <form onSubmit={handleContinueToPayment}>
               {/* Contact Information */}
               <div className="mb-8">
                 <h2 className="text-2xl font-serif font-medium text-gray-900 mb-2">
@@ -302,100 +277,15 @@ export default function Checkout() {
                 </p>
               </div>
 
-              {/* Payment Options */}
+              {/* Payment Info Message */}
               <div className="mb-8">
-                <h2 className="text-2xl font-serif font-medium text-gray-900 mb-4">
-                  Payment options
-                </h2>
-
-                {/* Credit/Debit Card */}
-                <div className="border-2 border-purple-300 rounded-lg mb-4 overflow-hidden">
-                  <label className="flex items-center justify-between p-4 cursor-pointer bg-purple-50">
-                    <div className="flex items-center gap-3">
-                      <input
-                        type="radio"
-                        name="payment"
-                        checked={paymentMethod === 'card'}
-                        onChange={() => setPaymentMethod('card')}
-                        className="w-4 h-4 text-purple-600"
-                      />
-                      <span className="font-medium text-gray-900">Credit / Debit Card</span>
-                    </div>
-                    <div className="flex gap-1">
-                      <img src="https://cdn-icons-png.flaticon.com/32/349/349221.png" alt="Visa" className="h-6" />
-                      <img src="https://cdn-icons-png.flaticon.com/32/349/349228.png" alt="Mastercard" className="h-6" />
-                      <img src="https://cdn-icons-png.flaticon.com/32/349/349230.png" alt="Amex" className="h-6" />
-                      <img src="https://cdn-icons-png.flaticon.com/32/349/349229.png" alt="Discover" className="h-6" />
-                    </div>
-                  </label>
-
-                  {paymentMethod === 'card' && (
-                    <div className="p-4 space-y-4 bg-white border-t">
-                      <div>
-                        <label className="block text-sm text-gray-700 mb-1">Card number</label>
-                        <input
-                          type="text"
-                          placeholder="1234 1234 1234 1234"
-                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                        />
-                      </div>
-                      <div className="grid grid-cols-2 gap-4">
-                        <div>
-                          <label className="block text-sm text-gray-700 mb-1">Expiration date</label>
-                          <input
-                            type="text"
-                            placeholder="MM / YY"
-                            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                          />
-                        </div>
-                        <div>
-                          <label className="block text-sm text-gray-700 mb-1">Security code</label>
-                          <input
-                            type="text"
-                            placeholder="CVC"
-                            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                          />
-                        </div>
-                      </div>
-                      <p className="text-xs text-gray-500">
-                        By providing your card information, you allow NoMatch to charge your card for future payments in accordance with their terms.
-                      </p>
-                    </div>
-                  )}
-                </div>
-
-                {/* Klarna */}
-                <div className="border-2 border-gray-200 rounded-lg mb-4">
-                  <label className="flex items-center justify-between p-4 cursor-pointer hover:bg-gray-50">
-                    <div className="flex items-center gap-3">
-                      <input
-                        type="radio"
-                        name="payment"
-                        checked={paymentMethod === 'klarna'}
-                        onChange={() => setPaymentMethod('klarna')}
-                        className="w-4 h-4 text-purple-600"
-                      />
-                      <span className="font-medium text-gray-900">Klarna</span>
-                    </div>
-                    <div className="bg-pink-100 px-3 py-1 rounded font-bold text-pink-600 text-sm">K</div>
-                  </label>
-                </div>
-
-                {/* Afterpay */}
-                <div className="border-2 border-gray-200 rounded-lg mb-4">
-                  <label className="flex items-center justify-between p-4 cursor-pointer hover:bg-gray-50">
-                    <div className="flex items-center gap-3">
-                      <input
-                        type="radio"
-                        name="payment"
-                        checked={paymentMethod === 'afterpay'}
-                        onChange={() => setPaymentMethod('afterpay')}
-                        className="w-4 h-4 text-purple-600"
-                      />
-                      <span className="font-medium text-gray-900">Afterpay</span>
-                    </div>
-                    <div className="text-teal-500 font-bold text-lg">◊</div>
-                  </label>
+                <div className="bg-purple-50 border-2 border-purple-200 rounded-lg p-4">
+                  <p className="text-sm text-purple-900 font-medium">
+                    💳 Payment will be processed securely on the next step
+                  </p>
+                  <p className="text-xs text-purple-700 mt-1">
+                    We accept all major credit cards, Apple Pay, Google Pay, and more.
+                  </p>
                 </div>
               </div>
 
@@ -445,20 +335,17 @@ export default function Checkout() {
                 </Link>
                 <button
                   type="submit"
-                  disabled={isProcessing}
+                  disabled={showPayment}
                   className={`flex-1 px-8 py-4 font-semibold rounded-lg transition-colors shadow-lg ${
-                    isProcessing
-                      ? 'bg-gray-400 cursor-not-allowed'
+                    showPayment
+                      ? 'bg-green-500 cursor-default'
                       : 'bg-pink-500 hover:bg-pink-600 hover:shadow-xl'
                   } text-white flex items-center justify-center gap-2`}
                 >
-                  {isProcessing ? (
-                    <>
-                      <div className="animate-spin w-5 h-5 border-2 border-white border-t-transparent rounded-full"></div>
-                      Processing...
-                    </>
+                  {showPayment ? (
+                    '✓ Continue to Payment Below'
                   ) : (
-                    'Place Order'
+                    'Continue to Payment'
                   )}
                 </button>
               </div>
@@ -547,6 +434,37 @@ export default function Checkout() {
             </div>
           </div>
         </div>
+
+        {/* Payment Section - Shows after form is validated */}
+        {showPayment && (
+          <div id="payment-section" className="mt-8 max-w-2xl mx-auto">
+            <div className="bg-white rounded-2xl shadow-xl p-8">
+              <h2 className="text-2xl font-serif font-medium text-gray-900 mb-2">
+                Payment Information
+              </h2>
+              <p className="text-sm text-gray-600 mb-6">
+                Complete your purchase securely. Your payment information is encrypted and secure.
+              </p>
+
+              <StripePaymentForm
+                items={cart}
+                customerInfo={{
+                  email: formData.email,
+                  firstName: formData.firstName,
+                  lastName: formData.lastName,
+                  address: formData.address,
+                  apartment: formData.apartment,
+                  city: formData.city,
+                  state: formData.state,
+                  zipCode: formData.zipCode,
+                  phone: formData.phone,
+                  country: formData.country,
+                }}
+                orderNumber={orderNumber}
+              />
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

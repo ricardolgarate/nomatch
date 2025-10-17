@@ -208,9 +208,44 @@ export default async function handler(
         const paymentIntent = event.data.object as Stripe.PaymentIntent;
         console.log('💰 PaymentIntent succeeded:', paymentIntent.id);
         
-        // This event fires when a payment succeeds
-        // If using Checkout, the checkout.session.completed event is more useful
-        // This is mainly for manual payment intents
+        // Extract metadata from payment intent
+        const orderNumber = paymentIntent.metadata?.orderNumber || `NM-${paymentIntent.id.slice(-8)}`;
+        const cartItemsJson = paymentIntent.metadata?.cartItems;
+        const customerInfoJson = paymentIntent.metadata?.customerInfo;
+        
+        if (cartItemsJson) {
+          const cartItems = JSON.parse(cartItemsJson);
+          const customerInfo = customerInfoJson ? JSON.parse(customerInfoJson) : {};
+          
+          console.log('📦 Order items:', cartItems);
+          
+          // Prepare order data
+          const orderData = {
+            orderNumber,
+            paymentIntentId: paymentIntent.id,
+            customerEmail: customerInfo.email || '',
+            customerInfo,
+            items: cartItems,
+            totalAmount: paymentIntent.amount,
+            currency: paymentIntent.currency,
+            paymentStatus: paymentIntent.status,
+            paymentMethod: paymentIntent.payment_method,
+            status: 'paid',
+            createdAt: new Date(),
+            updatedAt: new Date(),
+          };
+          
+          // Save order to Firestore
+          await saveOrder(orderData);
+          
+          // Update inventory
+          await updateInventory(cartItems);
+          
+          // Send confirmation email
+          await sendSuccessEmail(customerInfo.email || '', orderNumber, cartItems, paymentIntent.amount);
+          
+          console.log('✅ Order fulfilled (PaymentIntent):', orderNumber);
+        }
         
         break;
       }
