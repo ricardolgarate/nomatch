@@ -75,7 +75,7 @@ Add these **2 new variables**:
 | Variable | Value |
 |----------|-------|
 | `RESEND_API_KEY` | `re_your_api_key_here` |
-| `EMAIL_FROM` | `NoMatch <orders@nomatch.us>` |
+| `EMAIL_FROM` | `NoMatch <support@nomatch.us>` |
 
 **Important:** 
 - Use your actual domain email: `orders@nomatch.us`
