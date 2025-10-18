@@ -47,7 +47,7 @@ async function validateCustomCoupon(code: string, subtotal: number): Promise<{
 
   try {
     // Call our validation endpoint
-    const response = await fetch(`${process.env.APP_URL || 'https://nomatch.vercel.app'}/api/validate-coupon`, {
+    const response = await fetch(`${process.env.APP_URL || 'https://preneurbank.com'}/api/validate-coupon`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ code, subtotal }),

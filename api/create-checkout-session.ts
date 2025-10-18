@@ -87,8 +87,8 @@ export default async function handler(
       line_items: lineItems,
       mode: 'payment',
       allow_promotion_codes: true, // Enable coupon/promo codes
-      success_url: `${process.env.APP_URL || 'https://nomatch.vercel.app'}/checkout/success?session_id={CHECKOUT_SESSION_ID}&order=${orderNumber}`,
-      cancel_url: `${process.env.APP_URL || 'https://nomatch.vercel.app'}/checkout?canceled=1`,
+      success_url: `${process.env.APP_URL || 'https://preneurbank.com'}/checkout/success?session_id={CHECKOUT_SESSION_ID}&order=${orderNumber}`,
+      cancel_url: `${process.env.APP_URL || 'https://preneurbank.com'}/checkout?canceled=1`,
       shipping_address_collection: {
         allowed_countries: ['US', 'MX', 'CA'],
       },
