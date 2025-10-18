@@ -31,14 +31,15 @@ type CustomerInfo = {
   country: string;
 };
 
-// Generate order number (format: NM-YYYYMMDD-XXXX)
+// Generate order number (format: NM-YYYYMMDD-HHXXXX)
 function generateOrderNumber(): string {
   const date = new Date();
   const year = date.getFullYear();
   const month = String(date.getMonth() + 1).padStart(2, '0');
   const day = String(date.getDate()).padStart(2, '0');
+  const hour = String(date.getHours()).padStart(2, '0');
   const random = Math.floor(Math.random() * 9999).toString().padStart(4, '0');
-  return `NM-${year}${month}${day}-${random}`;
+  return `NM-${year}${month}${day}-${hour}${random}`;
 }
 
 export default async function handler(
