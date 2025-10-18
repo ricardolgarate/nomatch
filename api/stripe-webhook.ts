@@ -2,11 +2,18 @@ import type { VercelRequest, VercelResponse } from '@vercel/node';
 import Stripe from 'stripe';
 import { initializeApp, getApps, cert } from 'firebase-admin/app';
 import { getFirestore } from 'firebase-admin/firestore';
+import { Resend } from 'resend';
+import { renderAsync } from '@react-email/components';
+import OrderConfirmation from '../src/emails/OrderConfirmation';
+import PaymentFailed from '../src/emails/PaymentFailed';
 
 // Initialize Stripe with your secret key
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
   apiVersion: '2025-09-30.clover',
 });
+
+// Initialize Resend
+const resend = new Resend(process.env.RESEND_API_KEY!);
 
 // Webhook signature secret
 const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET!;
@@ -126,37 +133,129 @@ async function updateInventory(items: any[]) {
   }
 }
 
-// Send confirmation email (placeholder - integrate with your email service)
-async function sendSuccessEmail(email: string, orderNumber: string, items: any[], totalAmount: number) {
+// Send confirmation email using Resend
+async function sendSuccessEmail(
+  email: string,
+  orderNumber: string,
+  items: any[],
+  totalAmount: number,
+  orderData: any
+) {
   try {
     console.log('📧 Sending success email to:', email);
     console.log('   Order:', orderNumber);
     console.log('   Total:', totalAmount / 100);
+
+    if (!process.env.RESEND_API_KEY) {
+      console.warn('⚠️ RESEND_API_KEY not set - skipping email');
+      return;
+    }
+
+    // Parse customer info and address
+    const customerInfo = orderData.customerInfo || {};
+    const customerName = customerInfo.name || 'Valued Customer';
+    const billingAddress = customerInfo.address || customerInfo.billingAddress || {};
     
-    // TODO: Integrate with email service (Resend, SendGrid, etc.)
-    // Example with Resend:
-    // await resend.emails.send({
-    //   from: 'orders@nomatch.us',
-    //   to: email,
-    //   subject: `NoMatch – Order #${orderNumber} Confirmed`,
-    //   html: `<h1>Thank you for your order!</h1>...`
-    // });
-    
+    // Get payment method info
+    let paymentMethod = 'Card';
+    if (orderData.paymentMethod) {
+      const pm = await stripe.paymentMethods.retrieve(orderData.paymentMethod as string);
+      if (pm.card) {
+        paymentMethod = `${pm.card.brand.toUpperCase()} •••• ${pm.card.last4}`;
+      }
+    }
+
+    // Format items for email
+    const emailItems = items.map((item: any) => ({
+      id: item.id,
+      name: item.name,
+      image: items.find((i: any) => i.id === item.id)?.image || '',
+      size: item.size,
+      quantity: item.quantity,
+      price: `$${((totalAmount / items.length / item.quantity) / 100).toFixed(2)}`,
+      sku: item.sku,
+    }));
+
+    // Calculate amounts from metadata
+    const subtotal = parseInt(orderData.metadata?.subtotal || totalAmount);
+    const discount = parseInt(orderData.metadata?.discount || '0');
+    const shipping = 0;
+    const promoCode = orderData.metadata?.promoCode;
+
+    // Render email HTML
+    const emailHtml = await renderAsync(
+      OrderConfirmation({
+        orderNumber,
+        orderDate: new Date().toLocaleDateString('en-US', {
+          year: 'numeric',
+          month: 'long',
+          day: 'numeric',
+        }),
+        customerName,
+        customerEmail: email,
+        items: emailItems,
+        subtotal,
+        discount,
+        shipping,
+        total: totalAmount,
+        paymentMethod,
+        billingAddress,
+        promoCode,
+      })
+    );
+
+    // Send email
+    const result = await resend.emails.send({
+      from: process.env.EMAIL_FROM || 'NoMatch <orders@nomatch.us>',
+      to: email,
+      subject: `NoMatch – Order #${orderNumber} Confirmed!`,
+      html: emailHtml,
+    });
+
+    console.log('✅ Email sent successfully:', result.data?.id || 'sent');
   } catch (error) {
     console.error('❌ Error sending email:', error);
-    // Don't throw - email failure shouldn't block order
+    // Don't throw - email failure shouldn't block order completion
   }
 }
 
 // Send failed payment email
-async function sendFailureEmail(email: string, orderNumber: string, reason: string) {
+async function sendFailureEmail(
+  email: string,
+  orderNumber: string,
+  reason: string,
+  totalAmount: number,
+  customerName: string = 'Valued Customer'
+) {
   try {
     console.log('📧 Sending failure email to:', email);
     console.log('   Order:', orderNumber);
     console.log('   Reason:', reason);
-    
-    // TODO: Integrate with email service
-    
+
+    if (!process.env.RESEND_API_KEY) {
+      console.warn('⚠️ RESEND_API_KEY not set - skipping failure email');
+      return;
+    }
+
+    // Render email HTML
+    const emailHtml = await renderAsync(
+      PaymentFailed({
+        orderNumber,
+        customerName,
+        reason,
+        total: totalAmount,
+      })
+    );
+
+    // Send email
+    const result = await resend.emails.send({
+      from: process.env.EMAIL_FROM || 'NoMatch <orders@nomatch.us>',
+      to: email,
+      subject: `NoMatch – Payment Failed for Order #${orderNumber}`,
+      html: emailHtml,
+    });
+
+    console.log('✅ Failure email sent:', result.data?.id || 'sent');
   } catch (error) {
     console.error('❌ Error sending failure email:', error);
   }
@@ -229,7 +328,9 @@ export default async function handler(
             totalAmount: session.amount_total,
             currency: session.currency,
             paymentStatus: session.payment_status,
+            paymentMethod: (fullSession.payment_intent as any)?.payment_method,
             shippingAddress: (fullSession as any).shipping_details?.address || fullSession.customer_details?.address,
+            metadata: session.metadata, // Include all metadata (subtotal, discount, promoCode, etc.)
             status: 'paid',
             createdAt: new Date(),
             updatedAt: new Date(),
@@ -247,7 +348,7 @@ export default async function handler(
           }
           
           // Send confirmation email
-          await sendSuccessEmail(email, orderNumber, cartItems, session.amount_total || 0);
+          await sendSuccessEmail(email, orderNumber, cartItems, session.amount_total || 0, orderData);
           
           console.log('✅ Order fulfilled:', orderNumber);
         }
@@ -281,6 +382,7 @@ export default async function handler(
             currency: paymentIntent.currency,
             paymentStatus: paymentIntent.status,
             paymentMethod: paymentIntent.payment_method,
+            metadata: paymentIntent.metadata, // Include all metadata (subtotal, discount, promoCode, etc.)
             status: 'paid',
             createdAt: new Date(),
             updatedAt: new Date(),
@@ -298,7 +400,7 @@ export default async function handler(
           }
           
           // Send confirmation email
-          await sendSuccessEmail(customerInfo.email || '', orderNumber, cartItems, paymentIntent.amount);
+          await sendSuccessEmail(customerInfo.email || '', orderNumber, cartItems, paymentIntent.amount, orderData);
           
           console.log('✅ Order fulfilled (PaymentIntent):', orderNumber);
         }
@@ -312,7 +414,10 @@ export default async function handler(
         
         // Get order number from metadata
         const orderNumber = paymentIntent.metadata?.orderNumber || `NM-${paymentIntent.id.slice(-8)}`;
-        const email = (paymentIntent as any).receipt_email || '';
+        const customerInfoJson = paymentIntent.metadata?.customerInfo;
+        const customerInfo = customerInfoJson ? JSON.parse(customerInfoJson) : {};
+        const email = customerInfo.email || (paymentIntent as any).receipt_email || '';
+        const customerName = customerInfo.name || 'Valued Customer';
         const failureReason = paymentIntent.last_payment_error?.message || 'Your card was declined.';
         
         // Log failed payment
@@ -320,6 +425,7 @@ export default async function handler(
           paymentIntentId: paymentIntent.id,
           orderNumber,
           email,
+          customerName,
           reason: failureReason,
           amount: paymentIntent.amount,
           currency: paymentIntent.currency,
@@ -328,7 +434,7 @@ export default async function handler(
         
         // Send failure notification email
         if (email) {
-          await sendFailureEmail(email, orderNumber, failureReason);
+          await sendFailureEmail(email, orderNumber, failureReason, paymentIntent.amount, customerName);
         }
         
         console.log('📝 Failed payment logged:', orderNumber);
