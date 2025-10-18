@@ -165,22 +165,34 @@ async function sendSuccessEmail(
       }
     }
 
+    // Get line items from order for accurate pricing
+    const lineItems = orderData.lineItems || [];
+    
     // Format items for email
-    const emailItems = items.map((item: any) => ({
-      id: item.id,
-      name: item.name,
-      image: items.find((i: any) => i.id === item.id)?.image || '',
-      size: item.size,
-      quantity: item.quantity,
-      price: `$${((totalAmount / items.length / item.quantity) / 100).toFixed(2)}`,
-      sku: item.sku,
-    }));
+    const emailItems = items.map((item: any, index: number) => {
+      // Get line item for accurate price
+      const lineItem = lineItems[index];
+      const unitPrice = lineItem?.price?.unit_amount || (totalAmount / items.length);
+      
+      return {
+        id: item.id,
+        name: item.name,
+        image: lineItem?.price?.product?.images?.[0] || `https://preneurbank.com/Logo-NoMatch.webp`,
+        size: item.size,
+        quantity: item.quantity,
+        price: `$${(unitPrice / 100).toFixed(2)}`,
+        sku: item.sku,
+      };
+    });
 
-    // Calculate amounts from metadata
-    const subtotal = parseInt(orderData.metadata?.subtotal || totalAmount);
+    // Calculate amounts from metadata (already in cents)
+    const subtotal = parseInt(orderData.metadata?.subtotal || String(totalAmount));
     const discount = parseInt(orderData.metadata?.discount || '0');
     const shipping = 0;
-    const promoCode = orderData.metadata?.promoCode;
+    const promoCode = orderData.metadata?.promoCode || undefined;
+
+    console.log('📧 Rendering email template...');
+    console.log('Email data:', { orderNumber, customerName, itemCount: emailItems.length });
 
     // Render email HTML
     const emailHtml = await renderAsync(
@@ -192,7 +204,6 @@ async function sendSuccessEmail(
           day: 'numeric',
         }),
         customerName,
-        customerEmail: email,
         items: emailItems,
         subtotal,
         discount,
@@ -204,17 +215,32 @@ async function sendSuccessEmail(
       })
     );
 
+    console.log('✅ Email template rendered successfully');
+
     // Send email
+    const from = process.env.EMAIL_FROM || 'NoMatch <support@preneurbank.com>';
+    console.log('📤 Sending email from:', from, 'to:', email);
+
     const result = await resend.emails.send({
-      from: process.env.EMAIL_FROM || 'NoMatch <orders@nomatch.us>',
+      from,
       to: email,
       subject: `NoMatch – Order #${orderNumber} Confirmed!`,
       html: emailHtml,
     });
 
-    console.log('✅ Email sent successfully:', result.data?.id || 'sent');
-  } catch (error) {
+    if (result.error) {
+      console.error('❌ Resend error:', result.error);
+      throw new Error(result.error.message);
+    }
+
+    console.log('✅ Email sent successfully! ID:', result.data?.id);
+  } catch (error: any) {
     console.error('❌ Error sending email:', error);
+    console.error('Error details:', {
+      message: error?.message,
+      name: error?.name,
+      stack: error?.stack?.substring(0, 500),
+    });
     // Don't throw - email failure shouldn't block order completion
   }
 }
@@ -237,6 +263,8 @@ async function sendFailureEmail(
       return;
     }
 
+    console.log('📧 Rendering failure email template...');
+
     // Render email HTML
     const emailHtml = await renderAsync(
       PaymentFailed({
@@ -247,17 +275,28 @@ async function sendFailureEmail(
       })
     );
 
+    console.log('✅ Failure email template rendered');
+
     // Send email
+    const from = process.env.EMAIL_FROM || 'NoMatch <support@preneurbank.com>';
+    console.log('📤 Sending failure email from:', from, 'to:', email);
+
     const result = await resend.emails.send({
-      from: process.env.EMAIL_FROM || 'NoMatch <orders@nomatch.us>',
+      from,
       to: email,
       subject: `NoMatch – Payment Failed for Order #${orderNumber}`,
       html: emailHtml,
     });
 
-    console.log('✅ Failure email sent:', result.data?.id || 'sent');
-  } catch (error) {
+    if (result.error) {
+      console.error('❌ Resend error:', result.error);
+      throw new Error(result.error.message);
+    }
+
+    console.log('✅ Failure email sent! ID:', result.data?.id);
+  } catch (error: any) {
     console.error('❌ Error sending failure email:', error);
+    console.error('Error details:', error?.message);
   }
 }
 

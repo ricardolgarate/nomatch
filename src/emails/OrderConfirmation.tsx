@@ -28,7 +28,6 @@ interface OrderConfirmationProps {
   orderNumber: string;
   orderDate: string;
   customerName: string;
-  customerEmail: string;
   items: OrderItem[];
   subtotal: number;
   discount: number;
