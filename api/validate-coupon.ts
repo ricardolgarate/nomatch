@@ -3,48 +3,55 @@ import { initializeApp, getApps, cert } from 'firebase-admin/app';
 import { getFirestore } from 'firebase-admin/firestore';
 
 // Initialize Firebase Admin (only once)
-if (!getApps().length) {
-  try {
-    const projectId = process.env.VITE_FIREBASE_PROJECT_ID || process.env.FIREBASE_PROJECT_ID;
-    const clientEmail = process.env.FIREBASE_CLIENT_EMAIL;
-    let privateKey = process.env.FIREBASE_PRIVATE_KEY;
+let db: ReturnType<typeof getFirestore> | null = null;
 
-    // Handle different private key formats
-    if (privateKey) {
-      // Remove quotes if present
-      privateKey = privateKey.replace(/^["']|["']$/g, '');
-      // Replace literal \n with actual newlines
-      privateKey = privateKey.replace(/\\n/g, '\n');
-    }
+function initializeFirebase() {
+  if (!getApps().length) {
+    try {
+      const projectId = process.env.VITE_FIREBASE_PROJECT_ID || process.env.FIREBASE_PROJECT_ID;
+      const clientEmail = process.env.FIREBASE_CLIENT_EMAIL;
+      let privateKey = process.env.FIREBASE_PRIVATE_KEY;
 
-    if (!projectId || !clientEmail || !privateKey) {
-      console.error('Missing Firebase Admin credentials:', {
-        hasProjectId: !!projectId,
-        hasClientEmail: !!clientEmail,
-        hasPrivateKey: !!privateKey,
-        privateKeyLength: privateKey?.length,
+      // Handle different private key formats
+      if (privateKey) {
+        // Remove quotes if present
+        privateKey = privateKey.replace(/^["']|["']$/g, '');
+        // Replace literal \n with actual newlines
+        privateKey = privateKey.replace(/\\n/g, '\n');
+      }
+
+      if (!projectId || !clientEmail || !privateKey) {
+        console.error('Missing Firebase Admin credentials:', {
+          hasProjectId: !!projectId,
+          hasClientEmail: !!clientEmail,
+          hasPrivateKey: !!privateKey,
+        });
+        throw new Error('Missing Firebase Admin credentials');
+      }
+
+      console.log('Initializing Firebase Admin with project:', projectId);
+
+      initializeApp({
+        credential: cert({
+          projectId: projectId,
+          clientEmail: clientEmail,
+          privateKey: privateKey,
+        }),
       });
-      throw new Error('Missing Firebase Admin credentials');
+      
+      console.log('Firebase Admin initialized successfully');
+    } catch (error) {
+      console.error('Error initializing Firebase Admin:', error);
+      throw error;
     }
-
-    console.log('Initializing Firebase Admin with project:', projectId);
-
-    initializeApp({
-      credential: cert({
-        projectId: projectId,
-        clientEmail: clientEmail,
-        privateKey: privateKey,
-      }),
-    });
-    
-    console.log('Firebase Admin initialized successfully');
-  } catch (error) {
-    console.error('Error initializing Firebase Admin:', error);
-    throw error;
   }
+  
+  if (!db) {
+    db = getFirestore();
+  }
+  
+  return db;
 }
-
-const db = getFirestore();
 
 // Validate coupon server-side
 export default async function handler(
@@ -64,8 +71,10 @@ export default async function handler(
 
     console.log('Validating coupon:', code, 'for subtotal:', subtotal);
 
-    // Check if Firestore is initialized
-    if (!db) {
+    // Initialize Firebase
+    const database = initializeFirebase();
+    
+    if (!database) {
       console.error('Firestore not initialized');
       return res.status(500).json({ 
         valid: false, 
@@ -75,7 +84,7 @@ export default async function handler(
     }
 
     // Get coupon from Firestore
-    const couponsRef = db.collection('coupons');
+    const couponsRef = database.collection('coupons');
     const snapshot = await couponsRef.where('code', '==', code.toUpperCase()).limit(1).get();
 
     console.log('Coupon query result:', snapshot.empty ? 'not found' : 'found');
@@ -157,12 +166,17 @@ export default async function handler(
     });
   } catch (err: any) {
     console.error('Error validating coupon:', err);
-    console.error('Error details:', err.message, err.stack);
-    res.status(500).json({ 
+    console.error('Error details:', {
+      message: err.message,
+      name: err.name,
+      stack: err.stack?.substring(0, 200)
+    });
+    
+    return res.status(500).json({ 
       valid: false,
       discount: 0,
       message: 'Error validating coupon',
-      error: err.message 
+      error: err.message || 'Unknown error'
     });
   }
 }
