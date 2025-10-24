@@ -35,6 +35,14 @@ function computeSubtotal(items: CartItem[]): number {
   return items.reduce((sum, item) => sum + (item.unitAmount * item.quantity), 0);
 }
 
+// Type for coupon validation response
+type CouponValidationResponse = {
+  valid: boolean;
+  discount: number;
+  couponId?: string;
+  message?: string;
+};
+
 // Validate coupon using our custom system (not Stripe)
 async function validateCustomCoupon(code: string, subtotal: number): Promise<{
   valid: boolean;
@@ -53,7 +61,7 @@ async function validateCustomCoupon(code: string, subtotal: number): Promise<{
       body: JSON.stringify({ code, subtotal }),
     });
 
-    const result = await response.json();
+    const result = await response.json() as CouponValidationResponse;
     
     if (!result.valid) {
       console.log('Invalid coupon:', result.message);
