@@ -1,0 +1,3 @@
+# Email templates - only used by serverless functions
+emails/
+
