@@ -51,12 +51,16 @@ export default async function handler(
   req: VercelRequest,
   res: VercelResponse
 ) {
-  if (req.method !== 'POST') {
-    return res.status(405).json({ error: 'Method not allowed' });
-  }
-
   try {
+    console.log('📝 validate-coupon called');
+
+    if (req.method !== 'POST') {
+      return res.status(405).json({ error: 'Method not allowed' });
+    }
+
     const { code, subtotal } = req.body as { code: string; subtotal: number };
+
+    console.log('Request data:', { code, subtotal });
 
     if (!code) {
       return res.status(400).json({ error: 'Coupon code required' });
@@ -66,13 +70,15 @@ export default async function handler(
 
     // Check if Firestore is initialized
     if (!db) {
-      console.error('Firestore not initialized');
+      console.error('❌ Firestore not initialized');
       return res.status(500).json({ 
         valid: false, 
         discount: 0, 
         message: 'Database connection error' 
       });
     }
+
+    console.log('✅ Firestore initialized');
 
     // Get coupon from Firestore
     const couponsRef = db.collection('coupons');
@@ -156,13 +162,19 @@ export default async function handler(
       value: coupon.value,
     });
   } catch (err: any) {
-    console.error('Error validating coupon:', err);
-    console.error('Error details:', err.message, err.stack);
-    res.status(500).json({ 
+    console.error('❌ Error in validate-coupon handler:', err);
+    console.error('Error details:', {
+      message: err.message,
+      name: err.name,
+      stack: err.stack?.substring(0, 500),
+    });
+    
+    return res.status(500).json({ 
       valid: false,
       discount: 0,
       message: 'Error validating coupon',
-      error: err.message 
+      error: err.message,
+      errorType: err.name
     });
   }
 }
