@@ -4,8 +4,6 @@ import { initializeApp, getApps, cert } from 'firebase-admin/app';
 import { getFirestore } from 'firebase-admin/firestore';
 import { Resend } from 'resend';
 import { renderAsync } from '@react-email/components';
-import OrderConfirmation from '../src/emails/OrderConfirmation';
-import PaymentFailed from '../src/emails/PaymentFailed';
 
 // Initialize Stripe with your secret key
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
@@ -194,6 +192,9 @@ async function sendSuccessEmail(
     console.log('📧 Rendering email template...');
     console.log('Email data:', { orderNumber, customerName, itemCount: emailItems.length });
 
+    // Dynamically import email template
+    const { default: OrderConfirmation } = await import('../src/emails/OrderConfirmation');
+
     // Render email HTML
     const emailHtml = await renderAsync(
       OrderConfirmation({
@@ -264,6 +265,9 @@ async function sendFailureEmail(
     }
 
     console.log('📧 Rendering failure email template...');
+
+    // Dynamically import email template
+    const { default: PaymentFailed } = await import('../src/emails/PaymentFailed');
 
     // Render email HTML
     const emailHtml = await renderAsync(
