@@ -49,6 +49,19 @@ export function generateSessionId(): string {
   return sessionId;
 }
 
+// Remove undefined values from object (Firestore doesn't accept undefined)
+function removeUndefined(obj: any): any {
+  if (!obj || typeof obj !== 'object') return obj;
+  
+  const cleaned: any = {};
+  for (const key in obj) {
+    if (obj[key] !== undefined) {
+      cleaned[key] = obj[key];
+    }
+  }
+  return cleaned;
+}
+
 // Track a user event
 export async function trackEvent(
   eventType: UserEvent['type'],
@@ -56,6 +69,9 @@ export async function trackEvent(
 ): Promise<void> {
   try {
     const sessionId = generateSessionId();
+    
+    // Remove undefined values from metadata
+    const cleanMetadata = removeUndefined(metadata || {});
     
     // Create or update session
     const sessionsRef = collection(db, 'analytics_sessions');
@@ -65,7 +81,7 @@ export async function trackEvent(
     const event: UserEvent = {
       type: eventType,
       timestamp: new Date(),
-      metadata
+      metadata: cleanMetadata
     };
     
     if (snapshot.empty) {
@@ -76,7 +92,7 @@ export async function trackEvent(
         lastActivity: Timestamp.fromDate(new Date()),
         events: [event],
         status: getStatusFromEventType(eventType),
-        metadata: metadata || {}
+        metadata: cleanMetadata
       });
     } else {
       // Update existing session
@@ -88,10 +104,10 @@ export async function trackEvent(
         lastActivity: Timestamp.fromDate(new Date()),
         events: [...events, event],
         status: getStatusFromEventType(eventType),
-        metadata: {
+        metadata: removeUndefined({
           ...sessionData.metadata,
-          ...metadata
-        }
+          ...cleanMetadata
+        })
       });
     }
   } catch (error) {
