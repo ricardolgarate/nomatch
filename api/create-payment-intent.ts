@@ -53,7 +53,7 @@ async function validateCustomCoupon(code: string, subtotal: number): Promise<{
       body: JSON.stringify({ code, subtotal }),
     });
 
-    const result = await response.json();
+    const result = await response.json() as any;
     
     if (!result.valid) {
       console.log('Invalid coupon:', result.message);
@@ -62,7 +62,7 @@ async function validateCustomCoupon(code: string, subtotal: number): Promise<{
 
     return {
       valid: true,
-      discount: result.discount,
+      discount: result.discount || 0,
       couponId: result.couponId,
     };
   } catch (error) {
