@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { loadStripe, StripeElementsOptions } from '@stripe/stripe-js';
-import { Elements, PaymentElement, ExpressCheckoutElement, useStripe, useElements } from '@stripe/react-stripe-js';
+import { Elements, PaymentElement, useStripe, useElements } from '@stripe/react-stripe-js';
 import { Loader2 } from 'lucide-react';
 
 // Initialize Stripe
@@ -122,18 +122,6 @@ function CheckoutForm({ items, customerInfo, orderNumber, appliedCouponCode, onS
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
-      {/* Express Checkout (Apple Pay, Google Pay, etc.) */}
-      <div>
-        <h3 className="text-lg font-medium text-gray-900 mb-3 text-center">Express Checkout</h3>
-        <ExpressCheckoutElement 
-          onConfirm={async (event) => {
-            // Express checkout confirmed
-            console.log('Express checkout:', event);
-          }}
-        />
-        <p className="text-center text-sm text-gray-500 mt-3">Or continue below</p>
-      </div>
-
       {/* Show applied coupon info */}
       {appliedCouponCode && (
         <div className="bg-green-50 border-2 border-green-200 rounded-lg p-3">
@@ -193,7 +181,7 @@ export default function StripePaymentForm(props: PaymentFormProps) {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    // Get initial client secret (re-initialize when coupon changes)
+    // Get initial client secret (ONLY once - don't re-initialize when coupon changes)
     const initializePayment = async () => {
       try {
         setLoadingSecret(true);
@@ -214,7 +202,8 @@ export default function StripePaymentForm(props: PaymentFormProps) {
               size: item.size,
               category: item.category,
             })),
-            promoCode: props.appliedCouponCode || undefined,
+            // Don't pass coupon here - will be passed at submit time
+            promoCode: undefined,
             orderNumber: props.orderNumber,
             customerInfo: props.customerInfo,
             currency: 'usd',
@@ -238,7 +227,8 @@ export default function StripePaymentForm(props: PaymentFormProps) {
     };
 
     initializePayment();
-  }, [props.items, props.orderNumber, props.customerInfo, props.appliedCouponCode]);
+    // Only re-initialize if items or customer info changes, NOT when coupon changes
+  }, [props.items, props.orderNumber, props.customerInfo]);
 
   if (loadingSecret) {
     return (
@@ -277,7 +267,6 @@ export default function StripePaymentForm(props: PaymentFormProps) {
     <Elements 
       stripe={stripePromise} 
       options={options}
-      key={clientSecret} // Force remount when clientSecret changes
     >
       <CheckoutForm {...props} />
     </Elements>
