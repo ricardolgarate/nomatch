@@ -22,7 +22,7 @@ export interface UserSession {
 }
 
 export interface UserEvent {
-  type: 'page_visit' | 'shop_visit' | 'product_view' | 'add_to_cart' | 'cart_updated' | 'checkout_initiated' | 'payment_failed' | 'purchase_completed';
+  type: 'page_visit' | 'shop_visit' | 'product_view' | 'add_to_cart' | 'checkout_initiated' | 'payment_failed' | 'purchase_completed';
   timestamp: Date;
   metadata?: any;
 }
@@ -32,7 +32,6 @@ export interface AnalyticsMetrics {
   shopVisits: number;
   productViews: number;
   abandonedCarts: number;
-  averageCartValue: number;
   initiatedCheckouts: number;
   paymentFailed: number;
   successfulPurchases: number;
@@ -192,20 +191,6 @@ export async function getAnalyticsMetrics(
     const initiatedCheckouts = statusCounts.checkout;
     const abandonedCarts = statusCounts.cart;
     
-    // Calculate average cart value from cart_updated events
-    const cartsWithValue = sessions.filter(s => 
-      s.events.some((e: UserEvent) => e.type === 'cart_updated' && e.metadata?.cartValue)
-    );
-    
-    const totalCartValue = cartsWithValue.reduce((sum, session) => {
-      const cartEvent = session.events.find((e: UserEvent) => e.type === 'cart_updated');
-      return sum + (cartEvent?.metadata?.cartValue || 0);
-    }, 0);
-    
-    const averageCartValue = cartsWithValue.length > 0 
-      ? Math.round((totalCartValue / cartsWithValue.length) * 100) / 100 
-      : 0;
-    
     // Calculate conversion rates
     const conversionRate = totalTraffic > 0 ? (successfulPurchases / totalTraffic) * 100 : 0;
     const checkoutConversionRate = initiatedCheckouts + paymentFailed + successfulPurchases > 0
@@ -217,7 +202,6 @@ export async function getAnalyticsMetrics(
       shopVisits,
       productViews,
       abandonedCarts,
-      averageCartValue,
       initiatedCheckouts,
       paymentFailed,
       successfulPurchases,
@@ -231,7 +215,6 @@ export async function getAnalyticsMetrics(
       shopVisits: 0,
       productViews: 0,
       abandonedCarts: 0,
-      averageCartValue: 0,
       initiatedCheckouts: 0,
       paymentFailed: 0,
       successfulPurchases: 0,

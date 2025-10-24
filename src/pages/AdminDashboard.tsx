@@ -400,12 +400,7 @@ export default function AdminDashboard() {
                       <span className="text-3xl font-bold">{analytics.abandonedCarts}</span>
                     </div>
                     <p className="text-pink-50 font-medium">Abandoned Carts</p>
-                    <p className="text-xs text-pink-100 mt-1">
-                      Users who added to cart but didn't checkout
-                      {analytics.averageCartValue > 0 && (
-                        <><br />Avg value: ${analytics.averageCartValue.toFixed(2)}</>
-                      )}
-                    </p>
+                    <p className="text-xs text-pink-100 mt-1">Users who added to cart but didn't checkout</p>
                   </div>
 
                   {/* Initiated Checkouts */}
