@@ -181,7 +181,9 @@ export default function StripePaymentForm(props: PaymentFormProps) {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    // Get initial client secret (ONLY once - don't re-initialize when coupon changes)
+    // Get initial client secret (ONLY once on mount)
+    let mounted = true;
+    
     const initializePayment = async () => {
       try {
         setLoadingSecret(true);
@@ -212,6 +214,8 @@ export default function StripePaymentForm(props: PaymentFormProps) {
 
         const data = await response.json();
 
+        if (!mounted) return;
+
         if (data.error || !data.clientSecret) {
           setError(data.error || 'Could not initialize payment.');
           setLoadingSecret(false);
@@ -220,15 +224,23 @@ export default function StripePaymentForm(props: PaymentFormProps) {
 
         setClientSecret(data.clientSecret);
       } catch (err: any) {
+        if (!mounted) return;
         setError(err.message || 'Failed to initialize payment.');
       } finally {
-        setLoadingSecret(false);
+        if (mounted) {
+          setLoadingSecret(false);
+        }
       }
     };
 
     initializePayment();
-    // Only re-initialize if items or customer info changes, NOT when coupon changes
-  }, [props.items, props.orderNumber, props.customerInfo]);
+    
+    return () => {
+      mounted = false;
+    };
+    // Only initialize once when component mounts
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   if (loadingSecret) {
     return (
