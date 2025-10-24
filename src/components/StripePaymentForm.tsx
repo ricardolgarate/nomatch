@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { loadStripe, StripeElementsOptions } from '@stripe/stripe-js';
-import { Elements, PaymentElement, ExpressCheckoutElement, useStripe, useElements } from '@stripe/react-stripe-js';
+import { Elements, PaymentElement, useStripe, useElements } from '@stripe/react-stripe-js';
 import { Loader2 } from 'lucide-react';
 
 // Initialize Stripe
@@ -122,18 +122,6 @@ function CheckoutForm({ items, customerInfo, orderNumber, appliedCouponCode, onS
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
-      {/* Express Checkout (Apple Pay, Google Pay, etc.) */}
-      <div>
-        <h3 className="text-lg font-medium text-gray-900 mb-3 text-center">Express Checkout</h3>
-        <ExpressCheckoutElement 
-          onConfirm={async (event) => {
-            // Express checkout confirmed
-            console.log('Express checkout:', event);
-          }}
-        />
-        <p className="text-center text-sm text-gray-500 mt-3">Or continue below</p>
-      </div>
-
       {/* Show applied coupon info */}
       {appliedCouponCode && (
         <div className="bg-green-50 border-2 border-green-200 rounded-lg p-3">
