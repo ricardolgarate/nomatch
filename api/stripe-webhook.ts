@@ -4,8 +4,8 @@ import { initializeApp, getApps, cert } from 'firebase-admin/app';
 import { getFirestore } from 'firebase-admin/firestore';
 import { Resend } from 'resend';
 import { renderAsync } from '@react-email/components';
-import OrderConfirmation from '../src/emails/OrderConfirmation';
-import PaymentFailed from '../src/emails/PaymentFailed';
+import OrderConfirmation from '../emails/OrderConfirmation';
+import PaymentFailed from '../emails/PaymentFailed';
 
 // Initialize Stripe with your secret key
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
