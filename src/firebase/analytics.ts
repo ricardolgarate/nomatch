@@ -49,19 +49,6 @@ export function generateSessionId(): string {
   return sessionId;
 }
 
-// Remove undefined values from object (Firestore doesn't accept undefined)
-function removeUndefined(obj: any): any {
-  if (!obj || typeof obj !== 'object') return obj;
-  
-  const cleaned: any = {};
-  for (const key in obj) {
-    if (obj[key] !== undefined) {
-      cleaned[key] = obj[key];
-    }
-  }
-  return cleaned;
-}
-
 // Track a user event
 export async function trackEvent(
   eventType: UserEvent['type'],
@@ -69,9 +56,6 @@ export async function trackEvent(
 ): Promise<void> {
   try {
     const sessionId = generateSessionId();
-    
-    // Remove undefined values from metadata
-    const cleanMetadata = removeUndefined(metadata || {});
     
     // Create or update session
     const sessionsRef = collection(db, 'analytics_sessions');
@@ -81,11 +65,17 @@ export async function trackEvent(
     const event: UserEvent = {
       type: eventType,
       timestamp: new Date(),
-      metadata: cleanMetadata
+      metadata
     };
     
     if (snapshot.empty) {
       // Create new session
+      // Filter out undefined values from metadata
+      const cleanMetadata = metadata ? 
+        Object.fromEntries(
+          Object.entries(metadata).filter(([_, v]) => v !== undefined)
+        ) : {};
+      
       await addDoc(sessionsRef, {
         sessionId,
         timestamp: Timestamp.fromDate(new Date()),
@@ -100,14 +90,20 @@ export async function trackEvent(
       const sessionData = sessionDoc.data();
       const events = sessionData.events || [];
       
+      // Filter out undefined values from metadata
+      const cleanMetadata = metadata ? 
+        Object.fromEntries(
+          Object.entries(metadata).filter(([_, v]) => v !== undefined)
+        ) : {};
+      
       await updateDoc(doc(db, 'analytics_sessions', sessionDoc.id), {
         lastActivity: Timestamp.fromDate(new Date()),
         events: [...events, event],
         status: getStatusFromEventType(eventType),
-        metadata: removeUndefined({
+        metadata: {
           ...sessionData.metadata,
           ...cleanMetadata
-        })
+        }
       });
     }
   } catch (error) {

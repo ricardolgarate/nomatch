@@ -3,6 +3,9 @@ import Stripe from 'stripe';
 import { initializeApp, getApps, cert } from 'firebase-admin/app';
 import { getFirestore } from 'firebase-admin/firestore';
 import { Resend } from 'resend';
+import { renderAsync } from '@react-email/components';
+import OrderConfirmation from '../src/emails/OrderConfirmation';
+import PaymentFailed from '../src/emails/PaymentFailed';
 
 // Initialize Stripe with your secret key
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
@@ -188,158 +191,31 @@ async function sendSuccessEmail(
     const shipping = 0;
     const promoCode = orderData.metadata?.promoCode || undefined;
 
-    console.log('📧 Creating email HTML...');
+    console.log('📧 Rendering email template...');
     console.log('Email data:', { orderNumber, customerName, itemCount: emailItems.length });
 
-    const orderDate = new Date().toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-    });
+    // Render email HTML
+    const emailHtml = await renderAsync(
+      OrderConfirmation({
+        orderNumber,
+        orderDate: new Date().toLocaleDateString('en-US', {
+          year: 'numeric',
+          month: 'long',
+          day: 'numeric',
+        }),
+        customerName,
+        items: emailItems,
+        subtotal,
+        discount,
+        shipping,
+        total: totalAmount,
+        paymentMethod,
+        billingAddress,
+        promoCode,
+      })
+    );
 
-    // Create simple HTML email (React Email templates cause issues in Vercel functions)
-    const itemsHtml = emailItems.map((item: any) => `
-      <tr style="border-bottom: 1px solid #e5e7eb;">
-        <td style="padding: 16px 0;">
-          ${item.image ? `<img src="${item.image}" alt="${item.name}" width="80" height="80" style="border-radius: 8px; border: 1px solid #e5e7eb;" />` : ''}
-        </td>
-        <td style="padding: 16px; vertical-align: top;">
-          <div style="font-size: 16px; font-weight: 600; color: #1f2937; margin-bottom: 8px;">${item.name}</div>
-          ${item.size ? `<div style="font-size: 14px; color: #6b7280;">Size: US ${item.size}</div>` : ''}
-          ${item.sku ? `<div style="font-size: 14px; color: #6b7280;">SKU: ${item.sku}</div>` : ''}
-          <div style="font-size: 14px; color: #6b7280;">Quantity: ${item.quantity}</div>
-        </td>
-        <td style="padding: 16px; text-align: right; vertical-align: top;">
-          <div style="font-size: 16px; font-weight: 600; color: #9333ea;">${item.price}</div>
-        </td>
-      </tr>
-    `).join('');
-
-    const discountHtml = discount > 0 ? `
-      <tr>
-        <td style="padding: 8px 0; color: #059669;">Discount ${promoCode ? `(${promoCode})` : ''}</td>
-        <td style="padding: 8px 0; text-align: right; color: #059669; font-weight: 600;">-$${(discount / 100).toFixed(2)}</td>
-      </tr>
-    ` : '';
-
-    const emailHtml = `
-      <!DOCTYPE html>
-      <html>
-        <head>
-          <meta charset="utf-8">
-          <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        </head>
-        <body style="margin: 0; padding: 0; background-color: #fdf2f8; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
-          <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #fdf2f8; padding: 40px 20px;">
-            <tr>
-              <td align="center">
-                <table width="600" cellpadding="0" cellspacing="0" style="background-color: #ffffff; max-width: 600px;">
-                  <!-- Header -->
-                  <tr>
-                    <td style="text-align: center; padding: 20px 0 30px; border-bottom: 3px solid #ec4899;">
-                      <img src="https://preneurbank.com/Logo-NoMatch.webp" alt="NoMatch" width="180" height="60" />
-                    </td>
-                  </tr>
-                  
-                  <!-- Thank You -->
-                  <tr>
-                    <td style="padding: 40px 30px 20px;">
-                      <h1 style="font-size: 28px; font-weight: 700; color: #1f2937; text-align: center; margin: 0 0 20px;">Thank You for Your Order!</h1>
-                      <p style="font-size: 16px; line-height: 24px; color: #4b5563; margin: 0 0 16px;">Hi ${customerName},</p>
-                      <p style="font-size: 16px; line-height: 24px; color: #4b5563; margin: 0 0 16px;">We're excited to let you know that your NoMatch order has been confirmed and is being prepared for shipment. Each pair is handcrafted with love in Mexico, making your sneakers truly one-of-a-kind.</p>
-                    </td>
-                  </tr>
-                  
-                  <!-- Order Info Box -->
-                  <tr>
-                    <td style="padding: 0 30px;">
-                      <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #f3e8ff; border: 2px solid #d8b4fe; border-radius: 8px; padding: 20px;">
-                        <tr>
-                          <td>
-                            <div style="font-size: 12px; color: #6b7280; text-transform: uppercase; font-weight: 600; margin-bottom: 4px;">Order Number</div>
-                            <div style="font-size: 18px; color: #1f2937; font-weight: 700;">${orderNumber}</div>
-                          </td>
-                          <td align="right">
-                            <div style="font-size: 12px; color: #6b7280; text-transform: uppercase; font-weight: 600; margin-bottom: 4px;">Order Date</div>
-                            <div style="font-size: 18px; color: #1f2937; font-weight: 700;">${orderDate}</div>
-                          </td>
-                        </tr>
-                      </table>
-                    </td>
-                  </tr>
-                  
-                  <!-- Order Items -->
-                  <tr>
-                    <td style="padding: 30px;">
-                      <h2 style="font-size: 20px; font-weight: 600; color: #1f2937; margin: 0 0 16px;">Order Summary</h2>
-                      <table width="100%" cellpadding="0" cellspacing="0">
-                        ${itemsHtml}
-                      </table>
-                    </td>
-                  </tr>
-                  
-                  <!-- Totals -->
-                  <tr>
-                    <td style="padding: 0 30px 30px;">
-                      <table width="100%" cellpadding="0" cellspacing="0">
-                        <tr>
-                          <td style="padding: 8px 0; color: #4b5563;">Subtotal</td>
-                          <td style="padding: 8px 0; text-align: right; font-weight: 500;">$${(subtotal / 100).toFixed(2)}</td>
-                        </tr>
-                        ${discountHtml}
-                        <tr>
-                          <td style="padding: 8px 0; color: #4b5563;">Shipping</td>
-                          <td style="padding: 8px 0; text-align: right; color: #059669; font-weight: 600;">FREE</td>
-                        </tr>
-                        <tr style="border-top: 2px solid #e5e7eb;">
-                          <td style="padding: 12px 0 0; font-size: 20px; font-weight: 700; color: #1f2937;">Total</td>
-                          <td style="padding: 12px 0 0; text-align: right; font-size: 20px; font-weight: 700; color: #9333ea;">$${(totalAmount / 100).toFixed(2)}</td>
-                        </tr>
-                      </table>
-                    </td>
-                  </tr>
-                  
-                  <!-- Payment Info -->
-                  <tr>
-                    <td style="padding: 30px; border-top: 1px solid #e5e7eb;">
-                      <h2 style="font-size: 20px; font-weight: 600; color: #1f2937; margin: 0 0 16px;">Payment & Billing</h2>
-                      <div style="font-size: 14px; color: #6b7280; text-transform: uppercase; font-weight: 600; margin: 16px 0 4px;">Payment Method</div>
-                      <div style="font-size: 15px; color: #1f2937; margin-bottom: 16px;">${paymentMethod}</div>
-                      
-                      <div style="font-size: 14px; color: #6b7280; text-transform: uppercase; font-weight: 600; margin: 16px 0 4px;">Billing Address</div>
-                      <div style="font-size: 15px; color: #1f2937; line-height: 22px;">
-                        ${billingAddress.line1}<br/>
-                        ${billingAddress.line2 ? billingAddress.line2 + '<br/>' : ''}
-                        ${billingAddress.city}, ${billingAddress.state} ${billingAddress.postal_code}<br/>
-                        ${billingAddress.country}
-                      </div>
-                    </td>
-                  </tr>
-                  
-                  <!-- Shipping Info -->
-                  <tr>
-                    <td style="padding: 30px; border-top: 1px solid #e5e7eb;">
-                      <h2 style="font-size: 20px; font-weight: 600; color: #1f2937; margin: 0 0 16px;">Shipping Information</h2>
-                      <p style="font-size: 16px; line-height: 24px; color: #4b5563; margin: 0;">Your order will be delivered within <strong>3-5 business days</strong>. We'll send you tracking information as soon as your order ships.</p>
-                    </td>
-                  </tr>
-                  
-                  <!-- Footer -->
-                  <tr>
-                    <td style="padding: 30px; border-top: 1px solid #e5e7eb; text-align: center;">
-                      <p style="font-size: 13px; color: #9ca3af; margin: 0 0 8px;">Need help? Contact us at <a href="mailto:support@preneurbank.com" style="color: #ec4899; text-decoration: underline;">support@preneurbank.com</a></p>
-                      <p style="font-size: 13px; color: #9ca3af; margin: 0;">© ${new Date().getFullYear()} NoMatch. Made with love in Mexico.</p>
-                    </td>
-                  </tr>
-                </table>
-              </td>
-            </tr>
-          </table>
-        </body>
-      </html>
-    `;
-
-    console.log('✅ Email HTML created');
+    console.log('✅ Email template rendered successfully');
 
     // Send email
     const from = process.env.EMAIL_FROM || 'NoMatch <support@preneurbank.com>';
@@ -387,86 +263,19 @@ async function sendFailureEmail(
       return;
     }
 
-    console.log('📧 Creating failure email HTML...');
+    console.log('📧 Rendering failure email template...');
 
-    // Create simple HTML email
-    const emailHtml = `
-      <!DOCTYPE html>
-      <html>
-        <head>
-          <meta charset="utf-8">
-          <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        </head>
-        <body style="margin: 0; padding: 0; background-color: #fdf2f8; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
-          <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #fdf2f8; padding: 40px 20px;">
-            <tr>
-              <td align="center">
-                <table width="600" cellpadding="0" cellspacing="0" style="background-color: #ffffff; max-width: 600px;">
-                  <!-- Header -->
-                  <tr>
-                    <td style="text-align: center; padding: 20px 0 30px; border-bottom: 3px solid #ec4899;">
-                      <img src="https://preneurbank.com/Logo-NoMatch.webp" alt="NoMatch" width="180" height="60" />
-                    </td>
-                  </tr>
-                  
-                  <!-- Alert -->
-                  <tr>
-                    <td style="padding: 30px;">
-                      <div style="background-color: #fef2f2; border: 2px solid #fecaca; border-radius: 8px; padding: 20px; text-align: center;">
-                        <h1 style="font-size: 28px; font-weight: 700; color: #dc2626; margin: 0 0 12px;">Payment Failed</h1>
-                        <p style="font-size: 16px; color: #991b1b; margin: 0;">We were unable to process your payment for order ${orderNumber}.</p>
-                      </div>
-                    </td>
-                  </tr>
-                  
-                  <!-- Details -->
-                  <tr>
-                    <td style="padding: 0 30px 30px;">
-                      <p style="font-size: 16px; line-height: 24px; color: #4b5563; margin: 0 0 16px;">Hi ${customerName},</p>
-                      <p style="font-size: 16px; line-height: 24px; color: #4b5563; margin: 0 0 16px;">Unfortunately, your payment of <strong>$${(totalAmount / 100).toFixed(2)}</strong> could not be processed.</p>
-                      
-                      <div style="background-color: #f9fafb; border: 1px solid #e5e7eb; border-radius: 6px; padding: 16px; margin: 16px 0;">
-                        <div style="font-size: 14px; font-weight: 600; color: #6b7280; margin-bottom: 8px;">REASON:</div>
-                        <div style="font-size: 15px; color: #1f2937; font-weight: 500;">${reason}</div>
-                      </div>
-                      
-                      <p style="font-size: 16px; line-height: 24px; color: #4b5563; margin: 0;">Don't worry! Your order is still saved and you can complete it by visiting our website and trying a different payment method.</p>
-                    </td>
-                  </tr>
-                  
-                  <!-- What's Next -->
-                  <tr>
-                    <td style="padding: 30px; border-top: 1px solid #e5e7eb;">
-                      <h2 style="font-size: 20px; font-weight: 600; color: #1f2937; margin: 0 0 16px;">What's Next?</h2>
-                      <p style="font-size: 16px; line-height: 24px; color: #4b5563; margin: 0;">
-                        • <strong>Update your payment method</strong> and try again<br/>
-                        • <strong>Check your card details</strong> are correct<br/>
-                        • <strong>Contact your bank</strong> if the issue persists<br/>
-                        • <strong>Use a different payment method</strong>
-                      </p>
-                      
-                      <div style="text-align: center; margin: 30px 0;">
-                        <a href="https://preneurbank.com/checkout" style="background-color: #ec4899; color: #ffffff; font-size: 16px; font-weight: 600; text-decoration: none; padding: 14px 32px; border-radius: 8px; display: inline-block;">Complete Your Order</a>
-                      </div>
-                    </td>
-                  </tr>
-                  
-                  <!-- Footer -->
-                  <tr>
-                    <td style="padding: 30px; border-top: 1px solid #e5e7eb; text-align: center;">
-                      <p style="font-size: 13px; color: #9ca3af; margin: 0 0 8px;">Need help? <a href="mailto:support@preneurbank.com" style="color: #ec4899; text-decoration: underline;">Contact Support</a></p>
-                      <p style="font-size: 13px; color: #9ca3af; margin: 0;">© ${new Date().getFullYear()} NoMatch. Made with love in Mexico.</p>
-                    </td>
-                  </tr>
-                </table>
-              </td>
-            </tr>
-          </table>
-        </body>
-      </html>
-    `;
+    // Render email HTML
+    const emailHtml = await renderAsync(
+      PaymentFailed({
+        orderNumber,
+        customerName,
+        reason,
+        total: totalAmount,
+      })
+    );
 
-    console.log('✅ Failure email HTML created');
+    console.log('✅ Failure email template rendered');
 
     // Send email
     const from = process.env.EMAIL_FROM || 'NoMatch <support@preneurbank.com>';

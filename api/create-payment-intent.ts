@@ -53,11 +53,6 @@ async function validateCustomCoupon(code: string, subtotal: number): Promise<{
       body: JSON.stringify({ code, subtotal }),
     });
 
-    if (!response.ok) {
-      console.error('Coupon validation endpoint error:', response.status);
-      return { valid: false, discount: 0 };
-    }
-
     const result = await response.json();
     
     if (!result.valid) {
@@ -80,13 +75,11 @@ export default async function handler(
   req: VercelRequest,
   res: VercelResponse
 ) {
+  if (req.method !== 'POST') {
+    return res.status(405).json({ error: 'Method not allowed' });
+  }
+
   try {
-    console.log('📝 create-payment-intent called');
-
-    if (req.method !== 'POST') {
-      return res.status(405).json({ error: 'Method not allowed' });
-    }
-
     const { items, promoCode, orderNumber, customerInfo, currency = 'usd' } = req.body as {
       items: CartItem[];
       promoCode?: string;
@@ -95,46 +88,19 @@ export default async function handler(
       currency?: 'usd' | 'mxn';
     };
 
-    console.log('Request data:', { itemCount: items?.length, orderNumber, hasPromo: !!promoCode });
-
     if (!items || items.length === 0) {
       return res.status(400).json({ error: 'No items in cart' });
     }
 
-    // Check Stripe key
-    if (!process.env.STRIPE_SECRET_KEY) {
-      console.error('❌ STRIPE_SECRET_KEY not set');
-      return res.status(500).json({ error: 'Stripe not configured' });
-    }
-
     // Calculate amounts
     const subtotal = computeSubtotal(items);
-    console.log('💰 Subtotal calculated:', subtotal);
-
-    // Validate coupon (skip if validation endpoint fails)
-    let discount = 0;
-    let couponId = '';
-    
-    if (promoCode) {
-      try {
-        const couponResult = await validateCustomCoupon(promoCode, subtotal);
-        discount = couponResult.discount;
-        couponId = couponResult.couponId || '';
-        console.log('🎟️ Coupon result:', { discount, couponId });
-      } catch (err) {
-        console.warn('⚠️ Coupon validation failed, proceeding without discount:', err);
-        // Continue without discount rather than failing
-      }
-    }
-
-    const shipping = 0;  // Free shipping
-    const tax = 0;
+    const couponResult = await validateCustomCoupon(promoCode || '', subtotal);
+    const discount = couponResult.discount;
+    const shipping = 0;  // Free shipping or calculate based on your logic
+    const tax = 0;       // Calculate if needed
     const total = Math.max(subtotal - discount + shipping + tax, 0);
 
-    console.log('💵 Final amounts:', { subtotal, discount, total });
-
     // Create PaymentIntent
-    console.log('Creating PaymentIntent...');
     const paymentIntent = await stripe.paymentIntents.create({
       amount: total,
       currency,
@@ -171,8 +137,6 @@ export default async function handler(
       },
     });
 
-    console.log('✅ PaymentIntent created successfully');
-
     res.status(200).json({
       clientSecret: paymentIntent.client_secret,
       orderNumber,
@@ -181,12 +145,10 @@ export default async function handler(
       subtotal,
     });
   } catch (err: any) {
-    console.error('❌ Error creating payment intent:', err);
-    console.error('Error stack:', err.stack);
+    console.error('Error creating payment intent:', err);
     res.status(500).json({
       error: 'Failed to create payment intent',
       message: err.message,
-      details: err.toString(),
     });
   }
 }
