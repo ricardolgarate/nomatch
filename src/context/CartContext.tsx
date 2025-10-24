@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, ReactNode } from 'react';
+import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { trackEvent } from '../firebase/analytics';
 
 export interface CartItem {
@@ -26,9 +26,57 @@ interface CartContextType {
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
 
+const CART_STORAGE_KEY = 'nomatch_cart';
+
 export function CartProvider({ children }: { children: ReactNode }) {
-  const [cart, setCart] = useState<CartItem[]>([]);
+  // Initialize cart from localStorage
+  const [cart, setCart] = useState<CartItem[]>(() => {
+    if (typeof window === 'undefined') return [];
+    
+    try {
+      const savedCart = localStorage.getItem(CART_STORAGE_KEY);
+      if (savedCart) {
+        const parsed = JSON.parse(savedCart);
+        console.log('📦 Loaded cart from localStorage:', parsed.length, 'items');
+        return parsed;
+      }
+    } catch (error) {
+      console.error('Error loading cart from localStorage:', error);
+    }
+    return [];
+  });
+  
   const [isCartOpen, setIsCartOpen] = useState(false);
+
+  // Save cart to localStorage whenever it changes
+  useEffect(() => {
+    try {
+      localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(cart));
+      console.log('💾 Cart saved to localStorage:', cart.length, 'items');
+      
+      // Track cart updates in analytics
+      if (cart.length > 0) {
+        const cartTotal = cart.reduce((sum, item) => {
+          const price = parseFloat(item.price.replace('$', ''));
+          return sum + price * item.quantity;
+        }, 0);
+        
+        trackEvent('cart_updated', {
+          itemCount: cart.length,
+          totalItems: cart.reduce((sum, item) => sum + item.quantity, 0),
+          cartValue: cartTotal,
+          items: cart.map(item => ({
+            id: item.id,
+            name: item.name,
+            quantity: item.quantity,
+            size: item.size,
+          })),
+        });
+      }
+    } catch (error) {
+      console.error('Error saving cart to localStorage:', error);
+    }
+  }, [cart]);
 
   const addToCart = (item: Omit<CartItem, 'quantity'> & { quantity?: number }) => {
     setCart((prevCart) => {
