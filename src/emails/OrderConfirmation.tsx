@@ -76,9 +76,10 @@ export default function OrderConfirmation({
           {/* Header with Logo */}
           <Section style={header}>
             <Img
-              src="https://preneurbank.com/Logo-NoMatch.webp"
+              src="https://preneurbank.com/nomatch.png"
               alt="NoMatch"
-              width="200"
+              width="280"
+              height="52"
               style={logo}
             />
           </Section>
@@ -275,8 +276,9 @@ const header = {
 const logo = {
   margin: '0 auto',
   display: 'block',
-  maxWidth: '200px',
+  maxWidth: '280px',
   height: 'auto',
+  backgroundColor: 'transparent',
 };
 
 const pinkDivider = {
