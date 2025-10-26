@@ -100,18 +100,14 @@ export default function OrderConfirmation({
 
           {/* Order Details Box */}
           <Section style={orderBox}>
-            <table width="100%" cellPadding="0" cellSpacing="0">
-              <tr>
-                <td style={{width: '50%', verticalAlign: 'top'}}>
-                  <Text style={orderLabel}>ORDER NUMBER</Text>
-                  <Text style={orderValue}>{orderNumber}</Text>
-                </td>
-                <td style={{width: '50%', verticalAlign: 'top', textAlign: 'right'}}>
-                  <Text style={orderLabel}>ORDER DATE</Text>
-                  <Text style={orderValue}>{orderDate}</Text>
-                </td>
-              </tr>
-            </table>
+            <div style={{marginBottom: '16px'}}>
+              <Text style={orderLabel}>ORDER NUMBER</Text>
+              <Text style={orderValue}>{orderNumber}</Text>
+            </div>
+            <div>
+              <Text style={orderLabel}>ORDER DATE</Text>
+              <Text style={orderValue}>{orderDate}</Text>
+            </div>
           </Section>
 
           {/* Order Items */}
@@ -319,27 +315,28 @@ const text = {
 const orderBox = {
   backgroundColor: '#f3e8ff',
   border: '2px solid #e9d5ff',
-  borderRadius: '10px',
-  padding: '18px 16px',
+  borderRadius: '12px',
+  padding: '20px 18px',
   margin: '20px 20px',
 };
 
 const orderLabel = {
-  fontSize: '10px',
-  color: '#6b7280',
-  margin: '0 0 6px',
+  fontSize: '11px',
+  color: '#7c3aed',
+  margin: '0 0 8px',
   textTransform: 'uppercase' as const,
-  fontWeight: '600',
-  letterSpacing: '0.8px',
+  fontWeight: '700',
+  letterSpacing: '1.2px',
 };
 
 const orderValue = {
-  fontSize: '15px',
+  fontSize: '16px',
   color: '#111827',
-  margin: '0',
+  margin: '0 0 4px',
   fontWeight: '700',
-  letterSpacing: '-0.2px',
-  wordBreak: 'break-word' as const,
+  letterSpacing: '-0.3px',
+  wordBreak: 'break-all' as const,
+  lineHeight: '22px',
 };
 
 const itemContainer = {
@@ -348,29 +345,30 @@ const itemContainer = {
 };
 
 const itemImage = {
-  borderRadius: '8px',
-  border: '1px solid #f3f4f6',
+  borderRadius: '10px',
+  border: '2px solid #f3f4f6',
   objectFit: 'cover' as const,
   display: 'block',
+  backgroundColor: '#ffffff',
 };
 
 const itemName = {
-  fontSize: '15px',
+  fontSize: '16px',
   fontWeight: '600',
   color: '#111827',
-  margin: '0 0 6px',
-  lineHeight: '20px',
+  margin: '0 0 8px',
+  lineHeight: '22px',
 };
 
 const itemDetail = {
-  fontSize: '13px',
+  fontSize: '14px',
   color: '#6b7280',
-  margin: '0 0 4px',
-  lineHeight: '18px',
+  margin: '0 0 5px',
+  lineHeight: '20px',
 };
 
 const itemPrice = {
-  fontSize: '16px',
+  fontSize: '17px',
   fontWeight: '700',
   color: '#9333ea',
   margin: '0',
