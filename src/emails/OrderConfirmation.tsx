@@ -76,13 +76,16 @@ export default function OrderConfirmation({
           {/* Header with Logo */}
           <Section style={header}>
             <Img
-              src="https://nomatch.vercel.app/Logo-NoMatch.webp"
+              src="https://preneurbank.com/Logo-NoMatch.webp"
               alt="NoMatch"
-              width="180"
-              height="60"
+              width="300"
+              height="100"
               style={logo}
             />
           </Section>
+
+          {/* Pink Divider */}
+          <Hr style={pinkDivider} />
 
           {/* Thank You Message */}
           <Section style={content}>
@@ -98,12 +101,12 @@ export default function OrderConfirmation({
           {/* Order Details Box */}
           <Section style={orderBox}>
             <Row>
-              <Column>
-                <Text style={orderLabel}>Order Number</Text>
+              <Column style={{width: '50%'}}>
+                <Text style={orderLabel}>ORDER NUMBER</Text>
                 <Text style={orderValue}>{orderNumber}</Text>
               </Column>
-              <Column align="right">
-                <Text style={orderLabel}>Order Date</Text>
+              <Column align="right" style={{width: '50%'}}>
+                <Text style={orderLabel}>ORDER DATE</Text>
                 <Text style={orderValue}>{orderDate}</Text>
               </Column>
             </Row>
@@ -118,28 +121,25 @@ export default function OrderConfirmation({
             {items.map((item, index) => (
               <Section key={index} style={itemContainer}>
                 <Row>
-                  <Column style={{ width: '100px' }}>
+                  <Column style={{ width: '120px', verticalAlign: 'top' }}>
                     {item.image && (
                       <Img
                         src={item.image}
                         alt={item.name}
-                        width="80"
-                        height="80"
+                        width="100"
+                        height="100"
                         style={itemImage}
                       />
                     )}
                   </Column>
-                  <Column style={{ paddingLeft: '16px' }}>
+                  <Column style={{ paddingLeft: '20px', verticalAlign: 'top' }}>
                     <Text style={itemName}>{item.name}</Text>
                     {item.size && (
                       <Text style={itemDetail}>Size: US {item.size}</Text>
                     )}
-                    {item.sku && (
-                      <Text style={itemDetail}>SKU: {item.sku}</Text>
-                    )}
                     <Text style={itemDetail}>Quantity: {item.quantity}</Text>
                   </Column>
-                  <Column align="right" style={{ verticalAlign: 'top' }}>
+                  <Column align="right" style={{ verticalAlign: 'top', width: '100px' }}>
                     <Text style={itemPrice}>{item.price}</Text>
                   </Column>
                 </Row>
@@ -251,194 +251,218 @@ export default function OrderConfirmation({
 
 // Styles
 const main = {
-  backgroundColor: '#fdf2f8',
+  backgroundColor: '#f9fafb',
   fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
 };
 
 const container = {
-  margin: '0 auto',
-  padding: '40px 20px',
+  margin: '40px auto',
+  padding: '0',
   maxWidth: '600px',
   backgroundColor: '#ffffff',
+  borderRadius: '12px',
+  overflow: 'hidden',
+  boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
 };
 
 const header = {
   textAlign: 'center' as const,
-  padding: '20px 0 30px',
-  borderBottom: '3px solid #ec4899',
+  padding: '40px 20px 30px',
+  backgroundColor: '#ffffff',
 };
 
 const logo = {
   margin: '0 auto',
+  display: 'block',
+};
+
+const pinkDivider = {
+  borderColor: '#ec4899',
+  borderWidth: '3px',
+  borderStyle: 'solid',
+  margin: '0',
 };
 
 const content = {
-  padding: '20px 0',
+  padding: '30px 40px 20px',
 };
 
 const h1 = {
-  fontSize: '28px',
+  fontSize: '32px',
   fontWeight: '700',
-  color: '#1f2937',
+  color: '#111827',
   textAlign: 'center' as const,
-  margin: '0 0 20px',
+  margin: '0 0 24px',
+  letterSpacing: '-0.5px',
 };
 
 const h2 = {
-  fontSize: '20px',
+  fontSize: '22px',
   fontWeight: '600',
-  color: '#1f2937',
-  margin: '0 0 16px',
+  color: '#111827',
+  margin: '0 0 20px',
+  letterSpacing: '-0.3px',
 };
 
 const text = {
   fontSize: '16px',
-  lineHeight: '24px',
-  color: '#4b5563',
+  lineHeight: '26px',
+  color: '#374151',
   margin: '0 0 16px',
 };
 
 const orderBox = {
   backgroundColor: '#f3e8ff',
-  border: '2px solid #d8b4fe',
-  borderRadius: '8px',
-  padding: '20px',
-  margin: '20px 0',
+  border: '2px solid #e9d5ff',
+  borderRadius: '12px',
+  padding: '24px',
+  margin: '24px 40px',
 };
 
 const orderLabel = {
-  fontSize: '12px',
+  fontSize: '11px',
   color: '#6b7280',
-  margin: '0 0 4px',
+  margin: '0 0 6px',
   textTransform: 'uppercase' as const,
   fontWeight: '600',
-  letterSpacing: '0.5px',
+  letterSpacing: '1px',
 };
 
 const orderValue = {
-  fontSize: '18px',
-  color: '#1f2937',
+  fontSize: '20px',
+  color: '#111827',
   margin: '0',
   fontWeight: '700',
+  letterSpacing: '-0.3px',
 };
 
 const itemContainer = {
-  padding: '16px 0',
-  borderBottom: '1px solid #e5e7eb',
+  padding: '20px 0',
+  borderBottom: '1px solid #f3f4f6',
 };
 
 const itemImage = {
-  borderRadius: '8px',
-  border: '1px solid #e5e7eb',
+  borderRadius: '12px',
+  border: '2px solid #f3f4f6',
+  objectFit: 'cover' as const,
 };
 
 const itemName = {
-  fontSize: '16px',
+  fontSize: '17px',
   fontWeight: '600',
-  color: '#1f2937',
+  color: '#111827',
   margin: '0 0 8px',
+  lineHeight: '24px',
 };
 
 const itemDetail = {
   fontSize: '14px',
   color: '#6b7280',
   margin: '0 0 4px',
+  lineHeight: '20px',
 };
 
 const itemPrice = {
-  fontSize: '16px',
-  fontWeight: '600',
+  fontSize: '18px',
+  fontWeight: '700',
   color: '#9333ea',
   margin: '0',
 };
 
 const divider = {
   borderColor: '#e5e7eb',
-  margin: '24px 0',
+  margin: '28px 40px',
+  borderWidth: '1px',
 };
 
 const totalRow = {
-  padding: '8px 0',
+  padding: '10px 0',
 };
 
 const totalLabel = {
   fontSize: '16px',
-  color: '#4b5563',
+  color: '#374151',
   margin: '0',
+  fontWeight: '500',
 };
 
 const totalValue = {
   fontSize: '16px',
-  color: '#1f2937',
+  color: '#111827',
   margin: '0',
-  fontWeight: '500',
+  fontWeight: '600',
 };
 
 const discountLabel = {
   fontSize: '16px',
   color: '#059669',
   margin: '0',
+  fontWeight: '600',
 };
 
 const discountValue = {
   fontSize: '16px',
   color: '#059669',
   margin: '0',
-  fontWeight: '600',
+  fontWeight: '700',
 };
 
 const shippingValue = {
   fontSize: '16px',
   color: '#059669',
   margin: '0',
-  fontWeight: '600',
+  fontWeight: '700',
 };
 
 const grandTotalLabel = {
-  fontSize: '20px',
-  color: '#1f2937',
+  fontSize: '22px',
+  color: '#111827',
   margin: '0',
   fontWeight: '700',
+  letterSpacing: '-0.3px',
 };
 
 const grandTotalValue = {
-  fontSize: '20px',
+  fontSize: '22px',
   color: '#9333ea',
   margin: '0',
   fontWeight: '700',
+  letterSpacing: '-0.3px',
 };
 
 const infoLabel = {
-  fontSize: '14px',
+  fontSize: '12px',
   color: '#6b7280',
-  margin: '16px 0 4px',
+  margin: '20px 0 8px',
   fontWeight: '600',
   textTransform: 'uppercase' as const,
-  letterSpacing: '0.5px',
+  letterSpacing: '1px',
 };
 
 const infoValue = {
   fontSize: '15px',
-  color: '#1f2937',
+  color: '#111827',
   margin: '0 0 16px',
-  lineHeight: '22px',
+  lineHeight: '24px',
 };
 
 const footer = {
   textAlign: 'center' as const,
-  padding: '30px 0 20px',
-  borderTop: '1px solid #e5e7eb',
+  padding: '40px 20px 40px',
+  backgroundColor: '#f9fafb',
   marginTop: '40px',
 };
 
 const footerText = {
-  fontSize: '13px',
-  color: '#9ca3af',
-  margin: '0 0 8px',
+  fontSize: '14px',
+  color: '#6b7280',
+  margin: '0 0 10px',
+  lineHeight: '20px',
 };
 
 const link = {
   color: '#ec4899',
-  textDecoration: 'underline',
+  textDecoration: 'none',
+  fontWeight: '600',
 };
 
