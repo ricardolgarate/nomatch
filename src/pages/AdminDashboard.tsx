@@ -43,8 +43,8 @@ const WEBSITE_PRODUCTS = [
   { id: 'pink-signature-hoodie', name: 'NoMatch Pink Signature Hoodie', price: '$60', category: 'Clothing', sku: 'HOD-SIG-PK' },
 ];
 
-const SHOE_SIZES = ['6', '6.5', '7', '7.5', '8', '8.5', '9', '9.5', '10', '10.5', '11'];
-const CLOTHING_SIZES = ['XS', 'S', 'M', 'L'];
+const SHOE_SIZES = ['5', '5.5', '6', '6.5', '7', '7.5', '8', '8.5', '9', '9.5', '10', '10.5', '11', '11.5', '12'];
+const CLOTHING_SIZES = ['XS', 'S', 'M', 'L', 'XL'];
 
 export default function AdminDashboard() {
   const { isAdmin, logout, loading: authLoading } = useAdmin();
@@ -101,11 +101,29 @@ export default function AdminDashboard() {
       const data = await getAllProducts();
       setProducts(data);
       
-      // Initialize stock edits with current values
+      // Initialize stock edits with current values - ensure all sizes default to 0
       const edits: { [key: string]: any } = {};
       data.forEach(product => {
         if (product.sizes) {
-          edits[product.id] = { ...product.sizes };
+          // Initialize all sizes with 0, then override with actual values
+          const initialSizes: { [key: string]: number } = {};
+          const sizesArray = product.category === 'Shoes' 
+            ? SHOE_SIZES 
+            : product.subcategory === 'Hoodie' 
+              ? CLOTHING_SIZES 
+              : [];
+          
+          // Set all sizes to 0 first
+          sizesArray.forEach(size => {
+            initialSizes[size] = 0;
+          });
+          
+          // Then override with actual stock values
+          Object.keys(product.sizes).forEach(size => {
+            initialSizes[size] = product.sizes![size] || 0;
+          });
+          
+          edits[product.id] = initialSizes;
         } else {
           edits[product.id] = product.stock || 0;
         }
