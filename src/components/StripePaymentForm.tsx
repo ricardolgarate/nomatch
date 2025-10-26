@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { loadStripe, StripeElementsOptions } from '@stripe/stripe-js';
 import { Elements, PaymentElement, useStripe, useElements } from '@stripe/react-stripe-js';
 import { Loader2 } from 'lucide-react';
@@ -179,54 +179,66 @@ export default function StripePaymentForm(props: PaymentFormProps) {
   const [clientSecret, setClientSecret] = useState<string | null>(null);
   const [loadingSecret, setLoadingSecret] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const initializedRef = useRef(false);
+  const currentCouponRef = useRef(props.appliedCouponCode);
 
   useEffect(() => {
-    // Get initial client secret (re-initialize when coupon changes)
-    const initializePayment = async () => {
-      try {
-        setLoadingSecret(true);
-        const response = await fetch('/api/create-payment-intent', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            items: props.items.map(item => ({
-              id: item.id,
-              name: item.name,
-              image: item.image,
-              unitAmount: Math.round(parseFloat(item.price.replace('$', '')) * 100),
-              quantity: item.quantity,
+    // Only re-initialize if:
+    // 1. First time loading
+    // 2. Coupon code changes (affects price)
+    const couponChanged = currentCouponRef.current !== props.appliedCouponCode;
+    
+    if (!initializedRef.current || couponChanged) {
+      currentCouponRef.current = props.appliedCouponCode;
+      initializedRef.current = true;
+
+      // Get initial client secret (re-initialize when coupon changes)
+      const initializePayment = async () => {
+        try {
+          setLoadingSecret(true);
+          const response = await fetch('/api/create-payment-intent', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              items: props.items.map(item => ({
+                id: item.id,
+                name: item.name,
+                image: item.image,
+                unitAmount: Math.round(parseFloat(item.price.replace('$', '')) * 100),
+                quantity: item.quantity,
+                currency: 'usd',
+                sku: item.sku,
+                size: item.size,
+                category: item.category,
+              })),
+              promoCode: props.appliedCouponCode || undefined,
+              orderNumber: props.orderNumber,
+              customerInfo: props.customerInfo,
               currency: 'usd',
-              sku: item.sku,
-              size: item.size,
-              category: item.category,
-            })),
-            promoCode: props.appliedCouponCode || undefined,
-            orderNumber: props.orderNumber,
-            customerInfo: props.customerInfo,
-            currency: 'usd',
-          }),
-        });
+            }),
+          });
 
-        const data = await response.json();
+          const data = await response.json();
 
-        if (data.error || !data.clientSecret) {
-          setError(data.error || 'Could not initialize payment.');
+          if (data.error || !data.clientSecret) {
+            setError(data.error || 'Could not initialize payment.');
+            setLoadingSecret(false);
+            return;
+          }
+
+          setClientSecret(data.clientSecret);
+        } catch (err: any) {
+          setError(err.message || 'Failed to initialize payment.');
+        } finally {
           setLoadingSecret(false);
-          return;
         }
+      };
 
-        setClientSecret(data.clientSecret);
-      } catch (err: any) {
-        setError(err.message || 'Failed to initialize payment.');
-      } finally {
-        setLoadingSecret(false);
-      }
-    };
-
-    initializePayment();
-  }, [props.items, props.orderNumber, props.customerInfo, props.appliedCouponCode]);
+      initializePayment();
+    }
+  }, [props.appliedCouponCode]);
 
   if (loadingSecret) {
     return (
