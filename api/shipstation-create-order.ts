@@ -1,5 +1,13 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 
+interface ShipStationResponse {
+  orderId: number;
+  orderNumber: string;
+  orderKey: string;
+  orderDate: string;
+  orderStatus: string;
+}
+
 interface ShipStationOrderItem {
   sku: string;
   name: string;
@@ -92,7 +100,7 @@ export default async function handler(
       });
     }
 
-    const result = await response.json();
+    const result = await response.json() as ShipStationResponse;
     console.log('✅ ShipStation order created:', result.orderId);
 
     res.status(200).json({

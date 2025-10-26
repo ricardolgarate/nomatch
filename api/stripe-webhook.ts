@@ -5,6 +5,15 @@ import { getFirestore } from 'firebase-admin/firestore';
 import { Resend } from 'resend';
 import { renderAsync } from '@react-email/components';
 
+// ShipStation API Response type
+interface ShipStationResponse {
+  orderId: number;
+  orderNumber: string;
+  orderKey: string;
+  orderDate: string;
+  orderStatus: string;
+}
+
 // Initialize Stripe with your secret key
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
   apiVersion: '2025-09-30.clover',
@@ -327,7 +336,7 @@ async function sendToShipStation(
       throw new Error(`ShipStation error: ${errorText}`);
     }
 
-    const result = await response.json();
+    const result = await response.json() as ShipStationResponse;
     console.log('✅ ShipStation order created! Order ID:', result.orderId);
     
     return result;
