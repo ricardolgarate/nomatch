@@ -78,8 +78,7 @@ export default function OrderConfirmation({
             <Img
               src="https://preneurbank.com/Logo-NoMatch.webp"
               alt="NoMatch"
-              width="300"
-              height="100"
+              width="200"
               style={logo}
             />
           </Section>
@@ -100,16 +99,18 @@ export default function OrderConfirmation({
 
           {/* Order Details Box */}
           <Section style={orderBox}>
-            <Row>
-              <Column style={{width: '50%'}}>
-                <Text style={orderLabel}>ORDER NUMBER</Text>
-                <Text style={orderValue}>{orderNumber}</Text>
-              </Column>
-              <Column align="right" style={{width: '50%'}}>
-                <Text style={orderLabel}>ORDER DATE</Text>
-                <Text style={orderValue}>{orderDate}</Text>
-              </Column>
-            </Row>
+            <table width="100%" cellPadding="0" cellSpacing="0">
+              <tr>
+                <td style={{width: '50%', verticalAlign: 'top'}}>
+                  <Text style={orderLabel}>ORDER NUMBER</Text>
+                  <Text style={orderValue}>{orderNumber}</Text>
+                </td>
+                <td style={{width: '50%', verticalAlign: 'top', textAlign: 'right'}}>
+                  <Text style={orderLabel}>ORDER DATE</Text>
+                  <Text style={orderValue}>{orderDate}</Text>
+                </td>
+              </tr>
+            </table>
           </Section>
 
           {/* Order Items */}
@@ -120,29 +121,31 @@ export default function OrderConfirmation({
 
             {items.map((item, index) => (
               <Section key={index} style={itemContainer}>
-                <Row>
-                  <Column style={{ width: '120px', verticalAlign: 'top' }}>
-                    {item.image && (
-                      <Img
-                        src={item.image}
-                        alt={item.name}
-                        width="100"
-                        height="100"
-                        style={itemImage}
-                      />
-                    )}
-                  </Column>
-                  <Column style={{ paddingLeft: '20px', verticalAlign: 'top' }}>
-                    <Text style={itemName}>{item.name}</Text>
-                    {item.size && (
-                      <Text style={itemDetail}>Size: US {item.size}</Text>
-                    )}
-                    <Text style={itemDetail}>Quantity: {item.quantity}</Text>
-                  </Column>
-                  <Column align="right" style={{ verticalAlign: 'top', width: '100px' }}>
-                    <Text style={itemPrice}>{item.price}</Text>
-                  </Column>
-                </Row>
+                <table width="100%" cellPadding="0" cellSpacing="0">
+                  <tr>
+                    <td style={{width: '80px', verticalAlign: 'top'}}>
+                      {item.image && (
+                        <Img
+                          src={item.image}
+                          alt={item.name}
+                          width="70"
+                          height="70"
+                          style={itemImage}
+                        />
+                      )}
+                    </td>
+                    <td style={{paddingLeft: '12px', verticalAlign: 'top'}}>
+                      <Text style={itemName}>{item.name}</Text>
+                      {item.size && (
+                        <Text style={itemDetail}>Size: US {item.size}</Text>
+                      )}
+                      <Text style={itemDetail}>Quantity: {item.quantity}</Text>
+                    </td>
+                    <td style={{verticalAlign: 'top', textAlign: 'right', width: '80px'}}>
+                      <Text style={itemPrice}>{item.price}</Text>
+                    </td>
+                  </tr>
+                </table>
               </Section>
             ))}
           </Section>
@@ -256,24 +259,24 @@ const main = {
 };
 
 const container = {
-  margin: '40px auto',
+  margin: '20px auto',
   padding: '0',
-  maxWidth: '600px',
+  maxWidth: '100%',
+  width: '100%',
   backgroundColor: '#ffffff',
-  borderRadius: '12px',
-  overflow: 'hidden',
-  boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
 };
 
 const header = {
   textAlign: 'center' as const,
-  padding: '40px 20px 30px',
+  padding: '30px 20px 20px',
   backgroundColor: '#ffffff',
 };
 
 const logo = {
   margin: '0 auto',
   display: 'block',
+  maxWidth: '200px',
+  height: 'auto',
 };
 
 const pinkDivider = {
@@ -284,86 +287,88 @@ const pinkDivider = {
 };
 
 const content = {
-  padding: '30px 40px 20px',
+  padding: '20px 20px 15px',
 };
 
 const h1 = {
-  fontSize: '32px',
+  fontSize: '24px',
   fontWeight: '700',
   color: '#111827',
   textAlign: 'center' as const,
-  margin: '0 0 24px',
-  letterSpacing: '-0.5px',
-};
-
-const h2 = {
-  fontSize: '22px',
-  fontWeight: '600',
-  color: '#111827',
   margin: '0 0 20px',
   letterSpacing: '-0.3px',
 };
 
-const text = {
-  fontSize: '16px',
-  lineHeight: '26px',
-  color: '#374151',
+const h2 = {
+  fontSize: '20px',
+  fontWeight: '600',
+  color: '#111827',
   margin: '0 0 16px',
+  letterSpacing: '-0.2px',
+};
+
+const text = {
+  fontSize: '15px',
+  lineHeight: '24px',
+  color: '#374151',
+  margin: '0 0 14px',
 };
 
 const orderBox = {
   backgroundColor: '#f3e8ff',
   border: '2px solid #e9d5ff',
-  borderRadius: '12px',
-  padding: '24px',
-  margin: '24px 40px',
+  borderRadius: '10px',
+  padding: '18px 16px',
+  margin: '20px 20px',
 };
 
 const orderLabel = {
-  fontSize: '11px',
+  fontSize: '10px',
   color: '#6b7280',
   margin: '0 0 6px',
   textTransform: 'uppercase' as const,
   fontWeight: '600',
-  letterSpacing: '1px',
+  letterSpacing: '0.8px',
 };
 
 const orderValue = {
-  fontSize: '20px',
+  fontSize: '15px',
   color: '#111827',
   margin: '0',
   fontWeight: '700',
-  letterSpacing: '-0.3px',
+  letterSpacing: '-0.2px',
+  wordBreak: 'break-word' as const,
 };
 
 const itemContainer = {
-  padding: '20px 0',
+  padding: '16px 0',
   borderBottom: '1px solid #f3f4f6',
 };
 
 const itemImage = {
-  borderRadius: '12px',
-  border: '2px solid #f3f4f6',
+  borderRadius: '8px',
+  border: '1px solid #f3f4f6',
   objectFit: 'cover' as const,
+  display: 'block',
 };
 
 const itemName = {
-  fontSize: '17px',
+  fontSize: '15px',
   fontWeight: '600',
   color: '#111827',
-  margin: '0 0 8px',
-  lineHeight: '24px',
-};
-
-const itemDetail = {
-  fontSize: '14px',
-  color: '#6b7280',
-  margin: '0 0 4px',
+  margin: '0 0 6px',
   lineHeight: '20px',
 };
 
+const itemDetail = {
+  fontSize: '13px',
+  color: '#6b7280',
+  margin: '0 0 4px',
+  lineHeight: '18px',
+};
+
 const itemPrice = {
-  fontSize: '18px',
+  fontSize: '16px',
   fontWeight: '700',
   color: '#9333ea',
   margin: '0',
@@ -371,63 +376,63 @@ const itemPrice = {
 
 const divider = {
   borderColor: '#e5e7eb',
-  margin: '28px 40px',
+  margin: '20px 20px',
   borderWidth: '1px',
 };
 
 const totalRow = {
-  padding: '10px 0',
+  padding: '8px 0',
 };
 
 const totalLabel = {
-  fontSize: '16px',
+  fontSize: '15px',
   color: '#374151',
   margin: '0',
   fontWeight: '500',
 };
 
 const totalValue = {
-  fontSize: '16px',
+  fontSize: '15px',
   color: '#111827',
   margin: '0',
   fontWeight: '600',
 };
 
 const discountLabel = {
-  fontSize: '16px',
+  fontSize: '15px',
   color: '#059669',
   margin: '0',
   fontWeight: '600',
 };
 
 const discountValue = {
-  fontSize: '16px',
+  fontSize: '15px',
   color: '#059669',
   margin: '0',
   fontWeight: '700',
 };
 
 const shippingValue = {
-  fontSize: '16px',
+  fontSize: '15px',
   color: '#059669',
   margin: '0',
   fontWeight: '700',
 };
 
 const grandTotalLabel = {
-  fontSize: '22px',
+  fontSize: '20px',
   color: '#111827',
   margin: '0',
   fontWeight: '700',
-  letterSpacing: '-0.3px',
+  letterSpacing: '-0.2px',
 };
 
 const grandTotalValue = {
-  fontSize: '22px',
+  fontSize: '20px',
   color: '#9333ea',
   margin: '0',
   fontWeight: '700',
-  letterSpacing: '-0.3px',
+  letterSpacing: '-0.2px',
 };
 
 const infoLabel = {
@@ -448,15 +453,15 @@ const infoValue = {
 
 const footer = {
   textAlign: 'center' as const,
-  padding: '40px 20px 40px',
+  padding: '30px 20px 30px',
   backgroundColor: '#f9fafb',
-  marginTop: '40px',
+  marginTop: '30px',
 };
 
 const footerText = {
-  fontSize: '14px',
+  fontSize: '13px',
   color: '#6b7280',
-  margin: '0 0 10px',
+  margin: '0 0 8px',
   lineHeight: '20px',
 };
 
