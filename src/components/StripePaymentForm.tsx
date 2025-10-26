@@ -180,19 +180,13 @@ export default function StripePaymentForm(props: PaymentFormProps) {
   const [loadingSecret, setLoadingSecret] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const initializedRef = useRef(false);
-  const currentCouponRef = useRef(props.appliedCouponCode);
 
   useEffect(() => {
-    // Only re-initialize if:
-    // 1. First time loading
-    // 2. Coupon code changes (affects price)
-    const couponChanged = currentCouponRef.current !== props.appliedCouponCode;
-    
-    if (!initializedRef.current || couponChanged) {
-      currentCouponRef.current = props.appliedCouponCode;
+    // Only initialize payment intent ONCE on component mount
+    // Customer info will be captured when they submit the payment
+    if (!initializedRef.current) {
       initializedRef.current = true;
 
-      // Get initial client secret (re-initialize when coupon changes)
       const initializePayment = async () => {
         try {
           setLoadingSecret(true);
@@ -238,7 +232,7 @@ export default function StripePaymentForm(props: PaymentFormProps) {
 
       initializePayment();
     }
-  }, [props.appliedCouponCode]);
+  }, []); // Empty dependency array - only run once on mount
 
   if (loadingSecret) {
     return (
