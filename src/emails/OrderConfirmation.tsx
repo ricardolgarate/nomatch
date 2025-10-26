@@ -316,8 +316,8 @@ const orderBox = {
   backgroundColor: '#f3e8ff',
   border: '2px solid #e9d5ff',
   borderRadius: '12px',
-  padding: '20px 18px',
-  margin: '20px 20px',
+  padding: '20px 16px',
+  margin: '20px 0',
 };
 
 const orderLabel = {
@@ -376,7 +376,7 @@ const itemPrice = {
 
 const divider = {
   borderColor: '#e5e7eb',
-  margin: '20px 20px',
+  margin: '20px 0',
   borderWidth: '1px',
 };
 
