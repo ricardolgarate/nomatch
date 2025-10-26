@@ -208,7 +208,7 @@ const trackingBox = {
   border: '2px solid #86efac',
   borderRadius: '12px',
   padding: '24px 20px',
-  margin: '20px 20px',
+  margin: '20px 0',
   textAlign: 'center' as const,
 };
 
@@ -233,7 +233,6 @@ const trackingNumber = {
 };
 
 const trackButton = {
-  display: 'inline-block',
   backgroundColor: '#9333ea',
   color: '#ffffff',
   padding: '14px 32px',
