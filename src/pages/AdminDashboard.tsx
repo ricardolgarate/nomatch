@@ -43,8 +43,8 @@ const WEBSITE_PRODUCTS = [
   { id: 'pink-signature-hoodie', name: 'NoMatch Pink Signature Hoodie', price: '$60', category: 'Clothing', sku: 'HOD-SIG-PK' },
 ];
 
-const SHOE_SIZES = ['5', '5.5', '6', '6.5', '7', '7.5', '8', '8.5', '9', '9.5', '10', '10.5', '11', '11.5', '12'];
-const CLOTHING_SIZES = ['XS', 'S', 'M', 'L', 'XL'];
+const SHOE_SIZES = ['6', '6.5', '7', '7.5', '8', '8.5', '9', '9.5', '10', '10.5', '11'];
+const CLOTHING_SIZES = ['XS', 'S', 'M', 'L'];
 
 export default function AdminDashboard() {
   const { isAdmin, logout, loading: authLoading } = useAdmin();
