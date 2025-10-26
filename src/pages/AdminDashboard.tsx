@@ -534,7 +534,7 @@ export default function AdminDashboard() {
                             <input
                               type="number"
                               min="0"
-                              value={currentStock}
+                              value={currentStock || 0}
                               onChange={(e) => handleStockChange(productInfo.id, 'stock', parseInt(e.target.value) || 0)}
                               className="w-32 px-3 py-2.5 text-center border-2 border-pink-200 rounded-lg focus:ring-2 focus:ring-purple-400 focus:border-purple-400 transition-all font-medium"
                               disabled={!product}
@@ -613,7 +613,7 @@ export default function AdminDashboard() {
                             <input
                               type="number"
                               min="0"
-                              value={currentStock}
+                              value={currentStock || 0}
                               onChange={(e) => handleStockChange(productInfo.id, 'stock', parseInt(e.target.value) || 0)}
                               className="w-32 px-3 py-2.5 text-center border-2 border-pink-200 rounded-lg focus:ring-2 focus:ring-purple-400 focus:border-purple-400 transition-all font-medium"
                               disabled={!product}

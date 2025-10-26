@@ -373,11 +373,31 @@ export default function ProductDetail() {
         if (firestoreProduct) {
           setProduct(firestoreProduct);
           
-          // Load stock info
+          // Load stock info - ensure all sizes default to 0
           if (firestoreProduct.sizes) {
-            setStockInfo(firestoreProduct.sizes);
+            // Initialize all possible sizes with 0, then override with actual values
+            const initialStock: { [key: string]: number } = {};
+            const sizesToInit = firestoreProduct.category === 'Shoes' 
+              ? shoeSizes 
+              : firestoreProduct.subcategory === 'Hoodie' 
+                ? clothingSizes 
+                : [];
+            
+            // Set all sizes to 0 first
+            sizesToInit.forEach(size => {
+              initialStock[size] = 0;
+            });
+            
+            // Then override with actual stock values
+            Object.keys(firestoreProduct.sizes).forEach(size => {
+              initialStock[size] = firestoreProduct.sizes![size] || 0;
+            });
+            
+            setStockInfo(initialStock);
           } else if (firestoreProduct.stock !== undefined) {
-            setStockInfo({ general: firestoreProduct.stock });
+            setStockInfo({ general: firestoreProduct.stock || 0 });
+          } else {
+            setStockInfo({ general: 0 });
           }
         } else {
           // Fallback to hardcoded product
