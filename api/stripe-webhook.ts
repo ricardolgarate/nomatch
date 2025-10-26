@@ -255,6 +255,31 @@ async function sendSuccessEmail(
   }
 }
 
+// Convert country name to 2-character code
+function getCountryCode(country: string): string {
+  if (!country) return 'US';
+  
+  // Already a 2-character code
+  if (country.length === 2) return country.toUpperCase();
+  
+  // Extract from formats like "United States (US)"
+  const match = country.match(/\(([A-Z]{2})\)/);
+  if (match) return match[1];
+  
+  // Common country mappings
+  const countryMap: { [key: string]: string } = {
+    'united states': 'US',
+    'usa': 'US',
+    'mexico': 'MX',
+    'canada': 'CA',
+    'united kingdom': 'GB',
+    'uk': 'GB',
+  };
+  
+  const normalized = country.toLowerCase().trim();
+  return countryMap[normalized] || 'US';
+}
+
 // Send order to ShipStation
 async function sendToShipStation(
   orderNumber: string,
@@ -287,7 +312,7 @@ async function sendToShipStation(
         city: billingAddress.city || '',
         state: billingAddress.state || '',
         postalCode: billingAddress.postal_code || billingAddress.zipCode || '',
-        country: billingAddress.country || 'US',
+        country: getCountryCode(billingAddress.country || 'US'),
         phone: customerInfo.phone || '',
       },
       shipTo: {
@@ -297,7 +322,7 @@ async function sendToShipStation(
         city: shippingAddress.city || billingAddress.city || '',
         state: shippingAddress.state || billingAddress.state || '',
         postalCode: shippingAddress.postal_code || billingAddress.postal_code || '',
-        country: shippingAddress.country || billingAddress.country || 'US',
+        country: getCountryCode(shippingAddress.country || billingAddress.country || 'US'),
         phone: customerInfo.phone || shippingAddress.phone || '',
       },
       items: items.map(item => ({
