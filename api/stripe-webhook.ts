@@ -246,6 +246,98 @@ async function sendSuccessEmail(
   }
 }
 
+// Send order to ShipStation
+async function sendToShipStation(
+  orderNumber: string,
+  orderData: any,
+  items: any[],
+  totalAmount: number
+) {
+  try {
+    if (!process.env.SHIPSTATION_API_KEY || !process.env.SHIPSTATION_API_SECRET) {
+      console.warn('⚠️ ShipStation credentials not set - skipping order creation');
+      return;
+    }
+
+    console.log('📦 Creating ShipStation order:', orderNumber);
+
+    const customerInfo = orderData.customerInfo || {};
+    const shippingAddress = orderData.shippingAddress || customerInfo.address || {};
+    const billingAddress = customerInfo.address || {};
+
+    // Prepare ShipStation order
+    const shipStationOrder = {
+      orderNumber,
+      orderDate: new Date().toISOString(),
+      orderStatus: 'awaiting_shipment',
+      customerEmail: customerInfo.email || orderData.customerEmail || '',
+      billTo: {
+        name: customerInfo.name || 'Customer',
+        street1: billingAddress.line1 || '',
+        street2: billingAddress.line2 || '',
+        city: billingAddress.city || '',
+        state: billingAddress.state || '',
+        postalCode: billingAddress.postal_code || billingAddress.zipCode || '',
+        country: billingAddress.country || 'US',
+        phone: customerInfo.phone || '',
+      },
+      shipTo: {
+        name: customerInfo.name || shippingAddress.name || 'Customer',
+        street1: shippingAddress.line1 || billingAddress.line1 || '',
+        street2: shippingAddress.line2 || billingAddress.line2 || '',
+        city: shippingAddress.city || billingAddress.city || '',
+        state: shippingAddress.state || billingAddress.state || '',
+        postalCode: shippingAddress.postal_code || billingAddress.postal_code || '',
+        country: shippingAddress.country || billingAddress.country || 'US',
+        phone: customerInfo.phone || shippingAddress.phone || '',
+      },
+      items: items.map(item => ({
+        sku: item.sku || item.id,
+        name: item.name,
+        quantity: item.quantity,
+        unitPrice: parseFloat((item.price || '0').replace('$', '')),
+        imageUrl: item.image,
+        weight: {
+          value: 16, // Default 1 lb per pair of shoes
+          units: 'ounces' as const,
+        },
+      })),
+      amountPaid: totalAmount / 100,
+      shippingAmount: 0,
+      taxAmount: 0,
+      internalNotes: `Order from preneurbank.com. Stripe Payment ID: ${orderData.paymentIntentId}`,
+      requestedShippingService: 'USPS Priority Mail',
+    };
+
+    // Create Basic Auth header
+    const auth = Buffer.from(`${process.env.SHIPSTATION_API_KEY}:${process.env.SHIPSTATION_API_SECRET}`).toString('base64');
+
+    const response = await fetch('https://ssapi.shipstation.com/orders/createorder', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Basic ${auth}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(shipStationOrder),
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error('❌ ShipStation API error:', response.status, errorText);
+      throw new Error(`ShipStation error: ${errorText}`);
+    }
+
+    const result = await response.json();
+    console.log('✅ ShipStation order created! Order ID:', result.orderId);
+    
+    return result;
+  } catch (error: any) {
+    console.error('❌ Error sending to ShipStation:', error);
+    console.error('Error details:', error?.message);
+    // Don't throw - ShipStation failure shouldn't block order completion
+  }
+}
+
 // Send failed payment email
 async function sendFailureEmail(
   email: string,
@@ -393,6 +485,9 @@ export default async function handler(
           // Send confirmation email
           await sendSuccessEmail(email, orderNumber, cartItems, session.amount_total || 0, orderData);
           
+          // Send to ShipStation
+          await sendToShipStation(orderNumber, orderData, cartItems, session.amount_total || 0);
+          
           console.log('✅ Order fulfilled:', orderNumber);
         }
         
@@ -444,6 +539,9 @@ export default async function handler(
           
           // Send confirmation email
           await sendSuccessEmail(customerInfo.email || '', orderNumber, cartItems, paymentIntent.amount, orderData);
+          
+          // Send to ShipStation
+          await sendToShipStation(orderNumber, orderData, cartItems, paymentIntent.amount);
           
           console.log('✅ Order fulfilled (PaymentIntent):', orderNumber);
         }

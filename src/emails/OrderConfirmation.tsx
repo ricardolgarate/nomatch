@@ -93,8 +93,7 @@ export default function OrderConfirmation({
             <Text style={text}>Hi {customerName},</Text>
             <Text style={text}>
               We're excited to let you know that your NoMatch order has been confirmed and is being
-              prepared for shipment. Each pair is handcrafted with love in Mexico, making your
-              sneakers truly one-of-a-kind.
+              prepared for shipment. Each pair is truly one-of-a-kind designed to stand out.
             </Text>
           </Section>
 
@@ -226,7 +225,7 @@ export default function OrderConfirmation({
               Shipping Information
             </Heading>
             <Text style={text}>
-              Your order will be delivered within <strong>3-5 business days</strong>. We'll send you
+              Your order will be delivered within <strong>7-21 business days</strong>. We'll send you
               tracking information as soon as your order ships.
             </Text>
           </Section>
@@ -240,7 +239,7 @@ export default function OrderConfirmation({
               </Link>
             </Text>
             <Text style={footerText}>
-              © {new Date().getFullYear()} NoMatch. Made with love in Mexico.
+              © {new Date().getFullYear()} NoMatch. Designed to Stand Out.
             </Text>
           </Section>
         </Container>
