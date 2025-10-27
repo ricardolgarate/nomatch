@@ -228,7 +228,6 @@ const trackingNumber = {
   margin: '0 0 20px',
   fontWeight: 700,
   letterSpacing: '0.5px',
-  wordBreak: 'break-all' as const,
   textAlign: 'center' as const,
 };
 
