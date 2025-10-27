@@ -64,7 +64,7 @@ export default function ShippingNotification({
           {/* Tracking Box */}
           <Section style={trackingBox}>
             <Text style={trackingLabel}>TRACKING NUMBER</Text>
-            <Text style={trackingNumber}>{trackingNumber}</Text>
+            <Text style={trackingNumberStyle}>{trackingNumber}</Text>
             
             <Link href={trackingUrl} style={trackButton}>
               Track Your Package
@@ -222,7 +222,7 @@ const trackingLabel = {
   textAlign: 'center' as const,
 };
 
-const trackingNumber = {
+const trackingNumberStyle = {
   fontSize: '20px',
   color: '#111827',
   margin: '0 0 20px',
