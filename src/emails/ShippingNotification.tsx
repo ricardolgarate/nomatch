@@ -181,7 +181,7 @@ const shippingIcon = {
 
 const h1 = {
   fontSize: '24px',
-  fontWeight: '700',
+  fontWeight: 700,
   color: '#111827',
   textAlign: 'center' as const,
   margin: '0 0 20px',
@@ -190,7 +190,7 @@ const h1 = {
 
 const h2 = {
   fontSize: '20px',
-  fontWeight: '600',
+  fontWeight: 600,
   color: '#111827',
   margin: '0 0 16px',
   letterSpacing: '-0.2px',
@@ -217,7 +217,7 @@ const trackingLabel = {
   color: '#059669',
   margin: '0 0 10px',
   textTransform: 'uppercase' as const,
-  fontWeight: '700',
+  fontWeight: 700,
   letterSpacing: '1.2px',
   textAlign: 'center' as const,
 };
@@ -226,7 +226,7 @@ const trackingNumber = {
   fontSize: '20px',
   color: '#111827',
   margin: '0 0 20px',
-  fontWeight: '700',
+  fontWeight: 700,
   letterSpacing: '0.5px',
   wordBreak: 'break-all' as const,
   textAlign: 'center' as const,
@@ -238,7 +238,7 @@ const trackButton = {
   padding: '14px 32px',
   borderRadius: '8px',
   textDecoration: 'none',
-  fontWeight: '600',
+  fontWeight: 600,
   fontSize: '16px',
   margin: '0 0 16px',
   textAlign: 'center' as const,
@@ -248,7 +248,7 @@ const trackingCarrier = {
   fontSize: '13px',
   color: '#059669',
   margin: '0',
-  fontWeight: '600',
+  fontWeight: 600,
   textAlign: 'center' as const,
 };
 
@@ -295,6 +295,6 @@ const footerText = {
 const link = {
   color: '#ec4899',
   textDecoration: 'none',
-  fontWeight: '600',
+  fontWeight: 600,
 };
 
