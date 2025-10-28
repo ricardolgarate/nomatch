@@ -129,7 +129,9 @@ export default async function handler(
     if (resourceType === 'SHIP_NOTIFY') {
       console.log('🚢 Ship notification received');
 
-      // Fetch shipment details from ShipStation
+      // ShipStation sends shipment data directly in the webhook body
+      // The resourceUrl points to the full shipment details we can fetch
+      
       const apiKey = process.env.SHIPSTATION_API_KEY;
       const apiSecret = process.env.SHIPSTATION_API_SECRET;
 
@@ -140,27 +142,34 @@ export default async function handler(
 
       const auth = Buffer.from(`${apiKey}:${apiSecret}`).toString('base64');
 
-      // Get shipment details
-      const shipmentResponse = await fetch(resourceUrl, {
-        headers: {
-          'Authorization': `Basic ${auth}`,
-        },
-      });
+      // Fetch full shipment details from the resource URL
+      let shipment: any = {};
+      
+      if (resourceUrl) {
+        try {
+          const shipmentResponse = await fetch(resourceUrl, {
+            headers: {
+              'Authorization': `Basic ${auth}`,
+            },
+          });
 
-      if (!shipmentResponse.ok) {
-        console.error('Failed to fetch shipment details');
-        return res.status(200).json({ received: true });
+          if (shipmentResponse.ok) {
+            shipment = await shipmentResponse.json();
+            console.log('📦 Fetched shipment data from URL:', JSON.stringify(shipment, null, 2));
+          } else {
+            console.error('Failed to fetch from resource URL, status:', shipmentResponse.status);
+          }
+        } catch (err) {
+          console.error('Error fetching shipment details:', err);
+        }
       }
-
-      const shipment = await shipmentResponse.json() as any;
       
-      console.log('📦 Shipment response:', JSON.stringify(shipment, null, 2));
-      
-      const orderNumber = shipment.orderNumber;
-      const trackingNumber = shipment.trackingNumber;
-      const carrier = shipment.carrierCode;
+      // Extract data - try multiple possible field names
+      const orderNumber = shipment.orderNumber || shipment.order_number || webhook.order_number;
+      const trackingNumber = shipment.trackingNumber || shipment.tracking_number || webhook.tracking_number;
+      const carrier = shipment.carrierCode || shipment.carrier_code || webhook.carrier_code || shipment.serviceCode;
 
-      console.log('📦 Shipment info:', { orderNumber, trackingNumber, carrier });
+      console.log('📦 Extracted info:', { orderNumber, trackingNumber, carrier });
 
       // Only process our custom orders (not WooCommerce)
       if (orderNumber && orderNumber.startsWith('NM-')) {
