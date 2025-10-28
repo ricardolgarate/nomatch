@@ -116,6 +116,7 @@ export default async function handler(
 
   try {
     console.log('📦 ShipStation webhook received');
+    console.log('📦 Full webhook body:', JSON.stringify(req.body, null, 2));
 
     const webhook = req.body;
     const resourceType = webhook.resource_type;
@@ -152,6 +153,8 @@ export default async function handler(
       }
 
       const shipment = await shipmentResponse.json() as any;
+      
+      console.log('📦 Shipment response:', JSON.stringify(shipment, null, 2));
       
       const orderNumber = shipment.orderNumber;
       const trackingNumber = shipment.trackingNumber;
