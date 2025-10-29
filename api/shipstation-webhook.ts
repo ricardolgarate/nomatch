@@ -165,9 +165,11 @@ export default async function handler(
       }
       
       // Extract data - try multiple possible field names
-      const orderNumber = shipment.orderNumber || shipment.order_number || webhook.order_number;
-      const trackingNumber = shipment.trackingNumber || shipment.tracking_number || webhook.tracking_number;
-      const carrier = shipment.carrierCode || shipment.carrier_code || webhook.carrier_code || shipment.serviceCode;
+      // ShipStation API returns { shipments: [...] }, so get the first shipment
+      const shipmentData = shipment.shipments?.[0] || shipment;
+      const orderNumber = shipmentData.orderNumber || shipmentData.order_number || webhook.order_number;
+      const trackingNumber = shipmentData.trackingNumber || shipmentData.tracking_number || webhook.tracking_number;
+      const carrier = shipmentData.carrierCode || shipmentData.carrier_code || webhook.carrier_code || shipmentData.serviceCode;
 
       console.log('📦 Extracted info:', { orderNumber, trackingNumber, carrier });
 
