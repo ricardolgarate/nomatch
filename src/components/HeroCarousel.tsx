@@ -4,14 +4,14 @@ import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 const slides = [
   {
-    eyebrow: 'STYLED TO TURN HEADS',
-    title: 'Walk in any room',
-    accent: 'like you own it.',
+    eyebrow: 'NEW ARRIVALS · STYLED TO TURN HEADS',
+    title: 'Your next',
+    accent: 'favorite outfit.',
     description:
-      'Hand-picked pieces that make you feel beautiful before you even leave the house. Every size. Every shade. Every story.',
+      'Step into the boutique and walk out feeling beautiful. Hand-picked new and gently worn pieces for every shape, every shade, every story.',
     image:
       'https://images.pexels.com/photos/8386647/pexels-photo-8386647.jpeg?auto=compress&cs=tinysrgb&w=1920',
-    cta: 'SHOP THE LOOK',
+    cta: 'SHOP NEW ARRIVALS',
     link: '/shop',
   },
   {
@@ -19,21 +19,21 @@ const slides = [
     title: 'Finally, a boutique',
     accent: 'made for you.',
     description:
-      'XS to plus. New and gently worn. Real pieces at real prices — picked by a stylist with 20 years in fashion.',
+      'XS to plus. Dressy to casual. Real pieces at real prices — picked by a stylist with 20 years in fashion retail.',
     image:
-      'https://images.pexels.com/photos/10873719/pexels-photo-10873719.jpeg?auto=compress&cs=tinysrgb&w=1920',
+      'https://images.pexels.com/photos/1381553/pexels-photo-1381553.jpeg?auto=compress&cs=tinysrgb&w=1920',
     cta: 'FIND YOUR FIT',
     link: '/shop',
   },
   {
-    eyebrow: 'WE DO THE HUNTING',
+    eyebrow: 'HAND-PICKED BY CATRICE',
     title: 'Get the look',
     accent: 'without the hunt.',
     description:
-      'Skip the scroll. Catrice curates every piece so you don\'t have to guess. Open the door. Find your next favorite. Feel like a queen.',
+      'Skip the endless scroll. Every piece in the boutique is curated for you — so you can open the door, find your favorite, and go.',
     image:
-      'https://images.pexels.com/photos/5704720/pexels-photo-5704720.jpeg?auto=compress&cs=tinysrgb&w=1920',
-    cta: 'SEE WHAT IS NEW',
+      'https://images.pexels.com/photos/1926769/pexels-photo-1926769.jpeg?auto=compress&cs=tinysrgb&w=1920',
+    cta: 'SHOP THE LOOK',
     link: '/shop/clothing',
   },
 ];

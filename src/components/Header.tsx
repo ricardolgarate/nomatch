@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Search, ShoppingBag, ChevronDown, X, Menu } from 'lucide-react';
 import { useCart } from '../context/CartContext';
@@ -9,47 +9,34 @@ export default function Header() {
   const [mobileShopOpen, setMobileShopOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
-  const [scrolled, setScrolled] = useState(false);
+  const [compact, setCompact] = useState(false);
+  const sentinelRef = useRef<HTMLDivElement | null>(null);
   const location = useLocation();
   const navigate = useNavigate();
   const { getCartCount, openCart } = useCart();
 
+  // Use an IntersectionObserver on a sentinel at the top of the page. When the
+  // sentinel leaves the viewport, the logo has fully scrolled past and we flip
+  // to the compact nav-only state. Because nothing on the sticky header itself
+  // resizes, there is no layout-shift feedback loop (no jitter).
   useEffect(() => {
-    const COLLAPSE_AT = 120;
-    const EXPAND_AT = 40;
-    let ticking = false;
-    let lastState = window.scrollY > COLLAPSE_AT;
-    setScrolled(lastState);
-
-    const onScroll = () => {
-      if (ticking) return;
-      ticking = true;
-      requestAnimationFrame(() => {
-        const y = window.scrollY;
-        if (!lastState && y > COLLAPSE_AT) {
-          lastState = true;
-          setScrolled(true);
-        } else if (lastState && y < EXPAND_AT) {
-          lastState = false;
-          setScrolled(false);
-        }
-        ticking = false;
-      });
-    };
-
-    window.addEventListener('scroll', onScroll, { passive: true });
-    return () => window.removeEventListener('scroll', onScroll);
+    const sentinel = sentinelRef.current;
+    if (!sentinel) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => setCompact(!entry.isIntersecting),
+      { threshold: 0 },
+    );
+    observer.observe(sentinel);
+    return () => observer.disconnect();
   }, []);
 
   useEffect(() => {
-    // Close any open overlays on route change
     setMobileMenuOpen(false);
     setMobileShopOpen(false);
     setSearchOpen(false);
   }, [location.pathname, location.search]);
 
   useEffect(() => {
-    // Lock body scroll when mobile drawer is open
     if (mobileMenuOpen) {
       const prev = document.body.style.overflow;
       document.body.style.overflow = 'hidden';
@@ -75,7 +62,7 @@ export default function Header() {
   ];
 
   const navLinkClass = () =>
-    `relative pb-1 font-medium tracking-[0.16em] uppercase text-[13px] transition-colors hover:text-bfab-600 text-black`;
+    'relative pb-1 font-medium tracking-[0.16em] uppercase text-[13px] transition-colors hover:text-bfab-600 text-black';
 
   const navIndicator = (active: boolean) => (
     <span
@@ -87,45 +74,41 @@ export default function Header() {
 
   return (
     <>
+      {/* Announcement bar — plain document flow */}
       <div className="bg-bfab-900 text-white text-[10px] md:text-[11px] tracking-[0.2em] md:tracking-[0.25em] text-center uppercase py-2 md:py-2.5 px-3">
         Complimentary shipping on domestic orders over $150
       </div>
 
+      {/* Logo area — lives in the normal document flow so it scrolls away
+          naturally. No height animation, no layout shift. */}
+      <div className="bg-white flex justify-center pt-6 pb-4 md:pt-8 md:pb-6">
+        <Link
+          to="/"
+          aria-label="Beauty For Ashes Boutique — home"
+          className="inline-flex items-center"
+        >
+          <img
+            src="/BFABLOGO.png"
+            alt="Beauty For Ashes Boutique"
+            className="h-20 sm:h-24 md:h-28 w-auto object-contain"
+          />
+        </Link>
+      </div>
+
+      {/* Invisible sentinel: when it leaves the viewport we know the logo is
+          gone and the sticky nav should switch to its compact appearance. */}
+      <div ref={sentinelRef} aria-hidden="true" className="h-px" />
+
+      {/* Sticky nav row — always the same height, so it cannot glitch. */}
       <header
         className={`sticky top-0 z-50 bg-white/90 backdrop-blur-md border-b transition-[border-color,box-shadow] duration-500 ${
-          scrolled
+          compact
             ? 'border-black/10 shadow-[0_4px_20px_-12px_rgba(0,0,0,0.08)]'
             : 'border-transparent'
         }`}
       >
         <div className="container mx-auto px-4 md:px-6">
-          {/* Logo row (collapses on scroll) */}
-          <div
-            className={`flex justify-center overflow-hidden transition-[max-height,opacity,transform,margin] duration-[700ms] ease-[cubic-bezier(0.22,1,0.36,1)] ${
-              scrolled
-                ? 'max-h-0 opacity-0 -translate-y-2 pointer-events-none'
-                : 'max-h-40 opacity-100 translate-y-0 mt-3 md:mt-4'
-            }`}
-          >
-            <Link
-              to="/"
-              aria-label="Beauty For Ashes Boutique — home"
-              className="inline-flex items-center"
-            >
-              <img
-                src="/BFABLOGO.png"
-                alt="Beauty For Ashes Boutique"
-                className="h-16 sm:h-20 md:h-28 w-auto object-contain"
-              />
-            </Link>
-          </div>
-
-          {/* Controls + nav row */}
-          <div
-            className={`grid grid-cols-[auto_1fr_auto] items-center gap-2 md:gap-4 transition-[padding] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] ${
-              scrolled ? 'py-3' : 'pt-2.5 pb-4 md:pt-3 md:pb-5'
-            }`}
-          >
+          <div className="grid grid-cols-[auto_1fr_auto] items-center gap-2 md:gap-4 py-3 md:py-4">
             <div className="flex items-center">
               <button
                 onClick={() => setMobileMenuOpen(true)}
@@ -143,8 +126,7 @@ export default function Header() {
               </button>
             </div>
 
-            {/* Mobile: show small brand text when logo is hidden.
-                Desktop: show the nav links. */}
+            {/* Desktop nav */}
             <nav className="hidden md:flex items-center justify-center space-x-8 lg:space-x-12">
               <Link to="/" className={navLinkClass()}>
                 Home
@@ -190,10 +172,10 @@ export default function Header() {
               </Link>
             </nav>
 
-            {/* Small mobile-only brand text when logo row is collapsed */}
+            {/* Mobile center: small BFAB wordmark once scrolled past the logo */}
             <div
               className={`md:hidden flex items-center justify-center text-center transition-opacity duration-500 ${
-                scrolled ? 'opacity-100' : 'opacity-0 pointer-events-none'
+                compact ? 'opacity-100' : 'opacity-0 pointer-events-none'
               }`}
             >
               <Link
