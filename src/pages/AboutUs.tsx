@@ -24,26 +24,6 @@ export default function AboutUs() {
         </div>
       </div>
 
-      {/* Promise band */}
-      <section className="bg-bfab-50/60 border-b border-black/5 py-10">
-        <div className="container mx-auto px-6">
-          <div className="max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-6 text-center">
-            <div>
-              <p className="font-display text-3xl text-bfab-600">20+ yrs</p>
-              <p className="text-sm text-black/70 font-light">Fashion retail experience</p>
-            </div>
-            <div>
-              <p className="font-display text-3xl text-bfab-600">XS – Plus</p>
-              <p className="text-sm text-black/70 font-light">Curated for every body</p>
-            </div>
-            <div>
-              <p className="font-display text-3xl text-bfab-600">10-day returns</p>
-              <p className="text-sm text-black/70 font-light">Love it or send it back</p>
-            </div>
-          </div>
-        </div>
-      </section>
-
       {/* Catrice's story */}
       <section className="bg-white py-24 md:py-32">
         <div className="container mx-auto px-6">

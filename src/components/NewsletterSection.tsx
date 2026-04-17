@@ -22,13 +22,13 @@ export default function NewsletterSection() {
       <div className="container mx-auto px-6 relative">
         <div className="max-w-2xl mx-auto text-center">
           <span className="inline-block text-[11px] font-semibold uppercase tracking-[0.32em] text-bfab-200 mb-4">
-            Welcome gift inside
+            Join the BFAB fam
           </span>
           <h2 className="font-display text-4xl md:text-5xl font-medium leading-tight mb-6 text-balance">
-            Get <span className="italic text-bfab-200">10% off</span> your first order.
+            Be the first to <span className="italic text-bfab-200">shop new drops.</span>
           </h2>
           <p className="text-white/75 text-lg mb-10 font-light text-pretty">
-            Plus: early access to new drops, members-only deals, and styling tips from Catrice. No spam — we promise.
+            Sign up for first dibs on new arrivals, little secrets, and style tips from Catrice.
           </p>
 
           <form
@@ -52,19 +52,17 @@ export default function NewsletterSection() {
             >
               {submitted ? (
                 <>
-                  <CheckCircle2 className="w-4 h-4" /> CHECK YOUR EMAIL
+                  <CheckCircle2 className="w-4 h-4" /> SUBSCRIBED
                 </>
               ) : (
                 <>
-                  CLAIM 10% <ArrowRight className="w-4 h-4" />
+                  JOIN <ArrowRight className="w-4 h-4" />
                 </>
               )}
             </button>
           </form>
 
-          <p className="text-xs text-white/50 mt-4">
-            By joining, you agree to our privacy policy. Unsubscribe anytime.
-          </p>
+          <p className="text-xs text-white/50 mt-4">No spam — just the good stuff.</p>
         </div>
       </div>
     </section>
