@@ -24,10 +24,13 @@ export default function ProductGrid() {
     <section className="bg-bfab-50/60 py-24 border-y border-black/5">
       <div className="container mx-auto px-6">
         <div className="flex flex-col items-center text-center mb-14">
-          <span className="eyebrow mb-4">The Collection</span>
+          <span className="eyebrow mb-4">Selling fast · New arrivals</span>
           <h2 className="font-display text-5xl md:text-6xl font-medium text-black leading-[1.05]">
-            Our <span className="italic text-bfab-600">Faves</span>
+            This week's <span className="italic text-bfab-600">favorites.</span>
           </h2>
+          <p className="mt-4 text-black/60 max-w-xl font-light">
+            Small drops. When it's gone, it's gone.
+          </p>
         </div>
 
         {loading ? (

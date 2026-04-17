@@ -32,10 +32,11 @@ export default function CategorySection() {
         <div className="flex flex-col items-center text-center mb-14">
           <span className="eyebrow mb-4">Shop by category</span>
           <h2 className="font-display text-5xl md:text-6xl font-medium text-black leading-[1.05]">
-            Pick your <span className="italic text-bfab-600">favorite.</span>
+            What are you{' '}
+            <span className="italic text-bfab-600">looking for?</span>
           </h2>
           <p className="mt-4 text-black/60 max-w-xl font-light">
-            Every piece is hand-picked. Every size is welcome.
+            One click away from your next favorite piece.
           </p>
         </div>
 

@@ -4,33 +4,33 @@ import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 const slides = [
   {
-    eyebrow: 'BEAUTY FOR ASHES BOUTIQUE',
-    title: 'Wear Your',
-    accent: 'Crown.',
+    eyebrow: 'STYLED TO TURN HEADS',
+    title: 'Walk in any room',
+    accent: 'like you own it.',
     description:
-      'A little boutique in Desoto, Texas, for every woman — every shape, every shade, every story.',
+      'Hand-picked pieces that make you feel beautiful before you even leave the house. Every size. Every shade. Every story.',
     image:
       'https://images.pexels.com/photos/8386647/pexels-photo-8386647.jpeg?auto=compress&cs=tinysrgb&w=1920',
-    cta: 'SHOP THE COLLECTION',
+    cta: 'SHOP THE LOOK',
     link: '/shop',
   },
   {
-    eyebrow: 'FOR ALL SIZES',
-    title: 'Made for',
-    accent: 'all of us.',
+    eyebrow: 'SIZED FOR EVERY BODY',
+    title: 'Finally, a boutique',
+    accent: 'made for you.',
     description:
-      'New and gently worn pieces curated with love — sized for everybody, priced for every budget.',
+      'XS to plus. New and gently worn. Real pieces at real prices — picked by a stylist with 20 years in fashion.',
     image:
       'https://images.pexels.com/photos/10873719/pexels-photo-10873719.jpeg?auto=compress&cs=tinysrgb&w=1920',
-    cta: 'SHOP NEW',
+    cta: 'FIND YOUR FIT',
     link: '/shop',
   },
   {
-    eyebrow: 'GIFTS & STYLING',
-    title: 'Find your',
-    accent: 'next favorite.',
+    eyebrow: 'WE DO THE HUNTING',
+    title: 'Get the look',
+    accent: 'without the hunt.',
     description:
-      'Clothing, shoes, accessories and giftables — hand-picked by Catrice, our founder and stylist.',
+      'Skip the scroll. Catrice curates every piece so you don\'t have to guess. Open the door. Find your next favorite. Feel like a queen.',
     image:
       'https://images.pexels.com/photos/5704720/pexels-photo-5704720.jpeg?auto=compress&cs=tinysrgb&w=1920',
     cta: 'SEE WHAT IS NEW',
@@ -101,20 +101,27 @@ export default function HeroCarousel() {
               </h2>
               <p
                 key={`${i}-${current}-desc`}
-                className="text-lg md:text-xl text-white/85 mb-10 max-w-xl animate-fade-in-up font-light"
+                className="text-lg md:text-xl text-white/85 mb-6 max-w-xl animate-fade-in-up font-light"
                 style={{ animationDelay: '0.4s' }}
               >
                 {slide.description}
               </p>
-              <Link
-                key={`${i}-${current}-cta`}
-                to={slide.link}
-                className="inline-flex items-center gap-3 px-9 py-4 bg-white text-black hover:bg-bfab-600 hover:text-white transition-all duration-500 tracking-[0.2em] text-xs font-semibold rounded-md shadow-lg animate-fade-in-up"
+              <div
+                className="flex flex-wrap items-center gap-4 animate-fade-in-up"
                 style={{ animationDelay: '0.5s' }}
               >
-                {slide.cta}
-                <ChevronRight className="w-4 h-4" />
-              </Link>
+                <Link
+                  key={`${i}-${current}-cta`}
+                  to={slide.link}
+                  className="inline-flex items-center gap-3 px-9 py-4 bg-white text-black hover:bg-bfab-600 hover:text-white transition-all duration-500 tracking-[0.2em] text-xs font-semibold rounded-md shadow-lg"
+                >
+                  {slide.cta}
+                  <ChevronRight className="w-4 h-4" />
+                </Link>
+                <span className="text-xs tracking-[0.2em] uppercase text-white/70">
+                  Free shipping over $150 · Easy 10-day returns
+                </span>
+              </div>
             </div>
           </div>
         </div>
