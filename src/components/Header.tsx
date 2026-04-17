@@ -45,14 +45,11 @@ export default function Header() {
               </button>
             </div>
 
-            <Link
-              to="/"
-              className="flex items-center shrink-0 rounded-xl bg-black px-4 py-2 shadow-soft"
-            >
+            <Link to="/" className="flex items-center shrink-0">
               <img
                 src="/BFABLOGO.png"
                 alt="Beauty For Ashes Boutique"
-                className="h-12 w-auto object-contain"
+                className="h-14 w-auto object-contain"
               />
             </Link>
 
