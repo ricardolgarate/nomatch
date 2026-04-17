@@ -13,7 +13,7 @@ export default function Header() {
   const { getCartCount, openCart } = useCart();
 
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 40);
+    const onScroll = () => setScrolled(window.scrollY > 24);
     onScroll();
     window.addEventListener('scroll', onScroll, { passive: true });
     return () => window.removeEventListener('scroll', onScroll);
@@ -34,82 +34,74 @@ export default function Header() {
     { name: 'Accessories', path: '/shop/accessories' },
   ];
 
+  const navLinkClass = (active: boolean) =>
+    `relative pb-1 font-medium tracking-[0.16em] uppercase text-[13px] transition-colors hover:text-bfab-600 ${
+      active ? 'text-black' : 'text-black'
+    }`;
+
+  const navIndicator = (active: boolean) => (
+    <span
+      className={`absolute left-0 right-0 -bottom-0 h-[2px] bg-bfab-600 origin-center transition-transform duration-500 ${
+        active ? 'scale-x-100' : 'scale-x-0'
+      }`}
+    />
+  );
+
   return (
     <>
-      <div className="bg-bfab-900 text-white text-[11px] tracking-[0.25em] text-center py-2.5 uppercase">
+      <div
+        className={`bg-bfab-900 text-white text-[11px] tracking-[0.25em] text-center uppercase overflow-hidden transition-[max-height,padding,opacity] duration-[600ms] ease-[cubic-bezier(0.22,1,0.36,1)] ${
+          scrolled ? 'max-h-0 opacity-0 py-0' : 'max-h-12 opacity-100 py-2.5'
+        }`}
+      >
         Complimentary shipping on domestic orders over $150
       </div>
 
-      <header className="bg-white/95 backdrop-blur-md sticky top-0 z-50 border-b border-black/5">
+      <header
+        className={`sticky top-0 z-50 bg-white/90 backdrop-blur-md border-b transition-[border-color,box-shadow] duration-500 ${
+          scrolled
+            ? 'border-black/10 shadow-[0_4px_20px_-12px_rgba(0,0,0,0.08)]'
+            : 'border-transparent'
+        }`}
+      >
         <div className="container mx-auto px-6">
           <div
-            className={`overflow-hidden transition-all duration-500 ease-out ${
+            className={`flex justify-center overflow-hidden transition-[max-height,opacity,transform,margin] duration-[700ms] ease-[cubic-bezier(0.22,1,0.36,1)] ${
               scrolled
-                ? 'max-h-0 opacity-0 pointer-events-none'
-                : 'max-h-40 opacity-100'
+                ? 'max-h-0 opacity-0 -translate-y-2 pointer-events-none'
+                : 'max-h-40 opacity-100 translate-y-0 mt-4'
             }`}
           >
-            <div className="flex items-center justify-between h-28 md:h-32">
-              <div className="flex-1 flex items-center gap-3">
-                <button
-                  onClick={() => setSearchOpen(!searchOpen)}
-                  className="p-2 text-black hover:text-bfab-600 transition-colors"
-                  aria-label="Search"
-                >
-                  <Search className="w-5 h-5" />
-                </button>
-              </div>
-
-              <Link to="/" className="flex items-center shrink-0">
-                <img
-                  src="/BFABLOGO.png"
-                  alt="Beauty For Ashes Boutique"
-                  className="h-20 md:h-24 w-auto object-contain"
-                />
-              </Link>
-
-              <div className="flex-1 flex items-center justify-end gap-3">
-                <button
-                  onClick={openCart}
-                  className="p-2 text-black hover:text-bfab-600 transition-colors relative"
-                  aria-label="Open cart"
-                >
-                  <ShoppingBag className="w-5 h-5" />
-                  {getCartCount() > 0 && (
-                    <span className="absolute -top-0.5 -right-0.5 bg-bfab-600 text-white text-[10px] w-4 h-4 rounded-full flex items-center justify-center font-semibold">
-                      {getCartCount()}
-                    </span>
-                  )}
-                </button>
-              </div>
-            </div>
+            <Link
+              to="/"
+              aria-label="Beauty For Ashes Boutique — home"
+              className="inline-flex items-center"
+            >
+              <img
+                src="/BFABLOGO.png"
+                alt="Beauty For Ashes Boutique"
+                className="h-24 md:h-28 w-auto object-contain"
+              />
+            </Link>
           </div>
 
           <div
-            className={`relative flex items-center ${
-              scrolled ? 'py-3' : 'pb-5'
-            } transition-[padding] duration-500`}
+            className={`grid grid-cols-[auto_1fr_auto] items-center gap-4 transition-[padding] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] ${
+              scrolled ? 'py-3.5' : 'pt-3 pb-5'
+            }`}
           >
-            {scrolled && (
-              <button
-                onClick={() => setSearchOpen(!searchOpen)}
-                className="absolute left-0 p-2 text-black hover:text-bfab-600 transition-colors"
-                aria-label="Search"
-              >
-                <Search className="w-5 h-5" />
-              </button>
-            )}
+            <button
+              onClick={() => setSearchOpen(!searchOpen)}
+              className="p-2 text-black hover:text-bfab-600 transition-colors justify-self-start"
+              aria-label="Search"
+            >
+              <Search className="w-5 h-5" />
+            </button>
 
-            <nav className="flex-1 flex items-center justify-center space-x-12 text-[13px] tracking-[0.16em] uppercase">
-              <Link
-                to="/"
-                className={`hover:text-bfab-600 transition-colors font-medium pb-1 border-b-2 ${
-                  location.pathname === '/'
-                    ? 'text-black border-bfab-600'
-                    : 'text-black border-transparent'
-                }`}
-              >
+            <nav className="flex items-center justify-center space-x-10 md:space-x-12">
+              <Link to="/" className={navLinkClass(location.pathname === '/')}>
                 Home
+                {navIndicator(location.pathname === '/')}
               </Link>
 
               <div
@@ -118,14 +110,11 @@ export default function Header() {
                 onMouseLeave={() => setShopDropdownOpen(false)}
               >
                 <button
-                  className={`flex items-center gap-1 hover:text-bfab-600 transition-colors font-medium pb-1 border-b-2 ${
-                    location.pathname.startsWith('/shop')
-                      ? 'text-black border-bfab-600'
-                      : 'text-black border-transparent'
-                  }`}
+                  className={`${navLinkClass(location.pathname.startsWith('/shop'))} flex items-center gap-1`}
                 >
                   <span>Shop</span>
                   <ChevronDown className="w-3.5 h-3.5" />
+                  {navIndicator(location.pathname.startsWith('/shop'))}
                 </button>
 
                 {shopDropdownOpen && (
@@ -147,40 +136,33 @@ export default function Header() {
 
               <Link
                 to="/about"
-                className={`hover:text-bfab-600 transition-colors font-medium pb-1 border-b-2 ${
-                  location.pathname === '/about'
-                    ? 'text-black border-bfab-600'
-                    : 'text-black border-transparent'
-                }`}
+                className={navLinkClass(location.pathname === '/about')}
               >
                 About
+                {navIndicator(location.pathname === '/about')}
               </Link>
+
               <Link
                 to="/contact"
-                className={`hover:text-bfab-600 transition-colors font-medium pb-1 border-b-2 ${
-                  location.pathname === '/contact'
-                    ? 'text-black border-bfab-600'
-                    : 'text-black border-transparent'
-                }`}
+                className={navLinkClass(location.pathname === '/contact')}
               >
                 Contact
+                {navIndicator(location.pathname === '/contact')}
               </Link>
             </nav>
 
-            {scrolled && (
-              <button
-                onClick={openCart}
-                className="absolute right-0 p-2 text-black hover:text-bfab-600 transition-colors"
-                aria-label="Open cart"
-              >
-                <ShoppingBag className="w-5 h-5" />
-                {getCartCount() > 0 && (
-                  <span className="absolute -top-0.5 -right-0.5 bg-bfab-600 text-white text-[10px] w-4 h-4 rounded-full flex items-center justify-center font-semibold">
-                    {getCartCount()}
-                  </span>
-                )}
-              </button>
-            )}
+            <button
+              onClick={openCart}
+              className="p-2 text-black hover:text-bfab-600 transition-colors justify-self-end relative"
+              aria-label="Open cart"
+            >
+              <ShoppingBag className="w-5 h-5" />
+              {getCartCount() > 0 && (
+                <span className="absolute -top-0.5 -right-0.5 bg-bfab-600 text-white text-[10px] w-4 h-4 rounded-full flex items-center justify-center font-semibold">
+                  {getCartCount()}
+                </span>
+              )}
+            </button>
           </div>
 
           {searchOpen && (
