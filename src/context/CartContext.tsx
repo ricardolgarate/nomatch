@@ -1,5 +1,5 @@
+/* eslint-disable react-refresh/only-export-components */
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { trackEvent } from '../firebase/analytics';
 
 export interface CartItem {
   id: string;
@@ -26,10 +26,8 @@ interface CartContextType {
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
 
-// LocalStorage key
-const CART_STORAGE_KEY = 'nomatch_cart';
+const CART_STORAGE_KEY = 'bfab_cart';
 
-// Load cart from localStorage
 const loadCartFromStorage = (): CartItem[] => {
   try {
     const storedCart = localStorage.getItem(CART_STORAGE_KEY);
@@ -42,7 +40,6 @@ const loadCartFromStorage = (): CartItem[] => {
   return [];
 };
 
-// Save cart to localStorage
 const saveCartToStorage = (cart: CartItem[]) => {
   try {
     localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(cart));
@@ -55,45 +52,31 @@ export function CartProvider({ children }: { children: ReactNode }) {
   const [cart, setCart] = useState<CartItem[]>(loadCartFromStorage);
   const [isCartOpen, setIsCartOpen] = useState(false);
 
-  // Save cart to localStorage whenever it changes
   useEffect(() => {
     saveCartToStorage(cart);
   }, [cart]);
 
   const addToCart = (item: Omit<CartItem, 'quantity'> & { quantity?: number }) => {
     setCart((prevCart) => {
-      // Check if item already exists (with same size if applicable)
       const existingItemIndex = prevCart.findIndex(
-        (cartItem) => cartItem.id === item.id && cartItem.size === item.size
+        (cartItem) => cartItem.id === item.id && cartItem.size === item.size,
       );
 
       if (existingItemIndex > -1) {
-        // Update quantity if item exists
         const newCart = [...prevCart];
         newCart[existingItemIndex].quantity += item.quantity || 1;
         return newCart;
-      } else {
-        // Add new item
-        return [...prevCart, { ...item, quantity: item.quantity || 1 }];
       }
+
+      return [...prevCart, { ...item, quantity: item.quantity || 1 }];
     });
-    
-    // Track add to cart event
-    trackEvent('add_to_cart', {
-      productId: item.id,
-      productName: item.name,
-      category: item.category,
-      price: item.price,
-      size: item.size,
-      quantity: item.quantity || 1
-    });
-    
+
     setIsCartOpen(true);
   };
 
   const removeFromCart = (id: string, size?: string) => {
     setCart((prevCart) =>
-      prevCart.filter((item) => !(item.id === id && item.size === size))
+      prevCart.filter((item) => !(item.id === id && item.size === size)),
     );
   };
 
@@ -104,8 +87,8 @@ export function CartProvider({ children }: { children: ReactNode }) {
     }
     setCart((prevCart) =>
       prevCart.map((item) =>
-        item.id === id && item.size === size ? { ...item, quantity } : item
-      )
+        item.id === id && item.size === size ? { ...item, quantity } : item,
+      ),
     );
   };
 
@@ -121,9 +104,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
     return `$${total.toFixed(2)}`;
   };
 
-  const getCartCount = () => {
-    return cart.reduce((count, item) => count + item.quantity, 0);
-  };
+  const getCartCount = () => cart.reduce((count, item) => count + item.quantity, 0);
 
   const openCart = () => setIsCartOpen(true);
   const closeCart = () => setIsCartOpen(false);
@@ -155,4 +136,3 @@ export function useCart() {
   }
   return context;
 }
-

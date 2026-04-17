@@ -1,17 +1,12 @@
-import { useEffect } from 'react';
 import HeroCarousel from '../components/HeroCarousel';
 import HandcraftedSection from '../components/HandcraftedSection';
 import ProductGrid from '../components/ProductGrid';
 import ColorChangingSection from '../components/ColorChangingSection';
 import CategorySection from '../components/CategorySection';
 import ExperienceSection from '../components/ExperienceSection';
-import { trackEvent } from '../firebase/analytics';
+import NewsletterSection from '../components/NewsletterSection';
 
 export default function Home() {
-  useEffect(() => {
-    trackEvent('page_visit', { page: 'home' });
-  }, []);
-
   return (
     <>
       <HeroCarousel />
@@ -20,7 +15,7 @@ export default function Home() {
       <ColorChangingSection />
       <CategorySection />
       <ExperienceSection />
+      <NewsletterSection />
     </>
   );
 }
-

@@ -1,112 +1,80 @@
 import { useEffect } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
-import { CheckCircle2, Package, Mail } from 'lucide-react';
+import { CheckCircle2, Package, Mail, Sparkles } from 'lucide-react';
 import { useCart } from '../context/CartContext';
-import { trackEvent } from '../firebase/analytics';
 
 export default function CheckoutSuccess() {
   const [searchParams] = useSearchParams();
-  const sessionId = searchParams.get('session_id');
   const orderNumber = searchParams.get('order');
   const { clearCart } = useCart();
 
   useEffect(() => {
-    // Clear cart after successful purchase
     clearCart();
-
-    // Track successful purchase
-    if (sessionId) {
-      trackEvent('purchase_completed', {
-        sessionId,
-        orderNumber: orderNumber || '',
-        timestamp: new Date().toISOString(),
-      });
-    }
-  }, [sessionId, orderNumber, clearCart]);
+  }, [clearCart]);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-pink-50 to-purple-50 flex items-center justify-center px-4">
-      <div className="max-w-2xl w-full bg-white rounded-2xl shadow-xl p-8 md:p-12">
-        {/* Success Icon */}
-        <div className="flex justify-center mb-6">
-          <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center">
-            <CheckCircle2 className="w-12 h-12 text-green-600" />
+    <div className="min-h-screen bg-white flex items-center justify-center px-4 py-16">
+      <div className="max-w-xl w-full text-center">
+        <div className="flex justify-center mb-8">
+          <div className="relative">
+            <div className="w-24 h-24 bg-bfab-50 rounded-full flex items-center justify-center">
+              <CheckCircle2 className="w-12 h-12 text-bfab-600" strokeWidth={1.5} />
+            </div>
+            <Sparkles className="absolute -top-1 -right-1 w-6 h-6 text-bfab-400" />
+            <Sparkles className="absolute -bottom-1 -left-1 w-5 h-5 text-bfab-400" />
           </div>
         </div>
 
-        {/* Success Message */}
-        <h1 className="text-3xl md:text-4xl font-serif font-medium text-center text-gray-900 mb-4">
-          Order Confirmed!
+        <span className="eyebrow mb-4">Order Confirmed</span>
+        <h1 className="font-display text-5xl md:text-6xl font-medium text-black mt-3 mb-5 leading-tight">
+          Thank <span className="italic text-bfab-600">you.</span>
         </h1>
-        <p className="text-lg text-center text-gray-600 mb-8">
-          Thank you for your purchase. Your order has been successfully placed.
+        <p className="text-lg text-black/70 mb-10 font-light">
+          Your order has been placed. We can't wait for you to wear it.
         </p>
 
-        {/* Order Number */}
         {orderNumber && (
-          <div className="bg-purple-50 border-2 border-purple-200 rounded-lg p-4 mb-8">
-            <p className="text-sm text-purple-700 font-medium">Order Number</p>
-            <p className="text-lg text-purple-900 font-bold mt-1">
-              {orderNumber}
+          <div className="bg-bfab-50 border border-bfab-200 rounded-xl p-5 mb-10">
+            <p className="text-xs tracking-[0.25em] uppercase text-bfab-700 mb-1 font-semibold">
+              Order Number
             </p>
-            {sessionId && (
-              <p className="text-xs text-purple-600 mt-2 break-all">
-                Session: {sessionId.slice(0, 20)}...
-              </p>
-            )}
+            <p className="text-xl text-black font-medium">{orderNumber}</p>
           </div>
         )}
 
-        {/* What's Next */}
-        <div className="space-y-4 mb-8">
-          <div className="flex items-start gap-3">
-            <Mail className="w-6 h-6 text-purple-600 flex-shrink-0 mt-1" />
-            <div>
-              <h3 className="font-semibold text-gray-900">Check Your Email</h3>
-              <p className="text-sm text-gray-600">
-                We've sent a confirmation email with your order details and tracking information.
-              </p>
-            </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12 text-left">
+          <div className="p-5 rounded-xl border border-black/5 bg-white">
+            <Mail className="w-5 h-5 text-bfab-600 mb-3" />
+            <h3 className="font-display text-lg text-black mb-1">Check Your Email</h3>
+            <p className="text-sm text-black/60">
+              Once payments are connected, we'll send a confirmation with tracking.
+            </p>
           </div>
 
-          <div className="flex items-start gap-3">
-            <Package className="w-6 h-6 text-purple-600 flex-shrink-0 mt-1" />
-            <div>
-              <h3 className="font-semibold text-gray-900">Estimated Delivery</h3>
-              <p className="text-sm text-gray-600">
-                Your order will be delivered within 3-5 business days.
-              </p>
-            </div>
+          <div className="p-5 rounded-xl border border-black/5 bg-white">
+            <Package className="w-5 h-5 text-bfab-600 mb-3" />
+            <h3 className="font-display text-lg text-black mb-1">Estimated Delivery</h3>
+            <p className="text-sm text-black/60">3–5 business days to your door.</p>
           </div>
         </div>
 
-        {/* Action Buttons */}
-        <div className="flex flex-col sm:flex-row gap-4">
-          <Link
-            to="/shop"
-            className="flex-1 px-8 py-3 bg-purple-600 text-white hover:bg-purple-700 transition-all duration-300 font-medium tracking-wider text-sm text-center rounded-lg"
-          >
+        <div className="flex flex-col sm:flex-row gap-3 justify-center">
+          <Link to="/shop" className="btn-primary">
             CONTINUE SHOPPING
           </Link>
-          <Link
-            to="/"
-            className="flex-1 px-8 py-3 bg-white border-2 border-purple-600 text-purple-600 hover:bg-purple-50 transition-all duration-300 font-medium tracking-wider text-sm text-center rounded-lg"
-          >
+          <Link to="/" className="btn-outline">
             BACK TO HOME
           </Link>
         </div>
 
-        {/* Support Info */}
-        <div className="mt-8 pt-8 border-t border-gray-200 text-center">
-          <p className="text-sm text-gray-600">
-            Need help with your order?{' '}
-            <Link to="/contact" className="text-purple-600 hover:text-purple-700 font-medium">
-              Contact Support
-            </Link>
-          </p>
-        </div>
+        <p className="text-sm text-black/50 mt-10">
+          Need help?{' '}
+          <Link to="/contact" className="text-bfab-600 hover:text-bfab-700 font-medium">
+            Contact us
+          </Link>
+          .
+        </p>
       </div>
     </div>
   );
 }
-

@@ -1,162 +1,97 @@
-import { Instagram } from 'lucide-react';
-
-const instagramPosts = [
-  'https://images.pexels.com/photos/2529148/pexels-photo-2529148.jpeg?auto=compress&cs=tinysrgb&w=600',
-  'https://images.pexels.com/photos/1598505/pexels-photo-1598505.jpeg?auto=compress&cs=tinysrgb&w=600',
-  'https://images.pexels.com/photos/1598508/pexels-photo-1598508.jpeg?auto=compress&cs=tinysrgb&w=600',
-  'https://images.pexels.com/photos/3755706/pexels-photo-3755706.jpeg?auto=compress&cs=tinysrgb&w=600',
-  'https://images.pexels.com/photos/1124468/pexels-photo-1124468.jpeg?auto=compress&cs=tinysrgb&w=600',
-  'https://images.pexels.com/photos/3755708/pexels-photo-3755708.jpeg?auto=compress&cs=tinysrgb&w=600',
-];
+import { Instagram, Mail } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 export default function Footer() {
   return (
-    <footer className="bg-pink-50">
-      <div className="container mx-auto px-6 py-16">
-        <h2 className="text-4xl font-serif font-medium text-center text-gray-900 mb-12">
-          Follow Us
-        </h2>
+    <footer className="bg-black text-white relative overflow-hidden">
+      <div className="absolute inset-0 bg-hero-radial opacity-40 pointer-events-none" />
 
-        {/* Instagram Profile Header */}
-        <div className="flex items-center justify-center gap-3 mb-8">
-          <div className="relative">
-            <div className="w-16 h-16 rounded-full bg-gradient-to-tr from-yellow-400 via-pink-500 to-purple-600 p-0.5">
-              <div className="w-full h-full rounded-full bg-pink-50 p-1 flex items-center justify-center">
-                <img 
-                  src="/Logo-NoMatch.webp" 
-                  alt="NOMATCH Logo" 
-                  className="w-full h-full object-contain rounded-full"
-                />
-              </div>
-            </div>
+      <div className="container mx-auto px-6 pt-20 pb-10 relative">
+        <div className="flex flex-col items-center text-center mb-16">
+          <div className="w-24 h-24 rounded-full bg-white p-2 flex items-center justify-center mb-5 shadow-soft">
+            <img
+              src="/BFAB-Logo.jpg"
+              alt="Beauty For Ashes Boutique"
+              className="w-full h-full object-contain"
+            />
           </div>
-          <div className="text-left">
-            <p className="text-lg font-semibold text-gray-900">nomatch.us</p>
-            <a
-              href="https://www.instagram.com/nomatch.us/"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-sm text-purple-600 hover:text-purple-700 font-medium transition-colors"
-            >
-              View on Instagram
-            </a>
+          <p className="font-display text-2xl mb-1">Beauty For Ashes Boutique</p>
+          <div className="divider-ornament w-full max-w-xs mx-auto mt-3 mb-4 text-bfab-300">
+            <span>✦</span>
           </div>
+          <a
+            href="https://www.instagram.com/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-sm text-bfab-200 hover:text-white font-medium transition-colors inline-flex items-center gap-2"
+          >
+            <Instagram className="w-4 h-4" />
+            @bfab
+          </a>
         </div>
 
-        {/* Instagram Grid */}
-        <div className="max-w-6xl mx-auto mb-16">
-          <div className="grid grid-cols-3 md:grid-cols-6 gap-1">
-            {instagramPosts.map((image, index) => (
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-10 max-w-5xl mx-auto border-t border-white/10 pt-12 text-sm">
+          <div>
+            <h3 className="text-[11px] font-semibold text-bfab-200 mb-4 tracking-[0.3em] uppercase">
+              Shop
+            </h3>
+            <ul className="space-y-2.5 text-white/75">
+              <li><Link to="/" className="hover:text-white transition-colors">Home</Link></li>
+              <li><Link to="/shop" className="hover:text-white transition-colors">All</Link></li>
+              <li><Link to="/shop/shoes" className="hover:text-white transition-colors">Shoes</Link></li>
+              <li><Link to="/shop/clothing" className="hover:text-white transition-colors">Clothing</Link></li>
+              <li><Link to="/shop/accessories" className="hover:text-white transition-colors">Accessories</Link></li>
+            </ul>
+          </div>
+
+          <div>
+            <h3 className="text-[11px] font-semibold text-bfab-200 mb-4 tracking-[0.3em] uppercase">
+              About
+            </h3>
+            <ul className="space-y-2.5 text-white/75">
+              <li><Link to="/about" className="hover:text-white transition-colors">Our Story</Link></li>
+              <li><Link to="/contact" className="hover:text-white transition-colors">Contact</Link></li>
+            </ul>
+          </div>
+
+          <div>
+            <h3 className="text-[11px] font-semibold text-bfab-200 mb-4 tracking-[0.3em] uppercase">
+              Help
+            </h3>
+            <ul className="space-y-2.5 text-white/75">
+              <li><a href="#returns" className="hover:text-white transition-colors">Returns</a></li>
+              <li><a href="#terms" className="hover:text-white transition-colors">Terms &amp; Conditions</a></li>
+              <li><a href="#privacy" className="hover:text-white transition-colors">Privacy Policy</a></li>
+            </ul>
+          </div>
+
+          <div>
+            <h3 className="text-[11px] font-semibold text-bfab-200 mb-4 tracking-[0.3em] uppercase">
+              Reach Out
+            </h3>
+            <div className="space-y-3 text-white/75">
               <a
-                key={index}
-                href="https://www.instagram.com/nomatch.us/"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="relative aspect-square overflow-hidden group cursor-pointer bg-gray-100"
+                href="mailto:support@bfab.com"
+                className="inline-flex items-center gap-2 hover:text-white transition-colors"
               >
-                <img
-                  src={image}
-                  alt={`NoMatch Instagram post ${index + 1}`}
-                  className="w-full h-full object-cover transition-all duration-300 group-hover:scale-110"
-                />
-                <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-30 transition-all duration-300 flex items-center justify-center">
-                  <Instagram className="w-8 h-8 text-white opacity-0 group-hover:opacity-100 transition-opacity duration-300 transform group-hover:scale-110" />
-                </div>
+                <Mail className="w-4 h-4" /> support@bfab.com
               </a>
-            ))}
-          </div>
-        </div>
-
-        {/* Footer Links */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-12 max-w-5xl mx-auto border-t border-pink-200 pt-12">
-          <div>
-            <h3 className="text-sm font-semibold text-gray-900 mb-4 tracking-wider">
-              MENU
-            </h3>
-            <ul className="space-y-2 text-gray-700">
-              <li>
-                <a href="/" className="hover:text-purple-600 transition-colors">
-                  Home
-                </a>
-              </li>
-              <li>
-                <a href="/shop/shoes" className="hover:text-purple-600 transition-colors">
-                  Shoes
-                </a>
-              </li>
-              <li>
-                <a href="/shop" className="hover:text-purple-600 transition-colors">
-                  Shop
-                </a>
-              </li>
-              <li>
-                <a href="/shop/accessories" className="hover:text-purple-600 transition-colors">
-                  Accessories
-                </a>
-              </li>
-              <li>
-                <a href="/about" className="hover:text-purple-600 transition-colors">
-                  About Us
-                </a>
-              </li>
-              <li>
-                <a href="/contact" className="hover:text-purple-600 transition-colors">
-                  Contact
-                </a>
-              </li>
-            </ul>
-          </div>
-
-          <div>
-            <h3 className="text-sm font-semibold text-gray-900 mb-4 tracking-wider">
-              HELP
-            </h3>
-            <ul className="space-y-2 text-gray-700">
-              <li>
-                <a href="#tracking" className="hover:text-purple-600 transition-colors">
-                  Order Tracking
-                </a>
-              </li>
-              <li>
-                <a href="#returns" className="hover:text-purple-600 transition-colors">
-                  Returns
-                </a>
-              </li>
-              <li>
-                <a href="#terms" className="hover:text-purple-600 transition-colors">
-                  Terms and Conditions
-                </a>
-              </li>
-              <li>
-                <a href="#privacy" className="hover:text-purple-600 transition-colors">
-                  Privacy Policy
-                </a>
-              </li>
-            </ul>
-          </div>
-
-          <div>
-            <h3 className="text-sm font-semibold text-gray-900 mb-4 tracking-wider">
-              CONTACT
-            </h3>
-            <div className="space-y-2 text-gray-700">
-              <p>E-mail: support@nomatch.us</p>
-              <p>Order support at +1 (214) 876-6501</p>
+              <br />
               <a
-                href="https://www.instagram.com/nomatch.us/"
+                href="https://www.instagram.com/"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 mt-4 text-purple-600 hover:text-purple-700 transition-colors"
+                className="inline-flex items-center gap-2 hover:text-white transition-colors"
               >
-                <Instagram className="w-5 h-5" />
-                <span>@nomatch.us</span>
+                <Instagram className="w-4 h-4" /> Instagram
               </a>
             </div>
           </div>
         </div>
 
-        <div className="mt-12 text-center text-sm text-gray-600">
-          <p>NoMatch © 2025. Developed by Netcommerce.</p>
+        <div className="mt-14 pt-8 border-t border-white/10 flex flex-col md:flex-row items-center justify-between gap-3 text-xs text-white/50">
+          <p>© {new Date().getFullYear()} Beauty For Ashes Boutique. All rights reserved.</p>
+          <p className="tracking-widest uppercase">Crafted with ♥</p>
         </div>
       </div>
     </footer>

@@ -1,0 +1,12 @@
+rules_version = '2';
+
+// WARNING: fully open rules for the pre-auth / pre-payment dev phase.
+// Anyone on the internet can read and write any file in this bucket.
+// Tighten these before going to production.
+service firebase.storage {
+  match /b/{bucket}/o {
+    match /{allPaths=**} {
+      allow read, write: if true;
+    }
+  }
+}

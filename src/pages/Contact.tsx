@@ -1,42 +1,46 @@
 import { useState } from 'react';
-import { Instagram } from 'lucide-react';
+import { Instagram, Mail, MapPin, Send } from 'lucide-react';
 
 export default function Contact() {
   const [formData, setFormData] = useState({
     name: '',
     email: '',
     phone: '',
-    message: ''
+    message: '',
   });
+  const [submitted, setSubmitted] = useState(false);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // Handle form submission here
     console.log('Form submitted:', formData);
+    setSubmitted(true);
+    setFormData({ name: '', email: '', phone: '', message: '' });
+    setTimeout(() => setSubmitted(false), 4000);
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value
-    });
+    setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-pink-50 to-purple-50 py-20">
+    <div className="min-h-screen bg-white py-20 md:py-28">
       <div className="container mx-auto px-6">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 max-w-7xl mx-auto">
-          {/* Left Column - Contact Form */}
-          <div>
-            <h1 className="text-6xl font-serif font-medium text-purple-600 mb-12">
-              CONTACT US
-            </h1>
+        <div className="max-w-3xl mx-auto text-center mb-16">
+          <span className="eyebrow mb-4">Let's talk</span>
+          <h1 className="font-display text-6xl md:text-7xl font-medium text-black mt-3 leading-[1.05]">
+            <span className="italic text-bfab-600">Contact</span> Us
+          </h1>
+          <p className="text-black/65 mt-5 text-lg font-light max-w-lg mx-auto">
+            Questions, collabs, or just saying hi — we'd love to hear from you.
+          </p>
+        </div>
 
-            <form onSubmit={handleSubmit} className="space-y-6">
-              {/* Name Field */}
+        <div className="grid grid-cols-1 lg:grid-cols-5 gap-14 max-w-6xl mx-auto">
+          <div className="lg:col-span-3">
+            <form onSubmit={handleSubmit} className="space-y-5">
               <div>
-                <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-2">
-                  Name <span className="text-red-500">*</span>
+                <label htmlFor="name" className="block text-xs font-semibold tracking-[0.2em] uppercase text-black mb-2">
+                  Name
                 </label>
                 <input
                   type="text"
@@ -45,16 +49,15 @@ export default function Contact() {
                   required
                   value={formData.name}
                   onChange={handleChange}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-white transition-all"
+                  className="input-base"
                   placeholder="Your name"
                 />
               </div>
 
-              {/* Email and Phone Fields */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                 <div>
-                  <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
-                    Email <span className="text-red-500">*</span>
+                  <label htmlFor="email" className="block text-xs font-semibold tracking-[0.2em] uppercase text-black mb-2">
+                    Email
                   </label>
                   <input
                     type="email"
@@ -63,31 +66,29 @@ export default function Contact() {
                     required
                     value={formData.email}
                     onChange={handleChange}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-white transition-all"
-                    placeholder="your.email@example.com"
+                    className="input-base"
+                    placeholder="you@email.com"
                   />
                 </div>
                 <div>
-                  <label htmlFor="phone" className="block text-sm font-medium text-gray-700 mb-2">
-                    Phone <span className="text-red-500">*</span>
+                  <label htmlFor="phone" className="block text-xs font-semibold tracking-[0.2em] uppercase text-black mb-2">
+                    Phone
                   </label>
                   <input
                     type="tel"
                     id="phone"
                     name="phone"
-                    required
                     value={formData.phone}
                     onChange={handleChange}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-white transition-all"
-                    placeholder="(123) 456-7890"
+                    className="input-base"
+                    placeholder="(optional)"
                   />
                 </div>
               </div>
 
-              {/* Message Field */}
               <div>
-                <label htmlFor="message" className="block text-sm font-medium text-gray-700 mb-2">
-                  Message <span className="text-red-500">*</span>
+                <label htmlFor="message" className="block text-xs font-semibold tracking-[0.2em] uppercase text-black mb-2">
+                  Message
                 </label>
                 <textarea
                   id="message"
@@ -95,62 +96,60 @@ export default function Contact() {
                   required
                   value={formData.message}
                   onChange={handleChange}
-                  rows={8}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-white transition-all resize-none"
-                  placeholder="Tell us how we can help you..."
+                  rows={7}
+                  className="input-base resize-none"
+                  placeholder="Tell us how we can help you…"
                 />
               </div>
 
-              {/* Submit Button */}
-              <button
-                type="submit"
-                className="px-12 py-3 bg-pink-500 text-white font-semibold rounded-lg hover:bg-pink-600 transition-colors shadow-md hover:shadow-lg transform hover:-translate-y-0.5 duration-200"
-              >
-                SEND
+              <button type="submit" className="btn-primary">
+                <Send className="w-4 h-4" />
+                {submitted ? 'Message Sent' : 'Send Message'}
               </button>
             </form>
           </div>
 
-          {/* Right Column - Information */}
-          <div className="lg:pt-32">
-            <h2 className="text-4xl font-serif font-medium text-pink-500 mb-8">
-              Need more information?
-            </h2>
+          <div className="lg:col-span-2">
+            <div className="rounded-2xl border border-black/5 bg-bfab-50/60 p-8 space-y-6">
+              <div>
+                <h2 className="font-display text-2xl text-black mb-1">Say hello</h2>
+                <p className="text-sm text-black/60">
+                  We usually reply within 24–48 hours.
+                </p>
+              </div>
 
-            <div className="space-y-6 text-gray-700 text-lg">
-              <p>
-                For all customer enquiries please contact us at:{' '}
-                <a 
-                  href="mailto:support@nomatch.us" 
-                  className="text-purple-600 hover:text-purple-700 font-medium"
-                >
-                  support@nomatch.us
-                </a>
-              </p>
-              <p className="text-gray-600">
-                Please allow 24-48 hours for our team to respond to you.
-              </p>
-              <p>
-                For returns and exchanges, please click{' '}
-                <a 
-                  href="#returns" 
-                  className="text-purple-600 hover:text-purple-700 font-medium underline"
-                >
-                  here
-                </a>
-                .
-              </p>
-
-              {/* Instagram Link */}
-              <div className="pt-6">
+              <div className="space-y-4 text-sm">
                 <a
-                  href="https://www.instagram.com/nomatch.us/"
+                  href="mailto:support@bfab.com"
+                  className="flex items-center gap-3 text-black hover:text-bfab-600 transition-colors group"
+                >
+                  <div className="w-10 h-10 rounded-full bg-white border border-black/5 flex items-center justify-center group-hover:bg-bfab-600 group-hover:border-bfab-600 transition-colors">
+                    <Mail className="w-4 h-4 text-bfab-600 group-hover:text-white transition-colors" />
+                  </div>
+                  <span>support@bfab.com</span>
+                </a>
+
+                <a
+                  href="https://www.instagram.com/"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center justify-center w-12 h-12 rounded-full border-2 border-purple-400 text-purple-600 hover:bg-purple-600 hover:text-white hover:border-purple-600 transition-all duration-300"
+                  className="flex items-center gap-3 text-black hover:text-bfab-600 transition-colors group"
                 >
-                  <Instagram className="w-6 h-6" />
+                  <div className="w-10 h-10 rounded-full bg-white border border-black/5 flex items-center justify-center group-hover:bg-bfab-600 group-hover:border-bfab-600 transition-colors">
+                    <Instagram className="w-4 h-4 text-bfab-600 group-hover:text-white transition-colors" />
+                  </div>
+                  <span>@bfab</span>
                 </a>
+
+                <div className="flex items-start gap-3 text-black/70">
+                  <div className="w-10 h-10 rounded-full bg-white border border-black/5 flex items-center justify-center shrink-0">
+                    <MapPin className="w-4 h-4 text-bfab-600" />
+                  </div>
+                  <div>
+                    <p className="text-black">Online Boutique</p>
+                    <p className="text-xs">Serving customers nationwide</p>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -159,4 +158,3 @@ export default function Contact() {
     </div>
   );
 }
-

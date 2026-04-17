@@ -1,65 +1,149 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 const slides = [
   {
-    title: 'One Pair.',
-    subtitle: 'Two Designs.',
-    description: 'Because being unique is always in style.',
-    image: 'https://images.pexels.com/photos/2760241/pexels-photo-2760241.jpeg?auto=compress&cs=tinysrgb&w=1920',
+    eyebrow: 'BEAUTY FOR ASHES BOUTIQUE',
+    title: 'Wear Your',
+    accent: 'Crown.',
+    description:
+      'Curated pieces for the woman who was always meant to stand out.',
+    image:
+      'https://images.pexels.com/photos/8386647/pexels-photo-8386647.jpeg?auto=compress&cs=tinysrgb&w=1920',
+    cta: 'SHOP THE COLLECTION',
+    link: '/shop',
+  },
+  {
+    eyebrow: 'NEW ARRIVALS',
+    title: 'Soft Power.',
+    accent: 'Bold Grace.',
+    description:
+      'From statement heels to everyday essentials — pieces that feel like yours.',
+    image:
+      'https://images.pexels.com/photos/1381553/pexels-photo-1381553.jpeg?auto=compress&cs=tinysrgb&w=1920',
+    cta: 'EXPLORE NEW',
+    link: '/shop',
+  },
+  {
+    eyebrow: 'SIGNATURE PURPLE',
+    title: 'Royalty,',
+    accent: 'in every thread.',
+    description:
+      'Our signature purple palette — styled to feel luxe, never loud.',
+    image:
+      'https://images.pexels.com/photos/1926769/pexels-photo-1926769.jpeg?auto=compress&cs=tinysrgb&w=1920',
+    cta: 'SEE THE LOOK',
+    link: '/shop/clothing',
   },
 ];
 
 export default function HeroCarousel() {
-  const [currentSlide, setCurrentSlide] = useState(0);
+  const [current, setCurrent] = useState(0);
+  const [paused, setPaused] = useState(false);
+
+  useEffect(() => {
+    if (paused) return;
+    const timer = setInterval(() => {
+      setCurrent((prev) => (prev + 1) % slides.length);
+    }, 6500);
+    return () => clearInterval(timer);
+  }, [paused]);
+
+  const go = (dir: 1 | -1) => {
+    setCurrent((prev) => (prev + dir + slides.length) % slides.length);
+  };
 
   return (
-    <section className="relative h-[600px] overflow-hidden">
-      {slides.map((slide, index) => (
+    <section
+      className="relative h-[88vh] min-h-[560px] max-h-[820px] overflow-hidden bg-black"
+      onMouseEnter={() => setPaused(true)}
+      onMouseLeave={() => setPaused(false)}
+    >
+      {slides.map((slide, i) => (
         <div
-          key={index}
-          className={`absolute inset-0 transition-opacity duration-500 ${
-            index === currentSlide ? 'opacity-100' : 'opacity-0'
+          key={i}
+          className={`absolute inset-0 transition-opacity duration-[1200ms] ${
+            i === current ? 'opacity-100' : 'opacity-0 pointer-events-none'
           }`}
         >
           <div
-            className="absolute inset-0 bg-cover bg-center"
-            style={{
-              backgroundImage: `linear-gradient(to right, rgba(0,0,0,0.3), rgba(0,0,0,0.1)), url(${slide.image})`,
-            }}
+            className={`absolute inset-0 bg-cover bg-center transition-transform duration-[7000ms] ease-out ${
+              i === current ? 'scale-105' : 'scale-100'
+            }`}
+            style={{ backgroundImage: `url(${slide.image})` }}
           />
+          <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/40 to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
 
           <div className="relative container mx-auto px-6 h-full flex items-center">
-            <div className="max-w-xl text-white">
-              <h2 className="text-6xl font-serif font-light mb-2 leading-tight animate-fade-in-up" style={{ animationDelay: '0.1s' }}>
-                {slide.title}
-              </h2>
-              <h3 className="text-6xl font-serif font-light mb-6 leading-tight animate-fade-in-up" style={{ animationDelay: '0.2s' }}>
-                {slide.subtitle}
-              </h3>
-              <p className="text-xl mb-8 font-light animate-fade-in-up" style={{ animationDelay: '0.3s' }}>
-                {slide.description}
+            <div className="max-w-2xl text-white">
+              <p
+                key={`${i}-${current}-eyebrow`}
+                className="text-[11px] tracking-[0.5em] text-white/80 mb-6 animate-fade-in-up"
+                style={{ animationDelay: '0.1s' }}
+              >
+                {slide.eyebrow}
               </p>
-              <Link 
-                to="/shop"
-                className="inline-block px-8 py-3 border-2 border-white text-white hover:bg-white hover:text-gray-900 transition-all duration-300 tracking-wider text-sm font-medium transform hover:scale-105 active:scale-95 animate-fade-in-up" 
+              <h1
+                key={`${i}-${current}-title`}
+                className="font-display text-6xl md:text-7xl lg:text-8xl font-light leading-[1.05] mb-2 animate-fade-in-up"
+                style={{ animationDelay: '0.2s' }}
+              >
+                {slide.title}
+              </h1>
+              <h2
+                key={`${i}-${current}-accent`}
+                className="font-display italic text-6xl md:text-7xl lg:text-8xl font-light leading-[1.05] mb-8 text-bfab-200 animate-fade-in-up"
+                style={{ animationDelay: '0.3s' }}
+              >
+                {slide.accent}
+              </h2>
+              <p
+                key={`${i}-${current}-desc`}
+                className="text-lg md:text-xl text-white/85 mb-10 max-w-xl animate-fade-in-up font-light"
                 style={{ animationDelay: '0.4s' }}
               >
-                DISCOVER MORE
+                {slide.description}
+              </p>
+              <Link
+                key={`${i}-${current}-cta`}
+                to={slide.link}
+                className="inline-flex items-center gap-3 px-9 py-4 bg-white text-black hover:bg-bfab-600 hover:text-white transition-all duration-500 tracking-[0.2em] text-xs font-semibold rounded-md shadow-lg animate-fade-in-up"
+                style={{ animationDelay: '0.5s' }}
+              >
+                {slide.cta}
+                <ChevronRight className="w-4 h-4" />
               </Link>
             </div>
           </div>
         </div>
       ))}
 
-      <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 flex space-x-2">
-        {slides.map((_, index) => (
+      <button
+        onClick={() => go(-1)}
+        className="hidden md:flex absolute left-6 top-1/2 -translate-y-1/2 w-12 h-12 items-center justify-center rounded-full bg-white/15 hover:bg-white/30 backdrop-blur-sm border border-white/20 text-white transition-all z-10"
+        aria-label="Previous slide"
+      >
+        <ChevronLeft className="w-5 h-5" />
+      </button>
+      <button
+        onClick={() => go(1)}
+        className="hidden md:flex absolute right-6 top-1/2 -translate-y-1/2 w-12 h-12 items-center justify-center rounded-full bg-white/15 hover:bg-white/30 backdrop-blur-sm border border-white/20 text-white transition-all z-10"
+        aria-label="Next slide"
+      >
+        <ChevronRight className="w-5 h-5" />
+      </button>
+
+      <div className="absolute bottom-10 left-1/2 -translate-x-1/2 flex items-center gap-3 z-10">
+        {slides.map((_, i) => (
           <button
-            key={index}
-            onClick={() => setCurrentSlide(index)}
-            className={`w-2 h-2 rounded-full transition-all ${
-              index === currentSlide ? 'bg-white w-8' : 'bg-white/50'
+            key={i}
+            onClick={() => setCurrent(i)}
+            className={`h-[3px] rounded-full transition-all duration-500 ${
+              i === current ? 'w-12 bg-white' : 'w-6 bg-white/40 hover:bg-white/70'
             }`}
+            aria-label={`Go to slide ${i + 1}`}
           />
         ))}
       </div>

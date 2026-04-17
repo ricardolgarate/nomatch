@@ -1,40 +1,49 @@
 import { Link } from 'react-router-dom';
+import { Sparkle } from 'lucide-react';
 
 export default function ColorChangingSection() {
   return (
-    <section className="bg-pink-50 py-20">
+    <section className="bg-white py-24 md:py-32">
       <div className="container mx-auto px-6">
-        <div className="grid lg:grid-cols-2 gap-16 items-center">
+        <div className="grid lg:grid-cols-2 gap-12 lg:gap-20 items-center">
           <div className="order-2 lg:order-1">
-            <h2 className="text-5xl font-serif font-medium text-purple-600 mb-6 leading-tight">
-              COLOR-CHANGING<br />SNEAKERS
+            <span className="eyebrow mb-5 inline-flex items-center gap-2">
+              <Sparkle className="w-3.5 h-3.5" />
+              Statement Pieces
+            </span>
+
+            <h2 className="font-display text-5xl md:text-6xl lg:text-7xl font-medium text-black mt-4 mb-8 leading-[1.05]">
+              Royalty, in <br />
+              <span className="italic text-bfab-600">every thread.</span>
             </h2>
 
-            <div className="space-y-4 text-gray-900 text-lg">
+            <div className="space-y-5 text-black/75 text-lg leading-relaxed font-light">
               <p>
-                Discover a style that evolves with your every move. Indoors, the embroidery is white; step outside, and watch it transform with sun-activated colors.
+                Discover a style that evolves with every look. From bold accents to subtle
+                details, each piece is chosen to make getting dressed feel special.
               </p>
-
               <p>
-                Handmade in small batches with 100% premium leather and embroidery, NoMatch sneakers are crafted to turn heads while giving you all-day comfort.
+                Thoughtfully sourced in small drops, our pieces are picked to turn heads
+                while feeling completely you.
               </p>
             </div>
 
-            <Link 
-              to="/shop/uv"
-              className="inline-block mt-8 px-10 py-4 bg-purple-600 text-white hover:bg-purple-700 transition-all duration-300 font-medium tracking-wider text-sm transform hover:scale-105 hover:shadow-lg active:scale-95"
-            >
+            <Link to="/shop" className="btn-primary mt-10">
               SHOP NOW
             </Link>
           </div>
 
-          <div className="order-1 lg:order-2">
-            <div className="relative transform transition-transform duration-500 hover:scale-105">
+          <div className="order-1 lg:order-2 relative">
+            <div className="relative aspect-[4/5] rounded-2xl overflow-hidden shadow-soft group">
               <img
-                src="https://images.pexels.com/photos/2529148/pexels-photo-2529148.jpeg?auto=compress&cs=tinysrgb&w=1200"
-                alt="Color Changing Sneaker"
-                className="w-full rounded-lg shadow-xl"
+                src="https://images.pexels.com/photos/1926769/pexels-photo-1926769.jpeg?auto=compress&cs=tinysrgb&w=1200"
+                alt="Statement look"
+                className="w-full h-full object-cover transition-transform duration-[1200ms] group-hover:scale-105"
               />
+              <div className="absolute inset-0 ring-1 ring-inset ring-white/20 rounded-2xl" />
+            </div>
+            <div className="absolute -bottom-6 -left-6 bg-bfab-600 text-white font-display text-3xl px-8 py-5 rounded-2xl shadow-soft hidden md:block">
+              BFAB ✦
             </div>
           </div>
         </div>
