@@ -11,17 +11,17 @@ const categories = [
   },
   {
     title: 'Clothing',
-    blurb: 'New and gently worn for every size',
+    blurb: 'Pieces that wear you confidently',
     path: '/shop/clothing',
     image:
-      'https://images.pexels.com/photos/5704720/pexels-photo-5704720.jpeg?auto=compress&cs=tinysrgb&w=800',
+      'https://images.pexels.com/photos/7679454/pexels-photo-7679454.jpeg?auto=compress&cs=tinysrgb&w=800',
   },
   {
     title: 'Accessories',
-    blurb: 'Little pieces that say a lot',
+    blurb: 'The little things that say a lot',
     path: '/shop/accessories',
     image:
-      'https://images.pexels.com/photos/9558729/pexels-photo-9558729.jpeg?auto=compress&cs=tinysrgb&w=800',
+      'https://images.pexels.com/photos/1454171/pexels-photo-1454171.jpeg?auto=compress&cs=tinysrgb&w=800',
   },
 ];
 
@@ -30,13 +30,10 @@ export default function CategorySection() {
     <section className="bg-bfab-50/60 py-24 border-y border-black/5">
       <div className="container mx-auto px-6">
         <div className="flex flex-col items-center text-center mb-14">
-          <span className="eyebrow mb-4">Shop by category</span>
+          <span className="eyebrow mb-4">Shop by Category</span>
           <h2 className="font-display text-5xl md:text-6xl font-medium text-black leading-[1.05]">
-            Pick your <span className="italic text-bfab-600">favorite.</span>
+            Find your <span className="italic text-bfab-600">statement.</span>
           </h2>
-          <p className="mt-4 text-black/60 max-w-xl font-light">
-            Every piece is hand-picked. Every size is welcome.
-          </p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-5 md:gap-7">

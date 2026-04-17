@@ -1,14 +1,14 @@
 import { Link } from 'react-router-dom';
-import { MapPin, Sparkles, Heart } from 'lucide-react';
+import { Heart, Sparkles, MapPin } from 'lucide-react';
 
 export default function AboutUs() {
   return (
     <div className="min-h-screen bg-white">
       <div className="relative h-[70vh] min-h-[480px] bg-black overflow-hidden">
         <img
-          src="https://images.pexels.com/photos/7679720/pexels-photo-7679720.jpeg?auto=compress&cs=tinysrgb&w=1920"
-          alt="Woman shopping for clothes in a boutique"
-          className="absolute inset-0 w-full h-full object-cover opacity-55"
+          src="https://images.pexels.com/photos/2529148/pexels-photo-2529148.jpeg?auto=compress&cs=tinysrgb&w=1920"
+          alt=""
+          className="absolute inset-0 w-full h-full object-cover opacity-60"
         />
         <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-black/20 to-black/70" />
         <div className="absolute inset-0 flex flex-col items-center justify-center text-white text-center px-6">
@@ -16,143 +16,121 @@ export default function AboutUs() {
             Our Story
           </span>
           <h1 className="font-display text-6xl md:text-8xl font-light tracking-tight">
-            Meet <span className="italic text-bfab-200">BFAB</span>
+            About <span className="italic text-bfab-200">Us</span>
           </h1>
-          <p className="text-white/80 mt-6 max-w-lg text-lg font-light">
-            A little boutique with a big heart, right here in Desoto, Texas.
+          <p className="text-white/85 mt-6 max-w-lg text-lg font-light">
+            A little boutique in Desoto, Texas. A lot of love in every piece.
           </p>
+          <div className="mt-8 inline-flex items-center gap-2 text-bfab-200/90 text-xs tracking-[0.3em] uppercase">
+            <MapPin className="w-3.5 h-3.5" />
+            Desoto, Texas
+          </div>
         </div>
       </div>
 
-      {/* Catrice's story */}
+      {/* Meet Catrice */}
       <section className="bg-white py-24 md:py-32">
         <div className="container mx-auto px-6">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 lg:gap-24 items-center">
             <div className="order-2 lg:order-1">
               <img
-                src="https://images.pexels.com/photos/8386647/pexels-photo-8386647.jpeg?auto=compress&cs=tinysrgb&w=1200"
-                alt="Styling a piece at BFAB"
+                src="https://images.pexels.com/photos/1342609/pexels-photo-1342609.jpeg?auto=compress&cs=tinysrgb&w=1200"
+                alt="A thoughtfully curated shop"
                 className="rounded-2xl shadow-soft w-full h-auto"
               />
             </div>
             <div className="order-1 lg:order-2">
-              <span className="eyebrow mb-4">Meet Catrice</span>
+              <span className="eyebrow mb-4">Meet the Founder</span>
               <h2 className="font-display text-5xl md:text-6xl font-medium text-black mt-3 mb-8 leading-[1.05]">
-                Hi, I'm{' '}
-                <span className="italic text-bfab-600">Catrice Hines.</span>
+                Hi, I'm <span className="italic text-bfab-600">Catrice.</span>
               </h2>
-              <div className="space-y-5 text-black/75 text-lg leading-relaxed font-light text-pretty">
+              <div className="space-y-5 text-black/80 text-lg leading-relaxed font-light text-pretty">
+                <p>I started BFAB LLC in Desoto, Texas.</p>
+                <p>I have loved fashion my whole life.</p>
                 <p>
-                  I am the founder of Beauty For Ashes Boutique. I live and love
-                  fashion. I have for as long as I can remember.
+                  I studied Fashion Marketing at North Texas State University. Then I spent
+                  over <span className="font-medium text-bfab-700">20 years</span> in retail.
                 </p>
                 <p>
-                  I studied Fashion Marketing at the University of North Texas. I
-                  earned my BBA. Then I spent 20 years in retail learning every
-                  side of the business.
+                  I've sold jewelry. I've styled guests. I've run departments for big luxury
+                  names and small nonprofits. I learned every side of a store — sales floor,
+                  stockroom, dressing room.
                 </p>
                 <p>
-                  I have worked at luxury stores. I have worked at non-profit
-                  stores. I have done sales, jewelry, sportswear, fragrance and
-                  cosmetics. I have been a personal shopper and a stylist. I have
-                  managed departments and whole stores.
+                  I also learned one thing: the right piece can change your whole day.
                 </p>
                 <p>
-                  Through it all, one thing never changed. I love helping women
-                  feel good in what they wear.
+                  So I built BFAB to share that feeling with you — one piece at a time.
                 </p>
               </div>
+              <p className="mt-8 text-sm tracking-[0.2em] uppercase text-black/50">
+                — Catrice Hines, Founder
+              </p>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Three-up values */}
-      <section className="bg-bfab-50/60 py-20 md:py-24 border-y border-black/5">
+      {/* What you'll find */}
+      <section className="bg-bfab-50/60 py-24 md:py-32 border-y border-black/5">
         <div className="container mx-auto px-6">
-          <div className="text-center mb-14">
-            <span className="eyebrow mb-4">What we believe</span>
-            <h2 className="font-display text-4xl md:text-5xl font-medium text-black mt-3 leading-tight">
-              The BFAB <span className="italic text-bfab-600">promise.</span>
+          <div className="max-w-3xl mx-auto text-center mb-16">
+            <span className="eyebrow mb-4">The Boutique</span>
+            <h2 className="font-display text-5xl md:text-6xl font-medium text-black mt-3 mb-6 leading-[1.05]">
+              A little something for <span className="italic text-bfab-600">every you.</span>
             </h2>
+            <p className="text-black/75 text-lg font-light text-pretty">
+              Modern, trendy pieces for every size and every budget.
+            </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8 max-w-5xl mx-auto">
-            <div className="bg-white rounded-2xl p-8 border border-black/5 shadow-card">
-              <div className="w-12 h-12 rounded-full bg-bfab-50 flex items-center justify-center mb-5">
-                <Heart className="w-5 h-5 text-bfab-600" strokeWidth={1.6} />
-              </div>
-              <h3 className="font-display text-xl text-black mb-2">
-                For every woman
-              </h3>
-              <p className="text-black/70 text-sm font-light leading-relaxed">
-                Every size. Every shade. Every body. When you walk in, you belong.
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto">
+            <div className="bg-white rounded-2xl p-8 shadow-card">
+              <Sparkles className="w-8 h-8 text-bfab-600 mb-4" strokeWidth={1.5} />
+              <h3 className="font-display text-2xl text-black mb-2">New Arrivals</h3>
+              <p className="text-black/70 text-sm leading-relaxed">
+                Fresh pieces we can't wait to show you — chosen one by one.
               </p>
             </div>
-
-            <div className="bg-white rounded-2xl p-8 border border-black/5 shadow-card">
-              <div className="w-12 h-12 rounded-full bg-bfab-50 flex items-center justify-center mb-5">
-                <Sparkles className="w-5 h-5 text-bfab-600" strokeWidth={1.6} />
-              </div>
-              <h3 className="font-display text-xl text-black mb-2">
-                New or gently worn
-              </h3>
-              <p className="text-black/70 text-sm font-light leading-relaxed">
-                We stock both. New pieces for fresh style. Gently worn pieces for
-                smart style. Both are hand-picked.
+            <div className="bg-white rounded-2xl p-8 shadow-card">
+              <Heart className="w-8 h-8 text-bfab-600 mb-4" strokeWidth={1.5} />
+              <h3 className="font-display text-2xl text-black mb-2">Gently Worn Gems</h3>
+              <p className="text-black/70 text-sm leading-relaxed">
+                Very gently loved finds. Big style, smaller price.
               </p>
             </div>
-
-            <div className="bg-white rounded-2xl p-8 border border-black/5 shadow-card">
-              <div className="w-12 h-12 rounded-full bg-bfab-50 flex items-center justify-center mb-5">
-                <MapPin className="w-5 h-5 text-bfab-600" strokeWidth={1.6} />
-              </div>
-              <h3 className="font-display text-xl text-black mb-2">Made in Desoto</h3>
-              <p className="text-black/70 text-sm font-light leading-relaxed">
-                We are a small business in Desoto, Texas. When you shop BFAB,
-                you support a local dream.
+            <div className="bg-white rounded-2xl p-8 shadow-card">
+              <MapPin className="w-8 h-8 text-bfab-600 mb-4" strokeWidth={1.5} />
+              <h3 className="font-display text-2xl text-black mb-2">Shoes &amp; Extras</h3>
+              <p className="text-black/70 text-sm leading-relaxed">
+                Shoes, accessories, and little giftables that feel special.
               </p>
             </div>
           </div>
         </div>
       </section>
 
-      {/* What we carry */}
-      <section className="bg-white py-24 md:py-32">
+      {/* Our Name */}
+      <section className="bg-white py-24 md:py-28">
         <div className="container mx-auto px-6">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 lg:gap-24 items-center">
-            <div>
-              <span className="eyebrow mb-4">What you'll find</span>
-              <h2 className="font-display text-5xl md:text-6xl font-medium text-black mt-3 mb-8 leading-[1.05]">
-                A little of <span className="italic text-bfab-600">everything.</span>
-              </h2>
-              <div className="space-y-5 text-black/75 text-lg leading-relaxed font-light text-pretty">
-                <p>
-                  Clothing for every size. Shoes. Accessories. Little gifts
-                  you'll want to keep for yourself.
-                </p>
-                <p>
-                  Some pieces are brand new. Some are{' '}
-                  <span className="font-medium text-bfab-700">
-                    very gently worn
-                  </span>
-                  . All of them are chosen with care.
-                </p>
-                <p>
-                  Any budget. Any lifestyle. Any mood. You'll find something
-                  here that feels like you.
-                </p>
-              </div>
-              <Link to="/shop" className="btn-primary mt-10">
-                SHOP THE BOUTIQUE
-              </Link>
+          <div className="max-w-3xl mx-auto text-center">
+            <span className="eyebrow mb-4">Our Name</span>
+            <h2 className="font-display text-5xl md:text-6xl font-medium text-black mt-3 mb-8 leading-[1.05]">
+              Beauty For <span className="italic text-bfab-600">Ashes.</span>
+            </h2>
+            <div className="divider-ornament mb-10">
+              <span className="text-2xl">✦</span>
             </div>
-            <div>
-              <img
-                src="https://images.pexels.com/photos/5704720/pexels-photo-5704720.jpeg?auto=compress&cs=tinysrgb&w=1200"
-                alt="Diverse woman styling her outfit"
-                className="rounded-2xl shadow-soft w-full h-auto"
-              />
+            <div className="space-y-5 text-black/80 text-lg leading-relaxed font-light text-pretty">
+              <p>Our name means something to us.</p>
+              <p>
+                It's about turning hard times into something beautiful. About
+                showing up for yourself. About getting dressed like you mean it.
+              </p>
+              <p>
+                Fashion should make you feel like you again. We pick each piece
+                with that in mind.
+              </p>
             </div>
           </div>
         </div>
@@ -163,12 +141,10 @@ export default function AboutUs() {
         <div className="absolute inset-0 bg-hero-radial opacity-60" />
         <div className="container mx-auto px-6 text-center relative">
           <h3 className="font-display text-4xl md:text-5xl font-medium mb-6 leading-tight">
-            Come as you are. <br />
-            Leave feeling like{' '}
-            <span className="italic text-bfab-200">a queen.</span>
+            Ready to wear your <span className="italic text-bfab-200">crown?</span>
           </h3>
           <p className="text-lg text-white/75 mb-10 max-w-2xl mx-auto font-light">
-            Welcome to the BFAB family.
+            Come shop the boutique. We're so glad you're here.
           </p>
           <Link
             to="/shop"

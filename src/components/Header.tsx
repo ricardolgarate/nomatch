@@ -88,7 +88,7 @@ export default function Header() {
   return (
     <>
       <div className="bg-bfab-900 text-white text-[10px] md:text-[11px] tracking-[0.2em] md:tracking-[0.25em] text-center uppercase py-2 md:py-2.5 px-3">
-        Complimentary shipping on domestic orders over $150
+        Free shipping over $150 · Small boutique from Desoto, Texas
       </div>
 
       <header

@@ -5,19 +5,19 @@ const features = [
     icon: PackageOpen,
     title: 'Free Shipping Over $150',
     description:
-      'Free standard shipping on domestic orders over $150. Easy returns within 10 days.',
+      'Sent with care from Desoto, Texas. Easy 10-day returns and exchanges.',
   },
   {
     icon: MessageCircle,
-    title: 'Real People, Real Help',
+    title: 'We Are Real People',
     description:
-      'Questions? Styling help? Email us at shopbfabllc@gmail.com or call (469) 297-6359.',
+      'Questions? Styling help? Reach out any time at shopbfabllc@gmail.com or (469) 297-6359.',
   },
   {
     icon: Sparkles,
-    title: 'Hand-Picked Every Piece',
+    title: 'Hand-Picked by Catrice',
     description:
-      'Every item in the boutique is chosen by Catrice. New or gently worn — always good.',
+      'Every piece in the boutique is chosen by our founder — with 20+ years of retail know-how.',
   },
 ];
 
@@ -26,9 +26,9 @@ export default function ExperienceSection() {
     <section className="bg-white py-24">
       <div className="container mx-auto px-6">
         <div className="flex flex-col items-center text-center mb-16">
-          <span className="eyebrow mb-4">The BFAB Way</span>
+          <span className="eyebrow mb-4">The BFAB Experience</span>
           <h2 className="font-display text-5xl md:text-6xl font-medium text-black leading-[1.05]">
-            Shop with a little <span className="italic text-bfab-600">love</span>.
+            A small boutique. <span className="italic text-bfab-600">Big heart.</span>
           </h2>
         </div>
 
