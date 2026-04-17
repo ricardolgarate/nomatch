@@ -34,7 +34,7 @@ export default function Header() {
 
       <header className="bg-white/90 backdrop-blur-md sticky top-0 z-50 border-b border-black/5">
         <div className="container mx-auto px-6">
-          <div className="flex items-center justify-between h-24">
+          <div className="flex items-center justify-between h-28 md:h-32">
             <div className="flex-1 flex items-center gap-3">
               <button
                 onClick={() => setSearchOpen(!searchOpen)}
@@ -49,7 +49,7 @@ export default function Header() {
               <img
                 src="/BFABLOGO.png"
                 alt="Beauty For Ashes Boutique"
-                className="h-14 w-auto object-contain"
+                className="h-20 md:h-24 w-auto object-contain"
               />
             </Link>
 

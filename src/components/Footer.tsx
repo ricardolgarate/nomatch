@@ -8,13 +8,11 @@ export default function Footer() {
 
       <div className="container mx-auto px-6 pt-20 pb-10 relative">
         <div className="flex flex-col items-center text-center mb-16">
-          <div className="bg-white rounded-2xl px-6 py-4 mb-5 shadow-soft">
-            <img
-              src="/BFABLOGO.png"
-              alt="Beauty For Ashes Boutique"
-              className="w-48 h-auto object-contain"
-            />
-          </div>
+          <img
+            src="/BFABLOGO.png"
+            alt="Beauty For Ashes Boutique"
+            className="w-72 md:w-80 h-auto object-contain mb-5"
+          />
           <p className="font-display text-2xl mb-1">Beauty For Ashes Boutique</p>
           <div className="divider-ornament w-full max-w-xs mx-auto mt-3 mb-4 text-bfab-300">
             <span>✦</span>
