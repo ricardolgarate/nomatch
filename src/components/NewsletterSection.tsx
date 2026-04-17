@@ -22,13 +22,13 @@ export default function NewsletterSection() {
       <div className="container mx-auto px-6 relative">
         <div className="max-w-2xl mx-auto text-center">
           <span className="inline-block text-[11px] font-semibold uppercase tracking-[0.32em] text-bfab-200 mb-4">
-            Join the List
+            Join the BFAB fam
           </span>
           <h2 className="font-display text-4xl md:text-5xl font-medium leading-tight mb-6 text-balance">
-            Early access to <span className="italic text-bfab-200">new drops.</span>
+            Be the first to <span className="italic text-bfab-200">shop new drops.</span>
           </h2>
           <p className="text-white/75 text-lg mb-10 font-light text-pretty">
-            Sign up for first dibs on new arrivals, member-only offers, and little boutique extras.
+            Sign up for first dibs on new arrivals, little secrets, and style tips from Catrice.
           </p>
 
           <form

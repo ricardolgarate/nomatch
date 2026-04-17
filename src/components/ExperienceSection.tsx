@@ -3,21 +3,21 @@ import { PackageOpen, MessageCircle, Sparkles } from 'lucide-react';
 const features = [
   {
     icon: PackageOpen,
-    title: 'Complimentary Shipping',
+    title: 'Free Shipping Over $150',
     description:
-      'Free standard shipping on domestic orders over $150. Returns and exchanges within 10 days.',
+      'Free standard shipping on domestic orders over $150. Easy returns within 10 days.',
   },
   {
     icon: MessageCircle,
-    title: 'Concierge Support',
+    title: 'Real People, Real Help',
     description:
-      'Real humans, real answers — write us anytime at support@bfab.com.',
+      'Questions? Styling help? Email us at shopbfabllc@gmail.com or call (469) 297-6359.',
   },
   {
     icon: Sparkles,
-    title: 'Thoughtfully Curated',
+    title: 'Hand-Picked Every Piece',
     description:
-      'Every piece in our boutique is chosen by hand, from fit and feel to finishing details.',
+      'Every item in the boutique is chosen by Catrice. New or gently worn — always good.',
   },
 ];
 
@@ -26,9 +26,9 @@ export default function ExperienceSection() {
     <section className="bg-white py-24">
       <div className="container mx-auto px-6">
         <div className="flex flex-col items-center text-center mb-16">
-          <span className="eyebrow mb-4">The BFAB Experience</span>
+          <span className="eyebrow mb-4">The BFAB Way</span>
           <h2 className="font-display text-5xl md:text-6xl font-medium text-black leading-[1.05]">
-            A little <span className="italic text-bfab-600">luxury</span>, every time.
+            Shop with a little <span className="italic text-bfab-600">love</span>.
           </h2>
         </div>
 

@@ -8,32 +8,32 @@ const slides = [
     title: 'Wear Your',
     accent: 'Crown.',
     description:
-      'Curated pieces for the woman who was always meant to stand out.',
+      'A little boutique in Desoto, Texas, for every woman — every shape, every shade, every story.',
     image:
       'https://images.pexels.com/photos/8386647/pexels-photo-8386647.jpeg?auto=compress&cs=tinysrgb&w=1920',
     cta: 'SHOP THE COLLECTION',
     link: '/shop',
   },
   {
-    eyebrow: 'NEW ARRIVALS',
-    title: 'Soft Power.',
-    accent: 'Bold Grace.',
+    eyebrow: 'FOR ALL SIZES',
+    title: 'Made for',
+    accent: 'all of us.',
     description:
-      'From statement heels to everyday essentials — pieces that feel like yours.',
+      'New and gently worn pieces curated with love — sized for everybody, priced for every budget.',
     image:
-      'https://images.pexels.com/photos/1381553/pexels-photo-1381553.jpeg?auto=compress&cs=tinysrgb&w=1920',
-    cta: 'EXPLORE NEW',
+      'https://images.pexels.com/photos/10873719/pexels-photo-10873719.jpeg?auto=compress&cs=tinysrgb&w=1920',
+    cta: 'SHOP NEW',
     link: '/shop',
   },
   {
-    eyebrow: 'SIGNATURE PURPLE',
-    title: 'Royalty,',
-    accent: 'in every thread.',
+    eyebrow: 'GIFTS & STYLING',
+    title: 'Find your',
+    accent: 'next favorite.',
     description:
-      'Our signature purple palette — styled to feel luxe, never loud.',
+      'Clothing, shoes, accessories and giftables — hand-picked by Catrice, our founder and stylist.',
     image:
-      'https://images.pexels.com/photos/1926769/pexels-photo-1926769.jpeg?auto=compress&cs=tinysrgb&w=1920',
-    cta: 'SEE THE LOOK',
+      'https://images.pexels.com/photos/5704720/pexels-photo-5704720.jpeg?auto=compress&cs=tinysrgb&w=1920',
+    cta: 'SEE WHAT IS NEW',
     link: '/shop/clothing',
   },
 ];
