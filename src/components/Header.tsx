@@ -13,8 +13,28 @@ export default function Header() {
   const { getCartCount, openCart } = useCart();
 
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 24);
-    onScroll();
+    const COLLAPSE_AT = 120;
+    const EXPAND_AT = 40;
+    let ticking = false;
+    let lastState = window.scrollY > COLLAPSE_AT;
+    setScrolled(lastState);
+
+    const onScroll = () => {
+      if (ticking) return;
+      ticking = true;
+      requestAnimationFrame(() => {
+        const y = window.scrollY;
+        if (!lastState && y > COLLAPSE_AT) {
+          lastState = true;
+          setScrolled(true);
+        } else if (lastState && y < EXPAND_AT) {
+          lastState = false;
+          setScrolled(false);
+        }
+        ticking = false;
+      });
+    };
+
     window.addEventListener('scroll', onScroll, { passive: true });
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
@@ -49,11 +69,7 @@ export default function Header() {
 
   return (
     <>
-      <div
-        className={`bg-bfab-900 text-white text-[11px] tracking-[0.25em] text-center uppercase overflow-hidden transition-[max-height,padding,opacity] duration-[600ms] ease-[cubic-bezier(0.22,1,0.36,1)] ${
-          scrolled ? 'max-h-0 opacity-0 py-0' : 'max-h-12 opacity-100 py-2.5'
-        }`}
-      >
+      <div className="bg-bfab-900 text-white text-[11px] tracking-[0.25em] text-center uppercase py-2.5">
         Complimentary shipping on domestic orders over $150
       </div>
 
