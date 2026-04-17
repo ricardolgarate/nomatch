@@ -23,24 +23,22 @@ export default function LoadingScreen() {
 
   return (
     <div
-      className={`fixed inset-0 z-[9999] flex items-center justify-center bg-white transition-opacity duration-400 ${
+      className={`fixed inset-0 z-[9999] flex items-center justify-center bg-black transition-opacity duration-400 ${
         fadeOut ? 'opacity-0' : 'opacity-100'
       }`}
     >
-      <div className="absolute inset-0 bg-hero-radial opacity-70" />
+      <div className="absolute inset-0 bg-hero-radial opacity-50" />
       <div className="relative flex flex-col items-center">
-        <div className="w-40 h-40 rounded-full bg-white shadow-soft flex items-center justify-center animate-pulse">
-          <img
-            src="/BFAB-Logo.jpg"
-            alt="Beauty For Ashes Boutique"
-            className="w-28 h-auto object-contain"
-          />
-        </div>
+        <img
+          src="/BFABLOGO.png"
+          alt="Beauty For Ashes Boutique"
+          className="w-64 h-auto object-contain animate-pulse"
+        />
 
-        <div className="flex justify-center gap-1.5 mt-8">
-          <span className="w-1.5 h-1.5 bg-bfab-600 rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
-          <span className="w-1.5 h-1.5 bg-bfab-600 rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
-          <span className="w-1.5 h-1.5 bg-bfab-600 rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
+        <div className="flex justify-center gap-1.5 mt-10">
+          <span className="w-1.5 h-1.5 bg-bfab-300 rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
+          <span className="w-1.5 h-1.5 bg-bfab-400 rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
+          <span className="w-1.5 h-1.5 bg-bfab-300 rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
         </div>
       </div>
     </div>
