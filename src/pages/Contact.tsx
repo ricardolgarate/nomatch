@@ -143,7 +143,7 @@ export default function Contact() {
                 </a>
 
                 <a
-                  href="https://www.instagram.com/"
+                  href="https://www.instagram.com/bfabllc/"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="flex items-center gap-3 text-black hover:text-bfab-600 transition-colors group"
@@ -151,7 +151,7 @@ export default function Contact() {
                   <div className="w-10 h-10 rounded-full bg-white border border-black/5 flex items-center justify-center group-hover:bg-bfab-600 group-hover:border-bfab-600 transition-colors">
                     <Instagram className="w-4 h-4 text-bfab-600 group-hover:text-white transition-colors" />
                   </div>
-                  <span>@bfab</span>
+                  <span>@bfabllc</span>
                 </a>
 
                 <div className="flex items-start gap-3 text-black/70">

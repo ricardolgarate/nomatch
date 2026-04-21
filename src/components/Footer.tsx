@@ -23,13 +23,13 @@ export default function Footer() {
             <span>✦</span>
           </div>
           <a
-            href="https://www.instagram.com/"
+            href="https://www.instagram.com/bfabllc/"
             target="_blank"
             rel="noopener noreferrer"
             className="text-sm text-bfab-600 hover:text-bfab-700 font-medium transition-colors inline-flex items-center gap-2"
           >
             <Instagram className="w-4 h-4" />
-            @bfab
+            @bfabllc
           </a>
         </div>
 
@@ -92,13 +92,13 @@ export default function Footer() {
                 <span>Desoto, Texas</span>
               </div>
               <a
-                href="https://www.instagram.com/"
+                href="https://www.instagram.com/bfabllc/"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex items-center gap-2 hover:text-bfab-600 transition-colors"
               >
                 <Instagram className="w-4 h-4 shrink-0" />
-                <span>@bfab</span>
+                <span>@bfabllc</span>
               </a>
             </div>
           </div>
