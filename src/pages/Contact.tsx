@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import { Instagram, Mail, MapPin, Phone, Send } from 'lucide-react';
+import { Instagram, Mail, MapPin, Phone, Send, Loader2, AlertCircle } from 'lucide-react';
+import { saveContactMessage } from '../firebase/customers';
 
 export default function Contact() {
   const [formData, setFormData] = useState({
@@ -9,13 +10,33 @@ export default function Contact() {
     message: '',
   });
   const [submitted, setSubmitted] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log('Form submitted:', formData);
-    setSubmitted(true);
-    setFormData({ name: '', email: '', phone: '', message: '' });
-    setTimeout(() => setSubmitted(false), 4000);
+    setSubmitting(true);
+    setError(null);
+    try {
+      await saveContactMessage({
+        name: formData.name.trim(),
+        email: formData.email.trim(),
+        phone: formData.phone.trim() || undefined,
+        message: formData.message.trim(),
+      });
+      setSubmitted(true);
+      setFormData({ name: '', email: '', phone: '', message: '' });
+      setTimeout(() => setSubmitted(false), 4000);
+    } catch (err) {
+      console.error(err);
+      setError(
+        err instanceof Error
+          ? err.message
+          : 'Could not send your message. Please try again.',
+      );
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -102,10 +123,30 @@ export default function Contact() {
                 />
               </div>
 
-              <button type="submit" className="btn-primary">
-                <Send className="w-4 h-4" />
-                {submitted ? 'Message Sent!' : 'Send Message'}
+              <button type="submit" disabled={submitting} className="btn-primary">
+                {submitting ? (
+                  <>
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                    Sending…
+                  </>
+                ) : submitted ? (
+                  <>
+                    <Send className="w-4 h-4" /> Message Sent!
+                  </>
+                ) : (
+                  <>
+                    <Send className="w-4 h-4" /> Send Message
+                  </>
+                )}
               </button>
+
+              {error && (
+                <div className="bg-bfab-50 border border-bfab-200 rounded-lg p-3 text-sm text-bfab-700 flex items-center gap-2">
+                  <AlertCircle className="w-4 h-4 shrink-0" />
+                  {error}
+                </div>
+              )}
+
               <p className="text-xs text-black/50 pt-1">
                 We usually reply within a day or two.
               </p>

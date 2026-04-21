@@ -1,16 +1,34 @@
 import { useState } from 'react';
-import { Mail, ArrowRight, CheckCircle2 } from 'lucide-react';
+import { Mail, ArrowRight, CheckCircle2, Loader2, AlertCircle } from 'lucide-react';
+import { saveSubscriber } from '../firebase/customers';
 
 export default function NewsletterSection() {
   const [email, setEmail] = useState('');
   const [submitted, setSubmitted] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!email.trim()) return;
-    setSubmitted(true);
-    setEmail('');
-    setTimeout(() => setSubmitted(false), 4000);
+    const trimmed = email.trim();
+    if (!trimmed) return;
+    setSubmitting(true);
+    setError(null);
+    try {
+      await saveSubscriber(trimmed, 'newsletter');
+      setSubmitted(true);
+      setEmail('');
+      setTimeout(() => setSubmitted(false), 4000);
+    } catch (err) {
+      console.error(err);
+      setError(
+        err instanceof Error
+          ? err.message
+          : 'Could not save your email. Please try again.',
+      );
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
@@ -43,14 +61,20 @@ export default function NewsletterSection() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="Your email address"
-                className="w-full pl-11 pr-4 py-4 rounded-lg bg-white/10 border border-white/20 focus:border-white focus:bg-white/15 focus:outline-none backdrop-blur-sm text-white placeholder-white/50 transition-all"
+                disabled={submitting}
+                className="w-full pl-11 pr-4 py-4 rounded-lg bg-white/10 border border-white/20 focus:border-white focus:bg-white/15 focus:outline-none backdrop-blur-sm text-white placeholder-white/50 transition-all disabled:opacity-60"
               />
             </div>
             <button
               type="submit"
-              className="inline-flex items-center justify-center gap-2 px-7 py-4 bg-white text-bfab-900 font-semibold tracking-[0.2em] text-xs rounded-lg hover:bg-bfab-200 transition-colors"
+              disabled={submitting || submitted}
+              className="inline-flex items-center justify-center gap-2 px-7 py-4 bg-white text-bfab-900 font-semibold tracking-[0.2em] text-xs rounded-lg hover:bg-bfab-200 transition-colors disabled:opacity-80 disabled:cursor-not-allowed"
             >
-              {submitted ? (
+              {submitting ? (
+                <>
+                  <Loader2 className="w-4 h-4 animate-spin" /> JOINING
+                </>
+              ) : submitted ? (
                 <>
                   <CheckCircle2 className="w-4 h-4" /> SUBSCRIBED
                 </>
@@ -61,6 +85,13 @@ export default function NewsletterSection() {
               )}
             </button>
           </form>
+
+          {error && (
+            <p className="mt-4 text-sm text-bfab-200 flex items-center justify-center gap-2">
+              <AlertCircle className="w-4 h-4" />
+              {error}
+            </p>
+          )}
 
           <p className="text-xs text-white/50 mt-4">
             No spam. Just the good stuff. Pinky promise.

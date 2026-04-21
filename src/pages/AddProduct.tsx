@@ -229,7 +229,13 @@ export default function AddProduct() {
               to="/orders"
               className="inline-flex items-center gap-2 px-5 py-3 text-black/70 hover:text-bfab-600 font-medium"
             >
-              View orders
+              Orders
+            </Link>
+            <Link
+              to="/customers"
+              className="inline-flex items-center gap-2 px-5 py-3 text-black/70 hover:text-bfab-600 font-medium"
+            >
+              Customers
             </Link>
             <Link
               to="/shop"

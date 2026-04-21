@@ -10,5 +10,11 @@ service cloud.firestore {
     match /orders/{orderId} {
       allow read, write: if true;
     }
+    match /subscribers/{subscriberId} {
+      allow read, write: if true;
+    }
+    match /contact_messages/{messageId} {
+      allow read, write: if true;
+    }
   }
 }
