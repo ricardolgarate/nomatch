@@ -115,7 +115,7 @@ export default function Header() {
               <img
                 src="/BFABLOGO.png"
                 alt="Beauty For Ashes Boutique"
-                className="h-16 sm:h-20 md:h-28 w-auto object-contain"
+                className="h-12 sm:h-14 md:h-16 w-auto object-contain"
               />
             </Link>
           </div>
