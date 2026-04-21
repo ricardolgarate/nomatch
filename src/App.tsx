@@ -12,6 +12,7 @@ import ProductDetail from './pages/ProductDetail';
 import Checkout from './pages/Checkout';
 import CheckoutSuccess from './pages/CheckoutSuccess';
 import AddProduct from './pages/AddProduct';
+import Orders from './pages/Orders';
 import { CartProvider } from './context/CartContext';
 
 function Layout({ children }: { children: React.ReactNode }) {
@@ -40,6 +41,7 @@ function App() {
           <Route path="/about" element={<Layout><AboutUs /></Layout>} />
           <Route path="/contact" element={<Layout><Contact /></Layout>} />
           <Route path="/add" element={<Layout><AddProduct /></Layout>} />
+          <Route path="/orders" element={<Layout><Orders /></Layout>} />
         </Routes>
       </Router>
     </CartProvider>

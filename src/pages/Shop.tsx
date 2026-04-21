@@ -45,11 +45,19 @@ export default function Shop() {
 
   const currentCategory = getCurrentCategory();
 
+  const isOutOfStock = (product: ProductInventory) => {
+    if (product.sizes && Object.keys(product.sizes).length > 0) {
+      return Object.values(product.sizes).every((qty) => qty === 0);
+    }
+    return (product.stock || 0) === 0;
+  };
+
   const getFilteredProducts = () => {
-    let filtered = products;
+    // Hide out-of-stock pieces from shop browse/search entirely.
+    let filtered = products.filter((p) => !isOutOfStock(p));
     if (searchQuery) {
       const query = searchQuery.toLowerCase();
-      filtered = products.filter(
+      filtered = filtered.filter(
         (p) =>
           p.name.toLowerCase().includes(query) ||
           p.category.toLowerCase().includes(query) ||
@@ -57,7 +65,7 @@ export default function Shop() {
           p.sku?.toLowerCase().includes(query)
       );
     } else if (currentCategory !== 'Shop') {
-      filtered = products.filter((p) => p.category === currentCategory);
+      filtered = filtered.filter((p) => p.category === currentCategory);
     }
     return filtered;
   };
@@ -67,13 +75,6 @@ export default function Shop() {
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
   const currentProducts = filteredProducts.slice(startIndex, endIndex);
-
-  const isOutOfStock = (product: ProductInventory) => {
-    if (product.sizes && Object.keys(product.sizes).length > 0) {
-      return Object.values(product.sizes).every((qty) => qty === 0);
-    }
-    return (product.stock || 0) === 0;
-  };
 
   useEffect(() => {
     setCurrentPage(1);

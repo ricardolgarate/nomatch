@@ -11,7 +11,13 @@ export default function ProductGrid() {
     (async () => {
       try {
         const all = await getAllProducts();
-        setProducts(all.slice(0, 4));
+        const inStock = all.filter((p) => {
+          if (p.sizes && Object.keys(p.sizes).length > 0) {
+            return Object.values(p.sizes).some((qty) => (qty || 0) > 0);
+          }
+          return (p.stock || 0) > 0;
+        });
+        setProducts(inStock.slice(0, 4));
       } catch (err) {
         console.error('Error loading featured products:', err);
       } finally {

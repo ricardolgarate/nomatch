@@ -1,7 +1,9 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { ShoppingBag, CreditCard, Lock } from 'lucide-react';
+import { ShoppingBag, CreditCard, Lock, AlertCircle } from 'lucide-react';
 import { useCart } from '../context/CartContext';
+import { saveOrder } from '../firebase/orders';
+import { updateStock } from '../firebase/inventory';
 
 function generateOrderNumber(): string {
   const date = new Date();
@@ -19,6 +21,7 @@ export default function Checkout() {
   const [showOrderNote, setShowOrderNote] = useState(false);
   const [orderNumber] = useState(generateOrderNumber());
   const [placing, setPlacing] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const [formData, setFormData] = useState({
     email: '',
@@ -47,9 +50,60 @@ export default function Checkout() {
   const handlePlaceOrder = async (e: React.FormEvent) => {
     e.preventDefault();
     setPlacing(true);
-    await new Promise((r) => setTimeout(r, 600));
-    clearCart();
-    navigate(`/checkout/success?order=${orderNumber}`);
+    setError(null);
+    try {
+      await saveOrder({
+        id: orderNumber,
+        orderNumber,
+        items: cart.map((item) => ({
+          id: item.id,
+          name: item.name,
+          price: item.price,
+          image: item.image,
+          quantity: item.quantity,
+          size: item.size,
+          category: item.category,
+        })),
+        customer: {
+          email: formData.email,
+          firstName: formData.firstName,
+          lastName: formData.lastName,
+          address: formData.address,
+          apartment: formData.apartment || undefined,
+          city: formData.city,
+          state: formData.state,
+          zipCode: formData.zipCode,
+          phone: formData.phone || undefined,
+          country: formData.country,
+          orderNote: formData.orderNote || undefined,
+        },
+        subtotal,
+        shipping,
+        total,
+        status: 'new',
+        paymentStatus: 'pending',
+      });
+
+      // Decrement stock for each purchased line (best-effort).
+      await Promise.all(
+        cart.map((item) =>
+          updateStock(item.id, item.size, -item.quantity).catch((err) => {
+            console.warn(`Stock update failed for ${item.id}`, err);
+          }),
+        ),
+      );
+
+      clearCart();
+      navigate(`/checkout/success?order=${orderNumber}`);
+    } catch (err) {
+      console.error(err);
+      setError(
+        err instanceof Error
+          ? err.message
+          : 'Could not place the order. Please try again.',
+      );
+      setPlacing(false);
+    }
   };
 
   if (cart.length === 0) {
@@ -266,6 +320,13 @@ export default function Checkout() {
                   recorded as pending.
                 </p>
               </div>
+
+              {error && (
+                <div className="mt-4 bg-bfab-50 border border-bfab-200 rounded-lg p-3 text-sm text-bfab-700 flex items-center gap-2">
+                  <AlertCircle className="w-4 h-4 shrink-0" />
+                  {error}
+                </div>
+              )}
 
               <button
                 type="submit"
