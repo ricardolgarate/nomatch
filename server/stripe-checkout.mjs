@@ -1,9 +1,5 @@
-import dotenv from 'dotenv';
-import express from 'express';
-import path from 'node:path';
-import { fileURLToPath } from 'node:url';
 import Stripe from 'stripe';
-import { initializeApp } from 'firebase/app';
+import { initializeApp, getApps } from 'firebase/app';
 import {
   doc,
   getDoc,
@@ -14,46 +10,36 @@ import {
   setDoc,
 } from 'firebase/firestore';
 
-dotenv.config({ path: '.env.local' });
-dotenv.config();
+let dbInstance;
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-const distPath = path.resolve(__dirname, '../dist');
+function getDb() {
+  if (dbInstance) return dbInstance;
 
-const app = express();
-const port = Number(process.env.PORT || 4242);
-const stripe = process.env.STRIPE_SECRET_KEY
-  ? new Stripe(process.env.STRIPE_SECRET_KEY)
-  : null;
+  const firebaseConfig = {
+    apiKey: process.env.VITE_FIREBASE_API_KEY,
+    authDomain: process.env.VITE_FIREBASE_AUTH_DOMAIN,
+    projectId: process.env.VITE_FIREBASE_PROJECT_ID,
+    storageBucket: process.env.VITE_FIREBASE_STORAGE_BUCKET,
+    messagingSenderId: process.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
+    appId: process.env.VITE_FIREBASE_APP_ID,
+    measurementId: process.env.VITE_FIREBASE_MEASUREMENT_ID,
+  };
 
-const firebaseConfig = {
-  apiKey: process.env.VITE_FIREBASE_API_KEY,
-  authDomain: process.env.VITE_FIREBASE_AUTH_DOMAIN,
-  projectId: process.env.VITE_FIREBASE_PROJECT_ID,
-  storageBucket: process.env.VITE_FIREBASE_STORAGE_BUCKET,
-  messagingSenderId: process.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
-  appId: process.env.VITE_FIREBASE_APP_ID,
-  measurementId: process.env.VITE_FIREBASE_MEASUREMENT_ID,
-};
+  const app = getApps().length > 0 ? getApps()[0] : initializeApp(firebaseConfig);
+  dbInstance = initializeFirestore(app, {
+    ignoreUndefinedProperties: true,
+  });
+  return dbInstance;
+}
 
-const firebaseApp = initializeApp(firebaseConfig);
-const db = initializeFirestore(firebaseApp, {
-  ignoreUndefinedProperties: true,
-});
-
-function requireStripe() {
-  if (!stripe) {
-    throw new Error('Stripe is not configured. Add STRIPE_SECRET_KEY to .env.');
+export function getStripe() {
+  if (!process.env.STRIPE_SECRET_KEY) {
+    throw new Error('Stripe is not configured. Add STRIPE_SECRET_KEY to the deployment environment.');
   }
-  return stripe;
+  return new Stripe(process.env.STRIPE_SECRET_KEY);
 }
 
-function siteUrlFromRequest(req) {
-  return process.env.PUBLIC_SITE_URL || req.get('origin') || `http://localhost:${port}`;
-}
-
-function generateOrderNumber() {
+export function generateOrderNumber() {
   const date = new Date();
   const year = date.getFullYear();
   const month = String(date.getMonth() + 1).padStart(2, '0');
@@ -143,7 +129,7 @@ function validStripeImages(images) {
 }
 
 async function getProduct(productId) {
-  const snap = await getDoc(doc(db, 'products', productId));
+  const snap = await getDoc(doc(getDb(), 'products', productId));
   if (!snap.exists()) {
     throw new Error('A product in your cart is no longer available.');
   }
@@ -224,10 +210,52 @@ async function buildCheckoutOrder(cartItems, customer, orderNumber) {
   };
 }
 
-async function markOrderPaid(orderNumber, session) {
-  const orderRef = doc(db, 'orders', orderNumber);
+export async function createCheckoutSession({ body, siteUrl }) {
+  const stripe = getStripe();
+  const cartItems = normalizeCartItems(body?.items);
+  const customer = normalizeCustomer(body?.customer);
+  const orderNumber = String(body?.orderNumber || generateOrderNumber());
+  const { stripeLineItems, order } = await buildCheckoutOrder(cartItems, customer, orderNumber);
 
-  await runTransaction(db, async (transaction) => {
+  const successPath = new URL('/checkout/success', siteUrl).toString();
+  const cancelPath = new URL('/checkout', siteUrl).toString();
+  const successUrl = `${successPath}?order=${encodeURIComponent(orderNumber)}&session_id={CHECKOUT_SESSION_ID}`;
+  const cancelUrl = `${cancelPath}?order=${encodeURIComponent(orderNumber)}`;
+
+  const session = await stripe.checkout.sessions.create({
+    mode: 'payment',
+    customer_email: customer.email,
+    line_items: stripeLineItems,
+    success_url: successUrl,
+    cancel_url: cancelUrl,
+    metadata: {
+      orderNumber,
+    },
+    payment_intent_data: {
+      metadata: {
+        orderNumber,
+      },
+    },
+  });
+
+  await setDoc(
+    doc(getDb(), 'orders', orderNumber),
+    {
+      ...order,
+      stripeCheckoutSessionId: session.id,
+      createdAt: serverTimestamp(),
+      updatedAt: serverTimestamp(),
+    },
+    { merge: true },
+  );
+
+  return { url: session.url, orderNumber };
+}
+
+async function markOrderPaid(orderNumber, session) {
+  const orderRef = doc(getDb(), 'orders', orderNumber);
+
+  await runTransaction(getDb(), async (transaction) => {
     const orderSnap = await transaction.get(orderRef);
     if (!orderSnap.exists()) return;
 
@@ -250,7 +278,7 @@ async function markOrderPaid(orderNumber, session) {
     }
 
     for (const item of order.items || []) {
-      const productRef = doc(db, 'products', item.id);
+      const productRef = doc(getDb(), 'products', item.id);
       const quantity = -Math.abs(Number(item.quantity || 0));
       if (quantity === 0) continue;
 
@@ -284,100 +312,25 @@ async function markOrderPaid(orderNumber, session) {
   });
 }
 
-app.post('/api/stripe/webhook', express.raw({ type: 'application/json' }), async (req, res) => {
-  try {
-    const stripeClient = requireStripe();
-    const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
-    if (!webhookSecret) {
-      return res.status(400).send('Stripe webhook secret is not configured.');
-    }
-
-    const signature = req.headers['stripe-signature'];
-    const event = stripeClient.webhooks.constructEvent(req.body, signature, webhookSecret);
-
-    if (
-      event.type === 'checkout.session.completed' ||
-      event.type === 'checkout.session.async_payment_succeeded'
-    ) {
-      const session = event.data.object;
-      const orderNumber = session.metadata?.orderNumber;
-      if (orderNumber) {
-        await markOrderPaid(orderNumber, session);
-      }
-    }
-
-    res.json({ received: true });
-  } catch (error) {
-    console.error('Stripe webhook error:', error);
-    res.status(400).send(error instanceof Error ? error.message : 'Webhook failed.');
+export async function handleStripeWebhook({ rawBody, signature }) {
+  const stripe = getStripe();
+  const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
+  if (!webhookSecret) {
+    throw new Error('Stripe webhook secret is not configured.');
   }
-});
 
-app.use(express.json());
+  const event = stripe.webhooks.constructEvent(rawBody, signature, webhookSecret);
 
-app.post('/api/create-checkout-session', async (req, res) => {
-  try {
-    const stripeClient = requireStripe();
-    const cartItems = normalizeCartItems(req.body?.items);
-    const customer = normalizeCustomer(req.body?.customer);
-    const orderNumber = String(req.body?.orderNumber || generateOrderNumber());
-    const { stripeLineItems, order } = await buildCheckoutOrder(cartItems, customer, orderNumber);
-
-    const siteUrl = siteUrlFromRequest(req);
-    const successPath = new URL('/checkout/success', siteUrl).toString();
-    const cancelPath = new URL('/checkout', siteUrl).toString();
-    const successUrl = `${successPath}?order=${encodeURIComponent(orderNumber)}&session_id={CHECKOUT_SESSION_ID}`;
-    const cancelUrl = `${cancelPath}?order=${encodeURIComponent(orderNumber)}`;
-
-    const session = await stripeClient.checkout.sessions.create({
-      mode: 'payment',
-      customer_email: customer.email,
-      line_items: stripeLineItems,
-      success_url: successUrl,
-      cancel_url: cancelUrl,
-      metadata: {
-        orderNumber,
-      },
-      payment_intent_data: {
-        metadata: {
-          orderNumber,
-        },
-      },
-    });
-
-    await setDoc(
-      doc(db, 'orders', orderNumber),
-      {
-        ...order,
-        stripeCheckoutSessionId: session.id,
-        createdAt: serverTimestamp(),
-        updatedAt: serverTimestamp(),
-      },
-      { merge: true },
-    );
-
-    res.json({ url: session.url, orderNumber });
-  } catch (error) {
-    console.error('Checkout session error:', error);
-    res.status(400).json({
-      error:
-        error instanceof Error
-          ? error.message
-          : 'Could not start checkout. Please try again.',
-    });
+  if (
+    event.type === 'checkout.session.completed' ||
+    event.type === 'checkout.session.async_payment_succeeded'
+  ) {
+    const session = event.data.object;
+    const orderNumber = session.metadata?.orderNumber;
+    if (orderNumber) {
+      await markOrderPaid(orderNumber, session);
+    }
   }
-});
 
-app.use(express.static(distPath));
-
-app.get(/.*/, (_req, res) => {
-  res.sendFile(path.join(distPath, 'index.html'));
-});
-
-const server = app.listen(port, () => {
-  console.log(`API server running on http://localhost:${port}`);
-});
-
-server.on('error', (error) => {
-  console.error('API server error:', error);
-});
+  return { received: true };
+}
