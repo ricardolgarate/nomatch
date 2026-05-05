@@ -30,7 +30,7 @@ export default function CheckoutSuccess() {
           Thank <span className="italic text-bfab-600">you.</span>
         </h1>
         <p className="text-lg text-black/70 mb-10 font-light">
-          Your order has been placed. We can't wait for you to wear it.
+          Your payment was received and your order is being prepared.
         </p>
 
         {orderNumber && (
@@ -47,7 +47,7 @@ export default function CheckoutSuccess() {
             <Mail className="w-5 h-5 text-bfab-600 mb-3" />
             <h3 className="font-display text-lg text-black mb-1">Check Your Email</h3>
             <p className="text-sm text-black/60">
-              Once payments are connected, we'll send a confirmation with tracking.
+              Stripe will send your receipt, and we'll follow up with shipping updates.
             </p>
           </div>
 

@@ -54,6 +54,10 @@ export interface Order {
   total: number;
   status: OrderStatus;
   paymentStatus: 'pending' | 'paid' | 'refunded' | 'failed';
+  stripeCheckoutSessionId?: string;
+  stripePaymentIntentId?: string;
+  stockAdjusted?: boolean;
+  paidAt?: Date;
   createdAt?: Date;
   updatedAt?: Date;
 }
@@ -72,6 +76,19 @@ function toOrder(id: string, data: Record<string, unknown>): Order {
     status: (data.status as OrderStatus) || 'new',
     paymentStatus:
       (data.paymentStatus as Order['paymentStatus']) || 'pending',
+    stripeCheckoutSessionId:
+      typeof data.stripeCheckoutSessionId === 'string'
+        ? data.stripeCheckoutSessionId
+        : undefined,
+    stripePaymentIntentId:
+      typeof data.stripePaymentIntentId === 'string'
+        ? data.stripePaymentIntentId
+        : undefined,
+    stockAdjusted: Boolean(data.stockAdjusted),
+    paidAt:
+      data.paidAt instanceof Timestamp
+        ? data.paidAt.toDate()
+        : undefined,
     createdAt:
       data.createdAt instanceof Timestamp
         ? data.createdAt.toDate()

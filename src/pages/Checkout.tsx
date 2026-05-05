@@ -1,9 +1,8 @@
 import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { ShoppingBag, CreditCard, Lock, AlertCircle } from 'lucide-react';
 import { useCart } from '../context/CartContext';
-import { saveOrder } from '../firebase/orders';
-import { updateStock } from '../firebase/inventory';
+import { createCheckoutSession } from '../lib/checkout';
 
 function generateOrderNumber(): string {
   const date = new Date();
@@ -15,8 +14,7 @@ function generateOrderNumber(): string {
 }
 
 export default function Checkout() {
-  const { cart, getCartTotal, clearCart } = useCart();
-  const navigate = useNavigate();
+  const { cart, getCartTotal } = useCart();
   const [sameAsBilling, setSameAsBilling] = useState(true);
   const [showOrderNote, setShowOrderNote] = useState(false);
   const [orderNumber] = useState(generateOrderNumber());
@@ -52,17 +50,12 @@ export default function Checkout() {
     setPlacing(true);
     setError(null);
     try {
-      await saveOrder({
-        id: orderNumber,
+      const checkout = await createCheckoutSession({
         orderNumber,
         items: cart.map((item) => ({
           id: item.id,
-          name: item.name,
-          price: item.price,
-          image: item.image,
           quantity: item.quantity,
           size: item.size,
-          category: item.category,
         })),
         customer: {
           email: formData.email,
@@ -77,24 +70,9 @@ export default function Checkout() {
           country: formData.country,
           orderNote: formData.orderNote || undefined,
         },
-        subtotal,
-        shipping,
-        total,
-        status: 'new',
-        paymentStatus: 'pending',
       });
 
-      // Decrement stock for each purchased line (best-effort).
-      await Promise.all(
-        cart.map((item) =>
-          updateStock(item.id, item.size, -item.quantity).catch((err) => {
-            console.warn(`Stock update failed for ${item.id}`, err);
-          }),
-        ),
-      );
-
-      clearCart();
-      navigate(`/checkout/success?order=${orderNumber}`);
+      window.location.assign(checkout.url);
     } catch (err) {
       console.error(err);
       setError(
@@ -313,11 +291,11 @@ export default function Checkout() {
               <div className="rounded-lg border-2 border-dashed border-bfab-200 bg-bfab-50/50 p-6 text-center">
                 <CreditCard className="w-10 h-10 text-bfab-600 mx-auto mb-3" strokeWidth={1.5} />
                 <p className="text-sm font-medium text-black mb-1">
-                  Payment gateway coming soon
+                  Secure payment with Stripe
                 </p>
                 <p className="text-xs text-black/60 font-light">
-                  This checkout is ready to plug into a new Stripe account. Orders placed now are
-                  recorded as pending.
+                  You'll review and pay on Stripe's secure checkout page before the order is
+                  confirmed.
                 </p>
               </div>
 
@@ -334,7 +312,7 @@ export default function Checkout() {
                 className="mt-6 w-full btn-primary text-base py-4"
               >
                 <Lock className="w-4 h-4" />
-                {placing ? 'Placing order…' : `Place Order — $${total.toFixed(2)}`}
+                {placing ? 'Opening secure checkout…' : `Pay with Stripe — $${total.toFixed(2)}`}
               </button>
 
               <p className="text-xs text-center text-black/50 mt-4 font-light">
