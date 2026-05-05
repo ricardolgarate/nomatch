@@ -4,6 +4,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import Stripe from 'stripe';
 import { initializeApp } from 'firebase/app';
+import { createPaymentIntent, handleStripeWebhook } from './stripe-checkout.mjs';
 import {
   doc,
   getDoc,
@@ -286,27 +287,11 @@ async function markOrderPaid(orderNumber, session) {
 
 app.post('/api/stripe/webhook', express.raw({ type: 'application/json' }), async (req, res) => {
   try {
-    const stripeClient = requireStripe();
-    const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
-    if (!webhookSecret) {
-      return res.status(400).send('Stripe webhook secret is not configured.');
-    }
-
-    const signature = req.headers['stripe-signature'];
-    const event = stripeClient.webhooks.constructEvent(req.body, signature, webhookSecret);
-
-    if (
-      event.type === 'checkout.session.completed' ||
-      event.type === 'checkout.session.async_payment_succeeded'
-    ) {
-      const session = event.data.object;
-      const orderNumber = session.metadata?.orderNumber;
-      if (orderNumber) {
-        await markOrderPaid(orderNumber, session);
-      }
-    }
-
-    res.json({ received: true });
+    const result = await handleStripeWebhook({
+      rawBody: req.body,
+      signature: req.headers['stripe-signature'],
+    });
+    res.json(result);
   } catch (error) {
     console.error('Stripe webhook error:', error);
     res.status(400).send(error instanceof Error ? error.message : 'Webhook failed.');
@@ -314,6 +299,21 @@ app.post('/api/stripe/webhook', express.raw({ type: 'application/json' }), async
 });
 
 app.use(express.json());
+
+app.post('/api/create-payment-intent', async (req, res) => {
+  try {
+    const result = await createPaymentIntent({ body: req.body });
+    res.json(result);
+  } catch (error) {
+    console.error('Payment intent error:', error);
+    res.status(400).json({
+      error:
+        error instanceof Error
+          ? error.message
+          : 'Could not prepare payment. Please try again.',
+    });
+  }
+});
 
 app.post('/api/create-checkout-session', async (req, res) => {
   try {

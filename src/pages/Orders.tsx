@@ -351,6 +351,11 @@ function OrderRow({
             <span className="text-xs text-black/50">
               Payment: <span className="font-medium">{order.paymentStatus}</span>
             </span>
+            {order.stripePaymentIntentId && (
+              <span className="text-xs text-black/50">
+                Stripe: <span className="font-medium">{order.stripePaymentIntentId}</span>
+              </span>
+            )}
             <div className="flex-1" />
             <button
               onClick={onDelete}

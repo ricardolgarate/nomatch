@@ -1,8 +1,14 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ShoppingBag, CreditCard, Lock, AlertCircle } from 'lucide-react';
+import { Elements, PaymentElement, useElements, useStripe } from '@stripe/react-stripe-js';
+import { loadStripe } from '@stripe/stripe-js';
+import type { StripeElementsOptions } from '@stripe/stripe-js';
 import { useCart } from '../context/CartContext';
-import { createCheckoutSession } from '../lib/checkout';
+import { createPaymentIntent } from '../lib/checkout';
+
+const stripePublishableKey = import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY as string | undefined;
+const stripePromise = stripePublishableKey ? loadStripe(stripePublishableKey) : null;
 
 function generateOrderNumber(): string {
   const date = new Date();
@@ -14,12 +20,13 @@ function generateOrderNumber(): string {
 }
 
 export default function Checkout() {
-  const { cart, getCartTotal } = useCart();
+  const { cart, getCartTotal, clearCart } = useCart();
   const [sameAsBilling, setSameAsBilling] = useState(true);
   const [showOrderNote, setShowOrderNote] = useState(false);
   const [orderNumber] = useState(generateOrderNumber());
   const [placing, setPlacing] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [clientSecret, setClientSecret] = useState<string | null>(null);
 
   const [formData, setFormData] = useState({
     email: '',
@@ -39,6 +46,7 @@ export default function Checkout() {
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
   ) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
+    setClientSecret(null);
   };
 
   const subtotal = parseFloat(getCartTotal().replace('$', ''));
@@ -50,7 +58,7 @@ export default function Checkout() {
     setPlacing(true);
     setError(null);
     try {
-      const checkout = await createCheckoutSession({
+      const checkout = await createPaymentIntent({
         orderNumber,
         items: cart.map((item) => ({
           id: item.id,
@@ -72,7 +80,8 @@ export default function Checkout() {
         },
       });
 
-      window.location.assign(checkout.url);
+      setClientSecret(checkout.clientSecret);
+      setPlacing(false);
     } catch (err) {
       console.error(err);
       setError(
@@ -83,6 +92,20 @@ export default function Checkout() {
       setPlacing(false);
     }
   };
+
+  const stripeOptions: StripeElementsOptions | undefined = clientSecret
+    ? {
+        clientSecret,
+        appearance: {
+          theme: 'stripe',
+          variables: {
+            colorPrimary: '#8a1fd1',
+            borderRadius: '10px',
+            fontFamily: 'Inter, system-ui, sans-serif',
+          },
+        },
+      }
+    : undefined;
 
   if (cart.length === 0) {
     return (
@@ -288,16 +311,34 @@ export default function Checkout() {
 
             <div className="border-t border-black/10 pt-8">
               <h2 className="font-display text-2xl text-black mb-4">Payment</h2>
-              <div className="rounded-lg border-2 border-dashed border-bfab-200 bg-bfab-50/50 p-6 text-center">
-                <CreditCard className="w-10 h-10 text-bfab-600 mx-auto mb-3" strokeWidth={1.5} />
-                <p className="text-sm font-medium text-black mb-1">
-                  Secure payment with Stripe
-                </p>
-                <p className="text-xs text-black/60 font-light">
-                  You'll review and pay on Stripe's secure checkout page before the order is
-                  confirmed.
-                </p>
-              </div>
+              {!stripePublishableKey ? (
+                <div className="rounded-lg border border-bfab-200 bg-bfab-50 p-4 text-sm text-bfab-700 flex items-center gap-2">
+                  <AlertCircle className="w-4 h-4 shrink-0" />
+                  Stripe is missing VITE_STRIPE_PUBLISHABLE_KEY.
+                </div>
+              ) : clientSecret && stripeOptions ? (
+                <Elements stripe={stripePromise} options={stripeOptions}>
+                  <EmbeddedPaymentForm
+                    orderNumber={orderNumber}
+                    total={total}
+                    clearCart={clearCart}
+                    onError={setError}
+                    onProcessing={setPlacing}
+                    processing={placing}
+                  />
+                </Elements>
+              ) : (
+                <div className="rounded-lg border-2 border-dashed border-bfab-200 bg-bfab-50/50 p-6 text-center">
+                  <CreditCard className="w-10 h-10 text-bfab-600 mx-auto mb-3" strokeWidth={1.5} />
+                  <p className="text-sm font-medium text-black mb-1">
+                    Payment methods load here
+                  </p>
+                  <p className="text-xs text-black/60 font-light">
+                    Confirm your contact and shipping details, then choose from eligible Stripe
+                    payment methods without leaving this page.
+                  </p>
+                </div>
+              )}
 
               {error && (
                 <div className="mt-4 bg-bfab-50 border border-bfab-200 rounded-lg p-3 text-sm text-bfab-700 flex items-center gap-2">
@@ -306,14 +347,16 @@ export default function Checkout() {
                 </div>
               )}
 
-              <button
-                type="submit"
-                disabled={placing}
-                className="mt-6 w-full btn-primary text-base py-4"
-              >
-                <Lock className="w-4 h-4" />
-                {placing ? 'Opening secure checkout…' : `Pay with Stripe — $${total.toFixed(2)}`}
-              </button>
+              {!clientSecret && (
+                <button
+                  type="submit"
+                  disabled={placing || !stripePublishableKey}
+                  className="mt-6 w-full btn-primary text-base py-4"
+                >
+                  <Lock className="w-4 h-4" />
+                  {placing ? 'Loading payment methods…' : `Continue to Payment — $${total.toFixed(2)}`}
+                </button>
+              )}
 
               <p className="text-xs text-center text-black/50 mt-4 font-light">
                 By placing your order, you agree to our{' '}
@@ -384,6 +427,69 @@ export default function Checkout() {
           </div>
         </form>
       </div>
+    </div>
+  );
+}
+
+function EmbeddedPaymentForm({
+  orderNumber,
+  total,
+  clearCart,
+  onError,
+  onProcessing,
+  processing,
+}: {
+  orderNumber: string;
+  total: number;
+  clearCart: () => void;
+  onError: (message: string | null) => void;
+  onProcessing: (processing: boolean) => void;
+  processing: boolean;
+}) {
+  const stripe = useStripe();
+  const elements = useElements();
+
+  const handlePayment = async () => {
+    if (!stripe || !elements) return;
+
+    onProcessing(true);
+    onError(null);
+
+    const result = await stripe.confirmPayment({
+      elements,
+      confirmParams: {
+        return_url: `${window.location.origin}/checkout/success?order=${encodeURIComponent(orderNumber)}`,
+      },
+      redirect: 'if_required',
+    });
+
+    if (result.error) {
+      onError(result.error.message || 'Payment could not be completed. Please try again.');
+      onProcessing(false);
+      return;
+    }
+
+    if (result.paymentIntent?.status === 'succeeded') {
+      clearCart();
+      window.location.assign(`/checkout/success?order=${encodeURIComponent(orderNumber)}`);
+      return;
+    }
+
+    onProcessing(false);
+  };
+
+  return (
+    <div className="rounded-xl border border-black/10 bg-white p-4">
+      <PaymentElement />
+      <button
+        type="button"
+        onClick={handlePayment}
+        disabled={!stripe || !elements || processing}
+        className="mt-6 w-full btn-primary text-base py-4"
+      >
+        <Lock className="w-4 h-4" />
+        {processing ? 'Processing payment…' : `Pay Now — $${total.toFixed(2)}`}
+      </button>
     </div>
   );
 }

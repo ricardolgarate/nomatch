@@ -39,6 +39,9 @@ export default function CheckoutSuccess() {
               Order Number
             </p>
             <p className="text-xl text-black font-medium">{orderNumber}</p>
+            <p className="text-xs text-black/50 mt-2">
+              This number is attached to your Stripe payment and saved in our orders.
+            </p>
           </div>
         )}
 

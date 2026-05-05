@@ -212,6 +212,7 @@ async function buildCheckoutOrder(cartItems, customer, orderNumber) {
 
   return {
     stripeLineItems: lineItems,
+    amount: total,
     order: {
       id: orderNumber,
       orderNumber,
@@ -270,8 +271,54 @@ export async function createCheckoutSession({ body, siteUrl }) {
   return { url: session.url, orderNumber };
 }
 
+export async function createPaymentIntent({ body }) {
+  const stripe = getStripe();
+  const cartItems = normalizeCartItems(body?.items);
+  const customer = normalizeCustomer(body?.customer);
+  const orderNumber = String(body?.orderNumber || generateOrderNumber());
+  const { amount, order } = await buildCheckoutOrder(cartItems, customer, orderNumber);
+
+  const paymentIntent = await stripe.paymentIntents.create({
+    amount,
+    currency: 'usd',
+    description: `BFAB Order ${orderNumber}`,
+    receipt_email: customer.email,
+    automatic_payment_methods: {
+      enabled: true,
+    },
+    metadata: {
+      orderNumber,
+    },
+  });
+
+  await getDb()
+    .collection('orders')
+    .doc(orderNumber)
+    .set(
+      {
+        ...order,
+        stripePaymentIntentId: paymentIntent.id,
+        createdAt: FieldValue.serverTimestamp(),
+        updatedAt: FieldValue.serverTimestamp(),
+      },
+      { merge: true },
+    );
+
+  return {
+    clientSecret: paymentIntent.client_secret,
+    orderNumber,
+  };
+}
+
 async function markOrderPaid(orderNumber, session) {
   const orderRef = getDb().collection('orders').doc(orderNumber);
+  const paymentIntentId =
+    typeof session.payment_intent === 'string'
+      ? session.payment_intent
+      : session.object === 'payment_intent'
+        ? session.id
+        : undefined;
+  const checkoutSessionId = session.object === 'checkout.session' ? session.id : undefined;
 
   await getDb().runTransaction(async (transaction) => {
     const orderSnap = await transaction.get(orderRef);
@@ -284,9 +331,8 @@ async function markOrderPaid(orderNumber, session) {
         {
           paymentStatus: 'paid',
           status: order.status === 'new' ? 'processing' : order.status,
-          stripeCheckoutSessionId: session.id,
-          stripePaymentIntentId:
-            typeof session.payment_intent === 'string' ? session.payment_intent : undefined,
+          stripeCheckoutSessionId: checkoutSessionId,
+          stripePaymentIntentId: paymentIntentId,
           paidAt: FieldValue.serverTimestamp(),
           updatedAt: FieldValue.serverTimestamp(),
         },
@@ -319,15 +365,35 @@ async function markOrderPaid(orderNumber, session) {
         paymentStatus: 'paid',
         status: order.status === 'new' ? 'processing' : order.status,
         stockAdjusted: true,
-        stripeCheckoutSessionId: session.id,
-        stripePaymentIntentId:
-          typeof session.payment_intent === 'string' ? session.payment_intent : undefined,
+        stripeCheckoutSessionId: checkoutSessionId,
+        stripePaymentIntentId: paymentIntentId,
         paidAt: FieldValue.serverTimestamp(),
         updatedAt: FieldValue.serverTimestamp(),
       },
       { merge: true },
     );
   });
+}
+
+async function markOrderFailed(orderNumber, eventObject) {
+  const paymentIntentId =
+    typeof eventObject.payment_intent === 'string'
+      ? eventObject.payment_intent
+      : eventObject.object === 'payment_intent'
+        ? eventObject.id
+        : undefined;
+
+  await getDb()
+    .collection('orders')
+    .doc(orderNumber)
+    .set(
+      {
+        paymentStatus: 'failed',
+        stripePaymentIntentId: paymentIntentId,
+        updatedAt: FieldValue.serverTimestamp(),
+      },
+      { merge: true },
+    );
 }
 
 export async function handleStripeWebhook({ rawBody, signature }) {
@@ -347,6 +413,30 @@ export async function handleStripeWebhook({ rawBody, signature }) {
     const orderNumber = session.metadata?.orderNumber;
     if (orderNumber) {
       await markOrderPaid(orderNumber, session);
+    }
+  }
+
+  if (event.type === 'payment_intent.succeeded') {
+    const paymentIntent = event.data.object;
+    const orderNumber = paymentIntent.metadata?.orderNumber;
+    if (orderNumber) {
+      await markOrderPaid(orderNumber, paymentIntent);
+    }
+  }
+
+  if (event.type === 'payment_intent.payment_failed') {
+    const paymentIntent = event.data.object;
+    const orderNumber = paymentIntent.metadata?.orderNumber;
+    if (orderNumber) {
+      await markOrderFailed(orderNumber, paymentIntent);
+    }
+  }
+
+  if (event.type === 'checkout.session.async_payment_failed') {
+    const session = event.data.object;
+    const orderNumber = session.metadata?.orderNumber;
+    if (orderNumber) {
+      await markOrderFailed(orderNumber, session);
     }
   }
 
