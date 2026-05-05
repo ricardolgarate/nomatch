@@ -1,34 +1,50 @@
 import Stripe from 'stripe';
-import { initializeApp, getApps } from 'firebase/app';
-import {
-  doc,
-  getDoc,
-  increment,
-  initializeFirestore,
-  runTransaction,
-  serverTimestamp,
-  setDoc,
-} from 'firebase/firestore';
+import { cert, getApps, initializeApp } from 'firebase-admin/app';
+import { FieldValue, getFirestore } from 'firebase-admin/firestore';
 
 let dbInstance;
+
+function parseServiceAccount() {
+  const raw =
+    process.env.FIREBASE_SERVICE_ACCOUNT_KEY ||
+    process.env.FIREBASE_SERVICE_ACCOUNT;
+
+  if (raw) {
+    const json = raw.trim().startsWith('{')
+      ? raw
+      : Buffer.from(raw, 'base64').toString('utf8');
+    const serviceAccount = JSON.parse(json);
+    if (serviceAccount.private_key) {
+      serviceAccount.private_key = serviceAccount.private_key.replace(/\\n/g, '\n');
+    }
+    return serviceAccount;
+  }
+
+  if (
+    process.env.FIREBASE_CLIENT_EMAIL &&
+    process.env.FIREBASE_PRIVATE_KEY &&
+    (process.env.FIREBASE_PROJECT_ID || process.env.VITE_FIREBASE_PROJECT_ID)
+  ) {
+    return {
+      projectId: process.env.FIREBASE_PROJECT_ID || process.env.VITE_FIREBASE_PROJECT_ID,
+      clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
+      privateKey: process.env.FIREBASE_PRIVATE_KEY.replace(/\\n/g, '\n'),
+    };
+  }
+
+  throw new Error(
+    'Firebase Admin is not configured. Add FIREBASE_SERVICE_ACCOUNT_KEY to the deployment environment.',
+  );
+}
 
 function getDb() {
   if (dbInstance) return dbInstance;
 
-  const firebaseConfig = {
-    apiKey: process.env.VITE_FIREBASE_API_KEY,
-    authDomain: process.env.VITE_FIREBASE_AUTH_DOMAIN,
-    projectId: process.env.VITE_FIREBASE_PROJECT_ID,
-    storageBucket: process.env.VITE_FIREBASE_STORAGE_BUCKET,
-    messagingSenderId: process.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
-    appId: process.env.VITE_FIREBASE_APP_ID,
-    measurementId: process.env.VITE_FIREBASE_MEASUREMENT_ID,
-  };
-
-  const app = getApps().length > 0 ? getApps()[0] : initializeApp(firebaseConfig);
-  dbInstance = initializeFirestore(app, {
-    ignoreUndefinedProperties: true,
+  const app = getApps().length > 0 ? getApps()[0] : initializeApp({
+    credential: cert(parseServiceAccount()),
   });
+  dbInstance = getFirestore(app);
+  dbInstance.settings({ ignoreUndefinedProperties: true });
   return dbInstance;
 }
 
@@ -129,8 +145,8 @@ function validStripeImages(images) {
 }
 
 async function getProduct(productId) {
-  const snap = await getDoc(doc(getDb(), 'products', productId));
-  if (!snap.exists()) {
+  const snap = await getDb().collection('products').doc(productId).get();
+  if (!snap.exists) {
     throw new Error('A product in your cart is no longer available.');
   }
   return { id: snap.id, ...snap.data() };
@@ -238,26 +254,28 @@ export async function createCheckoutSession({ body, siteUrl }) {
     },
   });
 
-  await setDoc(
-    doc(getDb(), 'orders', orderNumber),
-    {
-      ...order,
-      stripeCheckoutSessionId: session.id,
-      createdAt: serverTimestamp(),
-      updatedAt: serverTimestamp(),
-    },
-    { merge: true },
-  );
+  await getDb()
+    .collection('orders')
+    .doc(orderNumber)
+    .set(
+      {
+        ...order,
+        stripeCheckoutSessionId: session.id,
+        createdAt: FieldValue.serverTimestamp(),
+        updatedAt: FieldValue.serverTimestamp(),
+      },
+      { merge: true },
+    );
 
   return { url: session.url, orderNumber };
 }
 
 async function markOrderPaid(orderNumber, session) {
-  const orderRef = doc(getDb(), 'orders', orderNumber);
+  const orderRef = getDb().collection('orders').doc(orderNumber);
 
-  await runTransaction(getDb(), async (transaction) => {
+  await getDb().runTransaction(async (transaction) => {
     const orderSnap = await transaction.get(orderRef);
-    if (!orderSnap.exists()) return;
+    if (!orderSnap.exists) return;
 
     const order = orderSnap.data();
     if (order.stockAdjusted) {
@@ -269,8 +287,8 @@ async function markOrderPaid(orderNumber, session) {
           stripeCheckoutSessionId: session.id,
           stripePaymentIntentId:
             typeof session.payment_intent === 'string' ? session.payment_intent : undefined,
-          paidAt: serverTimestamp(),
-          updatedAt: serverTimestamp(),
+          paidAt: FieldValue.serverTimestamp(),
+          updatedAt: FieldValue.serverTimestamp(),
         },
         { merge: true },
       );
@@ -278,19 +296,19 @@ async function markOrderPaid(orderNumber, session) {
     }
 
     for (const item of order.items || []) {
-      const productRef = doc(getDb(), 'products', item.id);
+      const productRef = getDb().collection('products').doc(item.id);
       const quantity = -Math.abs(Number(item.quantity || 0));
       if (quantity === 0) continue;
 
       if (item.size) {
         transaction.update(productRef, {
-          [`sizes.${item.size}`]: increment(quantity),
-          updatedAt: serverTimestamp(),
+          [`sizes.${item.size}`]: FieldValue.increment(quantity),
+          updatedAt: FieldValue.serverTimestamp(),
         });
       } else {
         transaction.update(productRef, {
-          stock: increment(quantity),
-          updatedAt: serverTimestamp(),
+          stock: FieldValue.increment(quantity),
+          updatedAt: FieldValue.serverTimestamp(),
         });
       }
     }
@@ -304,8 +322,8 @@ async function markOrderPaid(orderNumber, session) {
         stripeCheckoutSessionId: session.id,
         stripePaymentIntentId:
           typeof session.payment_intent === 'string' ? session.payment_intent : undefined,
-        paidAt: serverTimestamp(),
-        updatedAt: serverTimestamp(),
+        paidAt: FieldValue.serverTimestamp(),
+        updatedAt: FieldValue.serverTimestamp(),
       },
       { merge: true },
     );
