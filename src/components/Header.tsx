@@ -69,9 +69,12 @@ export default function Header() {
   };
 
   const shopCategories = [
+    { name: "Women's Clothing", path: '/shop/womens-clothing' },
     { name: 'Shoes', path: '/shop/shoes' },
-    { name: 'Clothing', path: '/shop/clothing' },
     { name: 'Accessories', path: '/shop/accessories' },
+    { name: "Men's", path: '/shop/mens' },
+    { name: 'Kids', path: '/shop/kids' },
+    { name: 'Giftables', path: '/shop/giftables' },
   ];
 
   const navLinkClass = () =>
@@ -87,10 +90,6 @@ export default function Header() {
 
   return (
     <>
-      <div className="bg-bfab-900 text-white text-[10px] md:text-[11px] tracking-[0.2em] md:tracking-[0.25em] text-center uppercase py-2 md:py-2.5 px-3">
-        Free shipping over $150 · Small boutique from Desoto, Texas
-      </div>
-
       <header
         className={`sticky top-0 z-50 bg-white/90 backdrop-blur-md border-b transition-[border-color,box-shadow] duration-500 ${
           scrolled
@@ -109,7 +108,7 @@ export default function Header() {
           >
             <Link
               to="/"
-              aria-label="Beauty For Ashes Boutique — home"
+              aria-label="Beauty For Ashes Boutique home"
               className="inline-flex items-center"
             >
               <img
@@ -198,7 +197,7 @@ export default function Header() {
             >
               <Link
                 to="/"
-                aria-label="Beauty For Ashes Boutique — home"
+                aria-label="Beauty For Ashes Boutique home"
                 className="font-display text-lg tracking-wider text-black"
               >
                 BFAB
@@ -315,7 +314,7 @@ export default function Header() {
             </button>
             <div
               className={`overflow-hidden transition-[max-height] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] ${
-                mobileShopOpen ? 'max-h-64' : 'max-h-0'
+                mobileShopOpen ? 'max-h-96' : 'max-h-0'
               }`}
             >
               <div className="pl-4 space-y-1 py-1">

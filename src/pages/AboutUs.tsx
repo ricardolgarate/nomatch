@@ -19,11 +19,11 @@ export default function AboutUs() {
             About <span className="italic text-bfab-200">Us</span>
           </h1>
           <p className="text-white/85 mt-6 max-w-lg text-lg font-light">
-            A little boutique in Desoto, Texas. A lot of love in every piece.
+            A Dallas boutique rooted in faith, restoration, and confidence.
           </p>
           <div className="mt-8 inline-flex items-center gap-2 text-bfab-200/90 text-xs tracking-[0.3em] uppercase">
             <MapPin className="w-3.5 h-3.5" />
-            Desoto, Texas
+            Dallas, Texas
           </div>
         </div>
       </div>
@@ -45,26 +45,28 @@ export default function AboutUs() {
                 Hi, I'm <span className="italic text-bfab-600">Catrice.</span>
               </h2>
               <div className="space-y-5 text-black/80 text-lg leading-relaxed font-light text-pretty">
-                <p>I started BFAB LLC in Desoto, Texas.</p>
-                <p>I have loved fashion my whole life.</p>
                 <p>
-                  I studied Fashion Marketing at North Texas State University. Then I spent
-                  over <span className="font-medium text-bfab-700">20 years</span> in retail.
+                  BFAB was created from my love for fashion, confidence, and helping people
+                  feel good about themselves without breaking the bank.
                 </p>
                 <p>
-                  I've sold jewelry. I've styled guests. I've run departments for big luxury
-                  names and small nonprofits. I learned every side of a store — sales floor,
-                  stockroom, dressing room.
+                  What started as a vision became a boutique focused on stylish, affordable
+                  pieces for women, men, and kids. I personally curate items that are trendy,
+                  versatile, and easy to wear.
                 </p>
                 <p>
-                  I also learned one thing: the right piece can change your whole day.
+                  Whether you're dressing up for a night out, heading to brunch, or just
+                  wanting to feel your best every day, I want BFAB to be a place where you
+                  can find something that feels like you.
                 </p>
                 <p>
-                  So I built BFAB to share that feeling with you — one piece at a time.
+                  As a small boutique based in Dallas, every order, share, and purchase truly
+                  means the world to me. Thank you for supporting my dream and shopping with
+                  BFAB!
                 </p>
               </div>
               <p className="mt-8 text-sm tracking-[0.2em] uppercase text-black/50">
-                — Catrice Hines, Founder
+                Catrice Hines, Founder
               </p>
             </div>
           </div>
@@ -77,10 +79,10 @@ export default function AboutUs() {
           <div className="max-w-3xl mx-auto text-center mb-16">
             <span className="eyebrow mb-4">The Boutique</span>
             <h2 className="font-display text-5xl md:text-6xl font-medium text-black mt-3 mb-6 leading-[1.05]">
-              A little something for <span className="italic text-bfab-600">every you.</span>
+              Fashion for every <span className="italic text-bfab-600">version of you.</span>
             </h2>
             <p className="text-black/75 text-lg font-light text-pretty">
-              Modern, trendy pieces for every size and every budget.
+              Modern, wearable pieces for real life, real confidence, and real budgets.
             </p>
           </div>
 
@@ -89,21 +91,54 @@ export default function AboutUs() {
               <Sparkles className="w-8 h-8 text-bfab-600 mb-4" strokeWidth={1.5} />
               <h3 className="font-display text-2xl text-black mb-2">New Arrivals</h3>
               <p className="text-black/70 text-sm leading-relaxed">
-                Fresh pieces we can't wait to show you — chosen one by one.
+                Fresh pieces we can't wait to show you, chosen one by one.
               </p>
             </div>
             <div className="bg-white rounded-2xl p-8 shadow-card">
               <Heart className="w-8 h-8 text-bfab-600 mb-4" strokeWidth={1.5} />
-              <h3 className="font-display text-2xl text-black mb-2">Gently Worn Gems</h3>
+              <h3 className="font-display text-2xl text-black mb-2">Curated Pre-Loved Gems</h3>
               <p className="text-black/70 text-sm leading-relaxed">
-                Very gently loved finds. Big style, smaller price.
+                Carefully chosen finds with plenty of style and a smaller price.
               </p>
             </div>
             <div className="bg-white rounded-2xl p-8 shadow-card">
               <MapPin className="w-8 h-8 text-bfab-600 mb-4" strokeWidth={1.5} />
-              <h3 className="font-display text-2xl text-black mb-2">Shoes &amp; Extras</h3>
+              <h3 className="font-display text-2xl text-black mb-2">Family &amp; Gift Finds</h3>
               <p className="text-black/70 text-sm leading-relaxed">
-                Shoes, accessories, and little giftables that feel special.
+                Shoes, accessories, kids pieces, men's finds, and little giftables that feel special.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Our Story */}
+      <section className="bg-white py-24 md:py-28">
+        <div className="container mx-auto px-6">
+          <div className="max-w-3xl mx-auto text-center">
+            <span className="eyebrow mb-4">Our Story</span>
+            <h2 className="font-display text-5xl md:text-6xl font-medium text-black mt-3 mb-8 leading-[1.05]">
+              Beauty from <span className="italic text-bfab-600">ashes.</span>
+            </h2>
+            <div className="space-y-5 text-black/80 text-lg leading-relaxed font-light text-pretty">
+              <p>
+                Beauty For Ashes Boutique is inspired by Isaiah 61:3, a message
+                of restoration, hope, and new beginnings.
+              </p>
+              <p>
+                BFAB was created to reflect that transformation, turning life's
+                difficult seasons into confidence, beauty, and renewed identity.
+                Fashion here is more than clothing. It is a reminder that what
+                you wear can reflect who you are becoming.
+              </p>
+              <p>
+                We curate stylish, wearable pieces for women, men, and kids that
+                fit real life, from everyday looks to standout moments. Our
+                mission is simple: help you feel confident in every season you
+                step into.
+              </p>
+              <p className="font-medium text-bfab-700">
+                At BFAB, style is not just what you wear. It is how you rise.
               </p>
             </div>
           </div>
@@ -111,7 +146,7 @@ export default function AboutUs() {
       </section>
 
       {/* Our Name */}
-      <section className="bg-white py-24 md:py-28">
+      <section className="bg-bfab-50/60 py-24 md:py-28 border-y border-black/5">
         <div className="container mx-auto px-6">
           <div className="max-w-3xl mx-auto text-center">
             <span className="eyebrow mb-4">Our Name</span>
@@ -122,14 +157,23 @@ export default function AboutUs() {
               <span className="text-2xl">✦</span>
             </div>
             <div className="space-y-5 text-black/80 text-lg leading-relaxed font-light text-pretty">
-              <p>Our name means something to us.</p>
               <p>
-                It's about turning hard times into something beautiful. About
-                showing up for yourself. About getting dressed like you mean it.
+                Our name, Beauty For Ashes Boutique, is inspired by Isaiah 61:3,
+                a scripture that speaks of restoration, healing, and new beginnings:
               </p>
               <p>
-                Fashion should make you feel like you again. We pick each piece
-                with that in mind.
+                "To give unto them beauty for ashes..."
+              </p>
+              <p>
+                This verse reflects the heart of our brand and our love for the Lord
+                Jesus Christ. It reminds us that even after loss, struggle, or change,
+                there is still purpose, confidence, and beauty to be found again.
+              </p>
+              <p>
+                At BFAB, fashion is more than clothing. It is expression, renewal,
+                and confidence. Every piece is chosen to help you step into your next
+                season looking and feeling like your best self, bold, restored, and
+                beautifully made new.
               </p>
             </div>
           </div>
@@ -144,7 +188,7 @@ export default function AboutUs() {
             Ready to wear your <span className="italic text-bfab-200">crown?</span>
           </h3>
           <p className="text-lg text-white/75 mb-10 max-w-2xl mx-auto font-light">
-            Come shop the boutique. We're so glad you're here.
+            Come shop the boutique. We're grateful you're here.
           </p>
           <Link
             to="/shop"

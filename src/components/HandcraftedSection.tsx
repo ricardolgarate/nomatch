@@ -19,13 +19,13 @@ export default function HandcraftedSection() {
 
         <div className="space-y-6 text-black/75 text-lg md:text-xl leading-relaxed font-light text-pretty">
           <p>
-            We are <span className="font-medium text-bfab-700">Beauty For Ashes Boutique</span> —
-            a small, women-owned boutique in Desoto, Texas.
+            We are <span className="font-medium text-bfab-700">Beauty For Ashes Boutique</span>,
+            a small, faith-rooted boutique in Dallas, Texas.
           </p>
 
           <p>
-            We pick every piece by hand. New arrivals. Very gently worn gems. Shoes.
-            Accessories. Little giftables. All sizes. Every budget.
+            We pick every piece by hand. New arrivals. Curated pre-loved gems.
+            Shoes. Accessories. Little giftables. Styles for women, men, and kids.
           </p>
 
           <p>

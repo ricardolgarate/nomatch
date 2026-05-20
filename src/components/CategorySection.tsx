@@ -3,6 +3,13 @@ import { ArrowRight } from 'lucide-react';
 
 const categories = [
   {
+    title: "Women's Clothing",
+    blurb: 'Everyday outfits and standout pieces',
+    path: '/shop/womens-clothing',
+    image:
+      'https://images.pexels.com/photos/7679454/pexels-photo-7679454.jpeg?auto=compress&cs=tinysrgb&w=800',
+  },
+  {
     title: 'Shoes',
     blurb: 'Heels, sneakers & everyday pairs',
     path: '/shop/shoes',
@@ -10,18 +17,32 @@ const categories = [
       'https://images.pexels.com/photos/1240892/pexels-photo-1240892.jpeg?auto=compress&cs=tinysrgb&w=800',
   },
   {
-    title: 'Clothing',
-    blurb: 'Pieces that wear you confidently',
-    path: '/shop/clothing',
-    image:
-      'https://images.pexels.com/photos/7679454/pexels-photo-7679454.jpeg?auto=compress&cs=tinysrgb&w=800',
-  },
-  {
     title: 'Accessories',
     blurb: 'The little things that say a lot',
     path: '/shop/accessories',
     image:
       'https://images.pexels.com/photos/1454171/pexels-photo-1454171.jpeg?auto=compress&cs=tinysrgb&w=800',
+  },
+  {
+    title: "Men's",
+    blurb: 'Easy pieces for his everyday style',
+    path: '/shop/mens',
+    image:
+      'https://images.pexels.com/photos/769749/pexels-photo-769749.jpeg?auto=compress&cs=tinysrgb&w=800',
+  },
+  {
+    title: 'Kids',
+    blurb: 'Cute finds for the little ones',
+    path: '/shop/kids',
+    image:
+      'https://images.pexels.com/photos/3661350/pexels-photo-3661350.jpeg?auto=compress&cs=tinysrgb&w=800',
+  },
+  {
+    title: 'Giftables',
+    blurb: 'Small treasures made to brighten a day',
+    path: '/shop/giftables',
+    image:
+      'https://images.pexels.com/photos/264787/pexels-photo-264787.jpeg?auto=compress&cs=tinysrgb&w=800',
   },
 ];
 
@@ -36,7 +57,7 @@ export default function CategorySection() {
           </h2>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-5 md:gap-7">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 md:gap-7">
           {categories.map((category) => (
             <Link
               key={category.title}

@@ -200,7 +200,7 @@ export default function Contact() {
                     <MapPin className="w-4 h-4 text-bfab-600" />
                   </div>
                   <div>
-                    <p className="text-black">Desoto, Texas</p>
+                    <p className="text-black">Dallas, Texas</p>
                     <p className="text-xs">Small town feel. Big city style.</p>
                   </div>
                 </div>

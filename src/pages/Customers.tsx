@@ -43,7 +43,7 @@ const STATUS_STYLES: Record<ContactStatus, string> = {
 };
 
 function formatDate(d?: Date): string {
-  if (!d) return '—';
+  if (!d) return '-';
   return d.toLocaleString(undefined, {
     year: 'numeric',
     month: 'short',

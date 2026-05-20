@@ -354,7 +354,7 @@ export default function Checkout() {
                   className="mt-6 w-full btn-primary text-base py-4"
                 >
                   <Lock className="w-4 h-4" />
-                  {placing ? 'Loading payment methods…' : `Continue to Payment — $${total.toFixed(2)}`}
+                  {placing ? 'Loading payment methods…' : `Continue to Payment: $${total.toFixed(2)}`}
                 </button>
               )}
 
@@ -488,7 +488,7 @@ function EmbeddedPaymentForm({
         className="mt-6 w-full btn-primary text-base py-4"
       >
         <Lock className="w-4 h-4" />
-        {processing ? 'Processing payment…' : `Pay Now — $${total.toFixed(2)}`}
+        {processing ? 'Processing payment…' : `Pay Now: $${total.toFixed(2)}`}
       </button>
     </div>
   );

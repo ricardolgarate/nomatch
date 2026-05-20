@@ -17,7 +17,7 @@ export default function Footer() {
             Beauty For Ashes Boutique
           </p>
           <p className="text-xs tracking-[0.3em] uppercase text-bfab-700 mt-1">
-            Made with love in Desoto, Texas
+            Curated with love in Dallas, Texas
           </p>
           <div className="divider-ornament w-full max-w-xs mx-auto mt-4 mb-4 text-bfab-400">
             <span>✦</span>
@@ -41,9 +41,12 @@ export default function Footer() {
             <ul className="space-y-2.5 text-black/75">
               <li><Link to="/" className="hover:text-bfab-600 transition-colors">Home</Link></li>
               <li><Link to="/shop" className="hover:text-bfab-600 transition-colors">All</Link></li>
+              <li><Link to="/shop/womens-clothing" className="hover:text-bfab-600 transition-colors">Women's Clothing</Link></li>
               <li><Link to="/shop/shoes" className="hover:text-bfab-600 transition-colors">Shoes</Link></li>
-              <li><Link to="/shop/clothing" className="hover:text-bfab-600 transition-colors">Clothing</Link></li>
               <li><Link to="/shop/accessories" className="hover:text-bfab-600 transition-colors">Accessories</Link></li>
+              <li><Link to="/shop/mens" className="hover:text-bfab-600 transition-colors">Men's</Link></li>
+              <li><Link to="/shop/kids" className="hover:text-bfab-600 transition-colors">Kids</Link></li>
+              <li><Link to="/shop/giftables" className="hover:text-bfab-600 transition-colors">Giftables</Link></li>
             </ul>
           </div>
 
@@ -89,7 +92,7 @@ export default function Footer() {
               </a>
               <div className="flex items-center gap-2">
                 <MapPin className="w-4 h-4 shrink-0" />
-                <span>Desoto, Texas</span>
+                <span>Dallas, Texas</span>
               </div>
               <a
                 href="https://www.instagram.com/bfabllc/"
@@ -106,7 +109,7 @@ export default function Footer() {
 
         <div className="mt-14 pt-8 border-t border-black/10 flex flex-col md:flex-row items-center justify-between gap-3 text-xs text-black/50">
           <p>© {new Date().getFullYear()} Beauty For Ashes Boutique. All rights reserved.</p>
-          <p className="tracking-widest uppercase">Crafted with ♥</p>
+          <p className="tracking-widest uppercase">Curated with love</p>
         </div>
       </div>
     </footer>

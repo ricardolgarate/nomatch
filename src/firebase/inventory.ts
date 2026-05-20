@@ -11,7 +11,15 @@ import {
   serverTimestamp,
 } from 'firebase/firestore';
 
-export type ProductCategory = 'Shoes' | 'Clothing' | 'Accessories' | 'Other';
+export type ProductCategory =
+  | "Women's Clothing"
+  | 'Shoes'
+  | 'Accessories'
+  | "Men's"
+  | 'Kids'
+  | 'Giftables'
+  | 'Clothing'
+  | 'Other';
 
 export interface ProductInventory {
   id: string;

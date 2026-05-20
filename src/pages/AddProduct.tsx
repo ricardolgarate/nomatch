@@ -24,20 +24,26 @@ import { deleteProductImage, uploadProductImage } from '../firebase/storage';
 const SHOE_SIZES = ['5', '5.5', '6', '6.5', '7', '7.5', '8', '8.5', '9', '9.5', '10', '10.5', '11', '11.5', '12'];
 const CLOTHING_SIZES = ['XS', 'S', 'M', 'L', 'XL', 'XXL'];
 
-type Mode = 'shoes' | 'clothing' | 'accessories' | 'other';
+type Mode = 'womens-clothing' | 'shoes' | 'accessories' | 'mens' | 'kids' | 'giftables' | 'other';
 type View = 'list' | 'form';
 
 const MODE_LABELS: Record<Mode, string> = {
+  'womens-clothing': "Women's Clothing",
   shoes: 'Shoes',
-  clothing: 'Clothing',
   accessories: 'Accessories',
+  mens: "Men's",
+  kids: 'Kids',
+  giftables: 'Giftables',
   other: 'Other',
 };
 
 const MODE_CATEGORY: Record<Mode, ProductCategory> = {
+  'womens-clothing': "Women's Clothing",
   shoes: 'Shoes',
-  clothing: 'Clothing',
   accessories: 'Accessories',
+  mens: "Men's",
+  kids: 'Kids',
+  giftables: 'Giftables',
   other: 'Other',
 };
 
@@ -46,9 +52,16 @@ function categoryToMode(category: string): Mode {
     case 'Shoes':
       return 'shoes';
     case 'Clothing':
-      return 'clothing';
+    case "Women's Clothing":
+      return 'womens-clothing';
     case 'Accessories':
       return 'accessories';
+    case "Men's":
+      return 'mens';
+    case 'Kids':
+      return 'kids';
+    case 'Giftables':
+      return 'giftables';
     default:
       return 'other';
   }
@@ -389,7 +402,7 @@ function ProductForm({ product, onBack, onSaved }: ProductFormProps) {
   const isEdit = !!product;
 
   const [mode, setMode] = useState<Mode>(
-    product ? categoryToMode(product.category) : 'shoes',
+    product ? categoryToMode(product.category) : 'womens-clothing',
   );
   const [name, setName] = useState(product?.name || '');
   const [description, setDescription] = useState(product?.description || '');
@@ -418,10 +431,10 @@ function ProductForm({ product, onBack, onSaved }: ProductFormProps) {
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
 
-  const needsSizes = mode === 'shoes' || mode === 'clothing';
+  const needsSizes = mode === 'shoes' || mode === 'womens-clothing' || mode === 'mens' || mode === 'kids';
   const sizeOptions = useMemo(
-    () => (mode === 'shoes' ? SHOE_SIZES : mode === 'clothing' ? CLOTHING_SIZES : []),
-    [mode],
+    () => (mode === 'shoes' ? SHOE_SIZES : needsSizes ? CLOTHING_SIZES : []),
+    [mode, needsSizes],
   );
 
   // When mode changes on a fresh form, reset size stock; don't reset on edit loading
@@ -688,7 +701,7 @@ function ProductForm({ product, onBack, onSaved }: ProductFormProps) {
             <label className="flex flex-col items-center justify-center gap-2 border-2 border-dashed border-black/20 hover:border-bfab-600 rounded-lg p-8 cursor-pointer transition-colors">
               <Upload className="w-8 h-8 text-bfab-600" />
               <span className="text-sm font-medium text-black">Click to upload images</span>
-              <span className="text-xs text-black/50">PNG / JPG / WEBP — up to 5MB each</span>
+              <span className="text-xs text-black/50">PNG / JPG / WEBP, up to 5MB each</span>
               <input
                 type="file"
                 accept="image/*"

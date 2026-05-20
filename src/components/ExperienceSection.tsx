@@ -5,7 +5,7 @@ const features = [
     icon: PackageOpen,
     title: 'Free Shipping Over $150',
     description:
-      'Sent with care from Desoto, Texas. Easy 10-day returns and exchanges.',
+      'Sent with care from Dallas, Texas. Easy 10-day returns and exchanges.',
   },
   {
     icon: MessageCircle,
@@ -17,7 +17,7 @@ const features = [
     icon: Sparkles,
     title: 'Hand-Picked by Catrice',
     description:
-      'Every piece in the boutique is chosen by our founder — with 20+ years of retail know-how.',
+      'Every piece in the boutique is chosen by our founder with 20+ years of retail know-how.',
   },
 ];
 

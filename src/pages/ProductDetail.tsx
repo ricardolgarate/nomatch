@@ -4,6 +4,17 @@ import { ChevronLeft, ChevronRight, Package, Clock, AlertCircle, Truck } from 'l
 import { useCart } from '../context/CartContext';
 import { getProduct, ProductInventory } from '../firebase/inventory';
 
+function categoryPath(category: string): string {
+  const normalized = category.toLowerCase();
+  if (normalized.includes('women') || normalized === 'clothing') return '/shop/womens-clothing';
+  if (normalized.includes('men')) return '/shop/mens';
+  if (normalized.includes('kid')) return '/shop/kids';
+  if (normalized.includes('gift')) return '/shop/giftables';
+  if (normalized.includes('accessories')) return '/shop/accessories';
+  if (normalized.includes('shoes')) return '/shop/shoes';
+  return '/shop';
+}
+
 export default function ProductDetail() {
   const { productId } = useParams();
   const { addToCart } = useCart();
@@ -125,7 +136,7 @@ export default function ProductDetail() {
           <Link to="/" className="hover:text-bfab-600">Home</Link>
           <span>›</span>
           <Link
-            to={`/shop/${String(product.category).toLowerCase()}`}
+            to={categoryPath(String(product.category))}
             className="hover:text-bfab-600"
           >
             {product.category}
@@ -350,14 +361,14 @@ export default function ProductDetail() {
                   <h3 className="font-display text-xl text-black mb-3">Shipping</h3>
                   <ul className="space-y-2 list-disc pl-5">
                     <li>Complimentary shipping on domestic orders over $150.</li>
-                    <li>Express delivery available — arrives in 3–4 business days.</li>
+                    <li>Express delivery available. Arrives in 3-4 business days.</li>
                   </ul>
                 </div>
                 <div>
                   <h3 className="font-display text-xl text-black mb-3">Returns</h3>
                   <ul className="space-y-2 list-disc pl-5">
                     <li>Free domestic returns within 10 days of delivery.</li>
-                    <li>Items must be in original condition — unworn, unwashed, tags attached.</li>
+                    <li>Items must be in original condition: unworn, unwashed, tags attached.</li>
                     <li>Free exchanges within 20 days on unworn items.</li>
                   </ul>
                 </div>

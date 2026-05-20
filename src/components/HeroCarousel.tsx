@@ -8,7 +8,7 @@ const slides = [
     title: 'Wear Your',
     accent: 'Crown.',
     description:
-      'Curated pieces for the woman who was always meant to stand out.',
+      'Fashion for every version of you, curated with faith, confidence, and love.',
     image:
       'https://images.pexels.com/photos/8386647/pexels-photo-8386647.jpeg?auto=compress&cs=tinysrgb&w=1920',
     cta: 'SHOP THE COLLECTION',
@@ -19,7 +19,7 @@ const slides = [
     title: 'Soft Power.',
     accent: 'Bold Grace.',
     description:
-      'From statement heels to everyday essentials — pieces that feel like yours.',
+      'From statement heels to everyday essentials, pieces that feel like yours.',
     image:
       'https://images.pexels.com/photos/1381553/pexels-photo-1381553.jpeg?auto=compress&cs=tinysrgb&w=1920',
     cta: 'EXPLORE NEW',
@@ -30,7 +30,7 @@ const slides = [
     title: 'Royalty,',
     accent: 'in every thread.',
     description:
-      'Our signature purple palette — styled to feel luxe, never loud.',
+      'Our signature purple palette, styled to feel luxe, never loud.',
     image:
       'https://images.pexels.com/photos/1926769/pexels-photo-1926769.jpeg?auto=compress&cs=tinysrgb&w=1920',
     cta: 'SEE THE LOOK',

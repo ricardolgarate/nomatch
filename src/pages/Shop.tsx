@@ -4,9 +4,12 @@ import { ChevronRight, Grid3x3, List, AlertCircle, Package, Plus } from 'lucide-
 import { getAllProducts, ProductInventory } from '../firebase/inventory';
 
 const categories = [
+  { name: "Women's Clothing", path: '/shop/womens-clothing' },
   { name: 'Shoes', path: '/shop/shoes' },
-  { name: 'Clothing', path: '/shop/clothing' },
   { name: 'Accessories', path: '/shop/accessories' },
+  { name: "Men's", path: '/shop/mens' },
+  { name: 'Kids', path: '/shop/kids' },
+  { name: 'Giftables', path: '/shop/giftables' },
 ];
 
 export default function Shop() {
@@ -37,9 +40,12 @@ export default function Shop() {
   const getCurrentCategory = () => {
     if (searchQuery) return 'Search Results';
     const path = location.pathname.toLowerCase();
+    if (path.includes('/shop/womens-clothing') || path.includes('/shop/clothing')) return "Women's Clothing";
     if (path.includes('/shop/accessories')) return 'Accessories';
-    if (path.includes('/shop/clothing')) return 'Clothing';
     if (path.includes('/shop/shoes')) return 'Shoes';
+    if (path.includes('/shop/mens')) return "Men's";
+    if (path.includes('/shop/kids')) return 'Kids';
+    if (path.includes('/shop/giftables')) return 'Giftables';
     return 'Shop';
   };
 
@@ -65,7 +71,7 @@ export default function Shop() {
           p.sku?.toLowerCase().includes(query)
       );
     } else if (currentCategory !== 'Shop') {
-      filtered = filtered.filter((p) => p.category === currentCategory);
+      filtered = filtered.filter((p) => matchesCategory(p, currentCategory));
     }
     return filtered;
   };
@@ -303,4 +309,24 @@ export default function Shop() {
       </div>
     </div>
   );
+}
+
+function matchesCategory(product: ProductInventory, category: string): boolean {
+  const categoryValue = String(product.category || '').toLowerCase();
+  const subcategoryValue = String(product.subcategory || '').toLowerCase();
+  const nameValue = product.name.toLowerCase();
+  const haystack = `${categoryValue} ${subcategoryValue} ${nameValue}`;
+
+  switch (category) {
+    case "Women's Clothing":
+      return categoryValue === 'clothing' || haystack.includes('women');
+    case "Men's":
+      return /\bmen'?s?\b/.test(haystack) || haystack.includes('menswear');
+    case 'Kids':
+      return haystack.includes('kid') || haystack.includes('children');
+    case 'Giftables':
+      return haystack.includes('gift');
+    default:
+      return categoryValue === category.toLowerCase();
+  }
 }
