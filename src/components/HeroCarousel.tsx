@@ -8,7 +8,7 @@ const slides = [
     title: 'Wear Your',
     accent: 'Crown.',
     description:
-      'Fashion for every version of you, curated with faith, confidence, and love.',
+      'Faith-rooted fashion for every version of you, curated with confidence and love.',
     image:
       'https://images.pexels.com/photos/8386647/pexels-photo-8386647.jpeg?auto=compress&cs=tinysrgb&w=1920',
     cta: 'SHOP THE COLLECTION',
@@ -34,7 +34,7 @@ const slides = [
     image:
       'https://images.pexels.com/photos/1926769/pexels-photo-1926769.jpeg?auto=compress&cs=tinysrgb&w=1920',
     cta: 'SEE THE LOOK',
-    link: '/shop/clothing',
+    link: '/shop/womens-clothing',
   },
 ];
 
@@ -56,7 +56,7 @@ export default function HeroCarousel() {
 
   return (
     <section
-      className="relative h-[88vh] min-h-[560px] max-h-[820px] overflow-hidden bg-black"
+      className="relative h-[88vh] min-h-[600px] max-h-[840px] overflow-hidden bg-black"
       onMouseEnter={() => setPaused(true)}
       onMouseLeave={() => setPaused(false)}
     >
@@ -73,21 +73,22 @@ export default function HeroCarousel() {
             }`}
             style={{ backgroundImage: `url(${slide.image})` }}
           />
-          <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/40 to-transparent" />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-bfab-900/55 to-black/20" />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-white/5" />
+          <div className="absolute -left-24 top-24 h-80 w-80 rounded-full bg-bfab-500/25 blur-3xl" />
 
           <div className="relative container mx-auto px-6 h-full flex items-center">
-            <div className="max-w-2xl text-white">
+            <div className="max-w-3xl text-white">
               <p
                 key={`${i}-${current}-eyebrow`}
-                className="text-[11px] tracking-[0.5em] text-white/80 mb-6 animate-fade-in-up"
+                className="text-[11px] tracking-[0.42em] text-bfab-200 mb-6 animate-fade-in-up"
                 style={{ animationDelay: '0.1s' }}
               >
                 {slide.eyebrow}
               </p>
               <h1
                 key={`${i}-${current}-title`}
-                className="font-display text-6xl md:text-7xl lg:text-8xl font-light leading-[1.05] mb-2 animate-fade-in-up"
+                className="font-display text-6xl md:text-7xl lg:text-8xl font-medium leading-[0.98] mb-2 animate-fade-in-up"
                 style={{ animationDelay: '0.2s' }}
               >
                 {slide.title}
@@ -101,20 +102,27 @@ export default function HeroCarousel() {
               </h2>
               <p
                 key={`${i}-${current}-desc`}
-                className="text-lg md:text-xl text-white/85 mb-10 max-w-xl animate-fade-in-up font-light"
+                className="text-lg md:text-xl text-white/85 mb-10 max-w-xl animate-fade-in-up font-light leading-relaxed"
                 style={{ animationDelay: '0.4s' }}
               >
                 {slide.description}
               </p>
-              <Link
-                key={`${i}-${current}-cta`}
-                to={slide.link}
-                className="inline-flex items-center gap-3 px-9 py-4 bg-white text-black hover:bg-bfab-600 hover:text-white transition-all duration-500 tracking-[0.2em] text-xs font-semibold rounded-md shadow-lg animate-fade-in-up"
-                style={{ animationDelay: '0.5s' }}
-              >
-                {slide.cta}
-                <ChevronRight className="w-4 h-4" />
-              </Link>
+              <div className="flex flex-col sm:flex-row gap-3 animate-fade-in-up" style={{ animationDelay: '0.5s' }}>
+                <Link
+                  key={`${i}-${current}-cta`}
+                  to={slide.link}
+                  className="inline-flex items-center justify-center gap-3 rounded-md bg-white px-9 py-4 text-xs font-semibold uppercase tracking-[0.2em] text-black shadow-lg transition-all duration-500 hover:bg-bfab-200"
+                >
+                  {slide.cta}
+                  <ChevronRight className="w-4 h-4" />
+                </Link>
+                <Link
+                  to="/about"
+                  className="inline-flex items-center justify-center rounded-md border border-white/25 bg-white/10 px-9 py-4 text-xs font-semibold uppercase tracking-[0.2em] text-white backdrop-blur-md transition-all duration-500 hover:bg-white hover:text-black"
+                >
+                  Our Story
+                </Link>
+              </div>
             </div>
           </div>
         </div>

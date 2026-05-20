@@ -27,19 +27,23 @@ export default function ProductGrid() {
   }, []);
 
   return (
-    <section className="bg-bfab-50/60 py-24 border-y border-black/5">
+    <section className="bg-[#fbf8ff] py-20 md:py-24 border-y border-bfab-100">
       <div className="container mx-auto px-6">
-        <div className="flex flex-col items-center text-center mb-14">
+        <div className="flex flex-col items-center text-center mb-14 max-w-3xl mx-auto">
           <span className="eyebrow mb-4">The Collection</span>
           <h2 className="font-display text-5xl md:text-6xl font-medium text-black leading-[1.05]">
-            Our <span className="italic text-bfab-600">Faves</span>
+            Fresh finds we're <span className="italic text-bfab-600">loving.</span>
           </h2>
+          <p className="mt-5 text-black/65 text-lg font-light">
+            A few favorite pieces from the boutique, hand-picked for style,
+            comfort, and confidence.
+          </p>
         </div>
 
         {loading ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {Array.from({ length: 4 }).map((_, i) => (
-              <div key={i} className="card overflow-hidden">
+              <div key={i} className="overflow-hidden rounded-[1.5rem] border border-bfab-100 bg-white shadow-card">
                 <div
                   className="aspect-[3/4] bg-gradient-to-r from-bfab-50 via-bfab-100 to-bfab-50 animate-shimmer"
                   style={{ backgroundSize: '200% 100%' }}
@@ -68,7 +72,7 @@ export default function ProductGrid() {
                   to={`/product/${product.id}`}
                   className="group block"
                 >
-                  <div className="card card-hover overflow-hidden">
+                  <div className="overflow-hidden rounded-[1.5rem] border border-white bg-white shadow-card transition-all duration-300 group-hover:-translate-y-1 group-hover:shadow-cardHover">
                     <div className="relative aspect-[3/4] overflow-hidden bg-bfab-50">
                       <img
                         src={product.images[0]}
@@ -82,11 +86,7 @@ export default function ProductGrid() {
                           className="absolute inset-0 w-full h-full object-cover opacity-0 group-hover:opacity-100 transition-opacity duration-700"
                         />
                       )}
-                      <div className="absolute inset-x-0 bottom-0 translate-y-full group-hover:translate-y-0 transition-transform duration-500">
-                        <div className="bg-white/95 backdrop-blur-sm text-center py-3 text-xs tracking-[0.25em] uppercase font-medium text-bfab-600">
-                          Quick View
-                        </div>
-                      </div>
+                      <div className="absolute inset-0 bg-black/0 transition-colors duration-500 group-hover:bg-black/10" />
                     </div>
                     <div className="p-5">
                       <h3 className="font-display text-lg text-black leading-tight mb-1 line-clamp-1">
@@ -102,7 +102,7 @@ export default function ProductGrid() {
             <div className="flex justify-center mt-14">
               <Link
                 to="/shop"
-                className="inline-flex items-center gap-2 text-black hover:text-bfab-600 transition-colors text-sm tracking-[0.25em] uppercase font-medium group"
+                className="inline-flex items-center justify-center gap-2 rounded-full border border-bfab-200 bg-white px-7 py-3 text-sm font-medium uppercase tracking-[0.2em] text-black shadow-card transition-all hover:border-bfab-600 hover:text-bfab-600 group"
               >
                 Shop the full collection
                 <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />

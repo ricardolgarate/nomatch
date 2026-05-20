@@ -2,40 +2,37 @@ import { Link } from 'react-router-dom';
 
 export default function HandcraftedSection() {
   return (
-    <section className="bg-white py-24 md:py-32 relative overflow-hidden">
-      <div className="absolute inset-0 bg-hero-radial opacity-70 pointer-events-none" />
+    <section className="relative overflow-hidden bg-white py-20 md:py-28">
+      <div className="absolute inset-0 bg-hero-radial opacity-60 pointer-events-none" />
+      <div className="container relative mx-auto px-6">
+        <div className="mx-auto max-w-5xl rounded-[2rem] border border-bfab-100 bg-bfab-50/75 p-8 md:p-14 shadow-card text-center">
+          <span className="eyebrow mb-5">Curated With Love</span>
 
-      <div className="container mx-auto px-6 text-center max-w-3xl relative">
-        <span className="eyebrow mb-5">Curated With Love</span>
+          <h2 className="font-display text-5xl md:text-6xl font-medium text-black mt-4 mb-8 leading-[1.05] text-balance">
+            Pieces chosen for the season you're{' '}
+            <span className="italic text-bfab-600">stepping into.</span>
+          </h2>
 
-        <h2 className="font-display text-5xl md:text-6xl font-medium text-black mt-4 mb-8 leading-[1.1] text-balance">
-          Designed to be{' '}
-          <span className="italic text-bfab-600">different.</span>
-        </h2>
+          <div className="mx-auto max-w-3xl space-y-5 text-black/75 text-lg leading-relaxed font-light text-pretty">
+            <p>
+              Beauty For Ashes Boutique is a small, faith-rooted boutique in Dallas,
+              Texas, inspired by Isaiah 61:3: "to give unto them beauty for ashes."
+            </p>
+            <p>
+              Every piece is selected with real life in mind: new arrivals, curated
+              pre-loved gems, shoes, accessories, giftables, and styles for women,
+              men, and kids.
+            </p>
+            <p className="font-medium text-bfab-800">
+              Our heart is simple: help you feel confident, restored, and ready for
+              the season you're stepping into.
+            </p>
+          </div>
 
-        <div className="divider-ornament mb-10">
-          <span className="text-2xl">✦</span>
+          <Link to="/about" className="btn-primary mt-10">
+            MEET CATRICE
+          </Link>
         </div>
-
-        <div className="space-y-6 text-black/75 text-lg md:text-xl leading-relaxed font-light text-pretty">
-          <p>
-            We are <span className="font-medium text-bfab-700">Beauty For Ashes Boutique</span>,
-            a small, faith-rooted boutique in Dallas, Texas.
-          </p>
-
-          <p>
-            We pick every piece by hand. New arrivals. Curated pre-loved gems.
-            Shoes. Accessories. Little giftables. Styles for women, men, and kids.
-          </p>
-
-          <p>
-            We do it for one reason: the right piece can change your whole day.
-          </p>
-        </div>
-
-        <Link to="/about" className="btn-primary mt-12">
-          MEET CATRICE
-        </Link>
       </div>
     </section>
   );

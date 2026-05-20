@@ -3,11 +3,11 @@ import { Link } from 'react-router-dom';
 
 export default function Footer() {
   return (
-    <footer className="bg-bfab-50/60 text-black relative overflow-hidden border-t border-black/5">
-      <div className="absolute inset-0 bg-hero-radial opacity-50 pointer-events-none" />
+    <footer className="relative overflow-hidden bg-[#fbf8ff] text-black border-t border-bfab-100">
+      <div className="absolute inset-0 bg-hero-radial opacity-60 pointer-events-none" />
 
       <div className="container mx-auto px-6 pt-20 pb-10 relative">
-        <div className="flex flex-col items-center text-center mb-16">
+        <div className="mx-auto mb-14 flex max-w-4xl flex-col items-center rounded-[2rem] border border-bfab-100 bg-white/85 px-6 py-10 text-center shadow-card">
           <img
             src="/BFABLOGO.png"
             alt="Beauty For Ashes Boutique"
@@ -18,6 +18,10 @@ export default function Footer() {
           </p>
           <p className="text-xs tracking-[0.3em] uppercase text-bfab-700 mt-1">
             Curated with love in Dallas, Texas
+          </p>
+          <p className="mt-4 max-w-xl text-sm leading-relaxed text-black/60">
+            Faith-rooted fashion for every version of you, inspired by beauty,
+            restoration, and confidence.
           </p>
           <div className="divider-ornament w-full max-w-xs mx-auto mt-4 mb-4 text-bfab-400">
             <span>✦</span>
@@ -33,7 +37,7 @@ export default function Footer() {
           </a>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-10 max-w-5xl mx-auto border-t border-black/10 pt-12 text-sm">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-10 max-w-5xl mx-auto border-t border-bfab-100 pt-12 text-sm">
           <div>
             <h3 className="text-[11px] font-semibold text-bfab-700 mb-4 tracking-[0.3em] uppercase">
               Shop
@@ -107,7 +111,7 @@ export default function Footer() {
           </div>
         </div>
 
-        <div className="mt-14 pt-8 border-t border-black/10 flex flex-col md:flex-row items-center justify-between gap-3 text-xs text-black/50">
+        <div className="mt-14 pt-8 border-t border-bfab-100 flex flex-col md:flex-row items-center justify-between gap-3 text-xs text-black/50">
           <p>© {new Date().getFullYear()} Beauty For Ashes Boutique. All rights reserved.</p>
           <p className="tracking-widest uppercase">Curated with love</p>
         </div>

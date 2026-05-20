@@ -91,19 +91,19 @@ export default function Shop() {
   }, [currentPage]);
 
   return (
-    <div className="min-h-screen bg-white">
-      <div className="relative h-80 overflow-hidden bg-black">
+    <div className="min-h-screen bg-[#fbf8ff]">
+      <div className="relative overflow-hidden bg-gradient-to-br from-bfab-900 via-black to-bfab-800">
         <img
           src="https://images.pexels.com/photos/1381553/pexels-photo-1381553.jpeg?auto=compress&cs=tinysrgb&w=1920"
           alt=""
-          className="absolute inset-0 w-full h-full object-cover opacity-55"
+          className="absolute inset-0 w-full h-full object-cover opacity-35"
         />
-        <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-black/10 to-black/60" />
-        <div className="absolute inset-0 flex flex-col items-center justify-center text-white text-center px-6">
-          <span className="text-[11px] tracking-[0.5em] uppercase mb-4 text-bfab-200">
-            Beauty For Ashes Boutique
-          </span>
-          <h1 className="font-display text-6xl md:text-7xl font-light">{currentCategory}</h1>
+        <div className="absolute inset-0 bg-hero-radial opacity-70" />
+        <div className="relative flex min-h-80 flex-col items-center justify-center text-white text-center px-6 py-20">
+          <h1 className="font-display text-6xl md:text-7xl font-medium">{currentCategory}</h1>
+          <p className="mt-4 max-w-xl text-white/75 font-light">
+            Curated pieces for real life, real confidence, and every season you step into.
+          </p>
           {searchQuery && (
             <p className="text-lg text-white/80 mt-3">
               Results for <span className="italic">"{searchQuery}"</span>
@@ -112,20 +112,21 @@ export default function Shop() {
         </div>
       </div>
 
-      <div className="container mx-auto px-6 py-16">
+      <div className="container mx-auto px-6 py-14 md:py-16">
         <div className="flex flex-col lg:flex-row gap-12">
-          <aside className="lg:w-64 flex-shrink-0">
-            <h3 className="text-[11px] font-semibold text-black mb-5 tracking-[0.3em] uppercase">
+          <aside className="lg:w-72 flex-shrink-0">
+            <div className="sticky top-28 rounded-[1.5rem] border border-bfab-100 bg-white p-6 shadow-card">
+            <h3 className="text-[11px] font-semibold text-bfab-700 mb-5 tracking-[0.3em] uppercase">
               Categories
             </h3>
             <ul className="space-y-1">
               <li>
                 <Link
                   to="/shop"
-                  className={`flex items-center justify-between w-full py-2.5 text-left text-sm transition-colors ${
+                  className={`flex items-center justify-between w-full rounded-xl px-3 py-2.5 text-left text-sm transition-colors ${
                     currentCategory === 'Shop'
-                      ? 'text-bfab-600 font-medium'
-                      : 'text-black hover:text-bfab-600'
+                      ? 'bg-bfab-50 text-bfab-600 font-medium'
+                      : 'text-black hover:bg-bfab-50 hover:text-bfab-600'
                   }`}
                 >
                   <span className="flex items-center gap-2">
@@ -138,10 +139,10 @@ export default function Shop() {
                 <li key={category.name}>
                   <Link
                     to={category.path}
-                    className={`flex items-center justify-between w-full py-2.5 text-left text-sm transition-colors ${
+                    className={`flex items-center justify-between w-full rounded-xl px-3 py-2.5 text-left text-sm transition-colors ${
                       currentCategory === category.name
-                        ? 'text-bfab-600 font-medium'
-                        : 'text-black hover:text-bfab-600'
+                        ? 'bg-bfab-50 text-bfab-600 font-medium'
+                        : 'text-black hover:bg-bfab-50 hover:text-bfab-600'
                     }`}
                   >
                     <span className="flex items-center gap-2">
@@ -156,6 +157,7 @@ export default function Shop() {
             <Link to="/add" className="btn-outline mt-8 w-full">
               <Plus className="w-4 h-4" /> Add Product
             </Link>
+            </div>
           </aside>
 
           <div className="flex-1">
@@ -193,7 +195,7 @@ export default function Shop() {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8 mb-14">
               {loading ? (
                 Array.from({ length: 6 }).map((_, i) => (
-                  <div key={i} className="card overflow-hidden">
+                  <div key={i} className="overflow-hidden rounded-[1.5rem] border border-bfab-100 bg-white shadow-card">
                     <div
                       className="aspect-[3/4] bg-gradient-to-r from-bfab-50 via-bfab-100 to-bfab-50 animate-shimmer"
                       style={{ backgroundSize: '200% 100%' }}
@@ -229,7 +231,7 @@ export default function Shop() {
               ) : (
                 currentProducts.map((product) => (
                   <Link key={product.id} to={`/product/${product.id}`} className="group block">
-                    <div className="card card-hover overflow-hidden">
+                    <div className="overflow-hidden rounded-[1.5rem] border border-white bg-white shadow-card transition-all duration-300 group-hover:-translate-y-1 group-hover:shadow-cardHover">
                       <div className="relative aspect-[3/4] overflow-hidden bg-bfab-50">
                         <img
                           src={product.images[0]}

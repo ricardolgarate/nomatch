@@ -32,13 +32,13 @@ export default function NewsletterSection() {
   };
 
   return (
-    <section className="relative py-24 overflow-hidden bg-bfab-900 text-white">
-      <div className="absolute inset-0 bg-hero-radial opacity-60" />
-      <div className="absolute -top-24 -left-24 w-96 h-96 rounded-full bg-bfab-600/30 blur-3xl" />
-      <div className="absolute -bottom-24 -right-24 w-96 h-96 rounded-full bg-bfab-400/20 blur-3xl" />
-
+    <section className="relative py-20 md:py-24 overflow-hidden bg-white">
       <div className="container mx-auto px-6 relative">
-        <div className="max-w-2xl mx-auto text-center">
+        <div className="relative max-w-4xl mx-auto overflow-hidden rounded-[2rem] bg-bfab-900 px-6 py-14 md:px-12 md:py-16 text-center text-white shadow-soft">
+          <div className="absolute inset-0 bg-hero-radial opacity-70" />
+          <div className="absolute -top-24 -left-24 w-96 h-96 rounded-full bg-bfab-600/30 blur-3xl" />
+          <div className="absolute -bottom-24 -right-24 w-96 h-96 rounded-full bg-bfab-400/20 blur-3xl" />
+          <div className="relative">
           <span className="inline-block text-[11px] font-semibold uppercase tracking-[0.32em] text-bfab-200 mb-4">
             Join the List
           </span>
@@ -96,6 +96,7 @@ export default function NewsletterSection() {
           <p className="text-xs text-white/50 mt-4">
             No spam. Just the good stuff. Pinky promise.
           </p>
+          </div>
         </div>
       </div>
     </section>

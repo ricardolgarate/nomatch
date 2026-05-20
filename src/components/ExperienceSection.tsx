@@ -23,20 +23,23 @@ const features = [
 
 export default function ExperienceSection() {
   return (
-    <section className="bg-white py-24">
+    <section className="bg-[#fbf8ff] py-20 md:py-24 border-y border-bfab-100">
       <div className="container mx-auto px-6">
-        <div className="flex flex-col items-center text-center mb-16">
+        <div className="flex flex-col items-center text-center mb-14 max-w-3xl mx-auto">
           <span className="eyebrow mb-4">The BFAB Experience</span>
           <h2 className="font-display text-5xl md:text-6xl font-medium text-black leading-[1.05]">
             A small boutique. <span className="italic text-bfab-600">Big heart.</span>
           </h2>
+          <p className="mt-5 text-black/65 text-lg font-light">
+            Shopping here should feel personal, easy, and full of care.
+          </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-10 max-w-6xl mx-auto">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-6xl mx-auto">
           {features.map((feature, index) => (
             <div
               key={index}
-              className="relative text-center p-8 rounded-2xl border border-black/5 bg-white hover:shadow-soft transition-all duration-500 hover:-translate-y-1 group"
+              className="relative text-center p-8 rounded-[1.5rem] border border-white bg-white hover:shadow-soft transition-all duration-500 hover:-translate-y-1 group"
             >
               <div className="flex justify-center mb-6">
                 <div className="w-16 h-16 rounded-full bg-bfab-50 flex items-center justify-center group-hover:bg-bfab-600 transition-colors duration-500">

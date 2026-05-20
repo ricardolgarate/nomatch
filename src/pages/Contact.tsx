@@ -44,21 +44,21 @@ export default function Contact() {
   };
 
   return (
-    <div className="min-h-screen bg-white py-20 md:py-28">
+    <div className="min-h-screen bg-[#fbf8ff] py-20 md:py-28">
       <div className="container mx-auto px-6">
         <div className="max-w-3xl mx-auto text-center mb-16">
           <span className="eyebrow mb-4">Let's talk</span>
           <h1 className="font-display text-6xl md:text-7xl font-medium text-black mt-3 leading-[1.05]">
-            <span className="italic text-bfab-600">Say</span> hi.
+            We'd love to <span className="italic text-bfab-600">hear from you.</span>
           </h1>
           <p className="text-black/65 mt-5 text-lg font-light max-w-lg mx-auto">
             Questions, styling help, or just want to say hello? We'd love to hear from you.
           </p>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-5 gap-14 max-w-6xl mx-auto">
+        <div className="grid grid-cols-1 lg:grid-cols-5 gap-8 lg:gap-10 max-w-6xl mx-auto">
           <div className="lg:col-span-3">
-            <form onSubmit={handleSubmit} className="space-y-5">
+            <form onSubmit={handleSubmit} className="space-y-5 rounded-[1.75rem] border border-bfab-100 bg-white p-6 md:p-8 shadow-card">
               <div>
                 <label htmlFor="name" className="block text-xs font-semibold tracking-[0.2em] uppercase text-black mb-2">
                   Name
@@ -123,7 +123,7 @@ export default function Contact() {
                 />
               </div>
 
-              <button type="submit" disabled={submitting} className="btn-primary">
+              <button type="submit" disabled={submitting} className="btn-primary w-full sm:w-auto">
                 {submitting ? (
                   <>
                     <Loader2 className="w-4 h-4 animate-spin" />
@@ -154,31 +154,31 @@ export default function Contact() {
           </div>
 
           <div className="lg:col-span-2">
-            <div className="rounded-2xl border border-black/5 bg-bfab-50/60 p-8 space-y-6">
+            <div className="rounded-[1.75rem] border border-bfab-100 bg-bfab-900 p-8 space-y-6 text-white shadow-soft">
               <div>
-                <h2 className="font-display text-2xl text-black mb-1">Reach out</h2>
-                <p className="text-sm text-black/60">
-                  Any way that works best for you.
+                <h2 className="font-display text-3xl text-white mb-2">Reach out</h2>
+                <p className="text-sm text-white/65">
+                  Any way that works best for you. Catrice and the BFAB team are happy to help.
                 </p>
               </div>
 
               <div className="space-y-4 text-sm">
                 <a
                   href="mailto:shopbfabllc@gmail.com"
-                  className="flex items-center gap-3 text-black hover:text-bfab-600 transition-colors group"
+                  className="flex items-center gap-3 text-white/85 hover:text-white transition-colors group"
                 >
-                  <div className="w-10 h-10 rounded-full bg-white border border-black/5 flex items-center justify-center group-hover:bg-bfab-600 group-hover:border-bfab-600 transition-colors">
-                    <Mail className="w-4 h-4 text-bfab-600 group-hover:text-white transition-colors" />
+                  <div className="w-10 h-10 rounded-full bg-white/10 border border-white/10 flex items-center justify-center group-hover:bg-white transition-colors">
+                    <Mail className="w-4 h-4 text-bfab-200 group-hover:text-bfab-700 transition-colors" />
                   </div>
                   <span>shopbfabllc@gmail.com</span>
                 </a>
 
                 <a
                   href="tel:+14692976359"
-                  className="flex items-center gap-3 text-black hover:text-bfab-600 transition-colors group"
+                  className="flex items-center gap-3 text-white/85 hover:text-white transition-colors group"
                 >
-                  <div className="w-10 h-10 rounded-full bg-white border border-black/5 flex items-center justify-center group-hover:bg-bfab-600 group-hover:border-bfab-600 transition-colors">
-                    <Phone className="w-4 h-4 text-bfab-600 group-hover:text-white transition-colors" />
+                  <div className="w-10 h-10 rounded-full bg-white/10 border border-white/10 flex items-center justify-center group-hover:bg-white transition-colors">
+                    <Phone className="w-4 h-4 text-bfab-200 group-hover:text-bfab-700 transition-colors" />
                   </div>
                   <span>(469) 297-6359</span>
                 </a>
@@ -187,23 +187,28 @@ export default function Contact() {
                   href="https://www.instagram.com/bfabllc/"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-center gap-3 text-black hover:text-bfab-600 transition-colors group"
+                  className="flex items-center gap-3 text-white/85 hover:text-white transition-colors group"
                 >
-                  <div className="w-10 h-10 rounded-full bg-white border border-black/5 flex items-center justify-center group-hover:bg-bfab-600 group-hover:border-bfab-600 transition-colors">
-                    <Instagram className="w-4 h-4 text-bfab-600 group-hover:text-white transition-colors" />
+                  <div className="w-10 h-10 rounded-full bg-white/10 border border-white/10 flex items-center justify-center group-hover:bg-white transition-colors">
+                    <Instagram className="w-4 h-4 text-bfab-200 group-hover:text-bfab-700 transition-colors" />
                   </div>
                   <span>@bfabllc</span>
                 </a>
 
-                <div className="flex items-start gap-3 text-black/70">
-                  <div className="w-10 h-10 rounded-full bg-white border border-black/5 flex items-center justify-center shrink-0">
-                    <MapPin className="w-4 h-4 text-bfab-600" />
+                <div className="flex items-start gap-3 text-white/75">
+                  <div className="w-10 h-10 rounded-full bg-white/10 border border-white/10 flex items-center justify-center shrink-0">
+                    <MapPin className="w-4 h-4 text-bfab-200" />
                   </div>
                   <div>
-                    <p className="text-black">Dallas, Texas</p>
+                    <p className="text-white">Dallas, Texas</p>
                     <p className="text-xs">Small town feel. Big city style.</p>
                   </div>
                 </div>
+              </div>
+
+              <div className="rounded-2xl border border-white/10 bg-white/10 p-5 text-sm text-white/75">
+                Thank you for supporting a small, faith-rooted boutique. Every message,
+                order, and share means so much.
               </div>
             </div>
           </div>
