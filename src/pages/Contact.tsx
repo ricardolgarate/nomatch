@@ -180,7 +180,7 @@ export default function Contact() {
                   <div className="w-10 h-10 rounded-full bg-white/10 border border-white/10 flex items-center justify-center group-hover:bg-white transition-colors">
                     <Phone className="w-4 h-4 text-bfab-200 group-hover:text-bfab-700 transition-colors" />
                   </div>
-                  <span>(469) 297-6359</span>
+                  <span>(469)297-6359</span>
                 </a>
 
                 <a

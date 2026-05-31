@@ -59,7 +59,7 @@ export default function Footer() {
               About
             </h3>
             <ul className="space-y-2.5 text-black/75">
-              <li><Link to="/about" className="hover:text-bfab-600 transition-colors">Our Story</Link></li>
+              <li><Link to="/about#our-story" className="hover:text-bfab-600 transition-colors">Our Story</Link></li>
               <li><Link to="/contact" className="hover:text-bfab-600 transition-colors">Contact</Link></li>
             </ul>
           </div>
@@ -92,7 +92,7 @@ export default function Footer() {
                 className="flex items-center gap-2 hover:text-bfab-600 transition-colors"
               >
                 <Phone className="w-4 h-4 shrink-0" />
-                <span>(469) 297-6359</span>
+                <span>(469)297-6359</span>
               </a>
               <div className="flex items-center gap-2">
                 <MapPin className="w-4 h-4 shrink-0" />

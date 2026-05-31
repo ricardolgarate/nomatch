@@ -303,7 +303,7 @@ export default function ProductDetail() {
             <div className="space-y-3 border-t border-black/10 pt-6 text-sm">
               <div className="flex items-center gap-3 text-black/80">
                 <Truck className="w-4 h-4 text-bfab-600" />
-                <span>Complimentary shipping on orders over $150</span>
+                <span>Complimentary shipping on orders over $100</span>
               </div>
               <div className="flex items-center gap-3 text-black/80">
                 <Clock className="w-4 h-4 text-bfab-600" />
@@ -360,7 +360,7 @@ export default function ProductDetail() {
                 <div>
                   <h3 className="font-display text-xl text-black mb-3">Shipping</h3>
                   <ul className="space-y-2 list-disc pl-5">
-                    <li>Complimentary shipping on domestic orders over $150.</li>
+                    <li>Complimentary shipping on domestic orders over $100.</li>
                     <li>Express delivery available. Arrives in 3-4 business days.</li>
                   </ul>
                 </div>

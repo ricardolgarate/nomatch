@@ -9,7 +9,7 @@ const boutiqueHighlights = [
   },
   {
     icon: Heart,
-    title: 'Pre-Loved Finds',
+    title: 'Curated Pre-Loved Gems',
     copy: 'Curated pre-loved gems selected with care, style, and budget in mind.',
   },
   {
@@ -86,7 +86,7 @@ export default function AboutUs() {
         </div>
       </section>
 
-      <section className="bg-white py-20 md:py-24">
+      <section id="our-story" className="scroll-mt-32 bg-white py-20 md:py-24">
         <div className="container mx-auto px-6">
           <div className="grid grid-cols-1 lg:grid-cols-[0.8fr_1.2fr] gap-8 lg:gap-12 items-stretch">
             <div className="rounded-[1.75rem] bg-bfab-900 p-8 md:p-10 text-white shadow-soft flex flex-col justify-between">
@@ -113,13 +113,14 @@ export default function AboutUs() {
               </h2>
               <div className="space-y-5 text-black/75 leading-relaxed font-light text-lg">
                 <p>
-                  BFAB reflects transformation. Life can bring loss, change, and
-                  hard seasons, but God still brings purpose, confidence, and beauty
-                  from it all.
+                  BFAB came into existence from Catrice's love for fashion, her
+                  faith in Jesus Christ, and her desire to help people feel confident
+                  without breaking the bank.
                 </p>
                 <p>
-                  Fashion here is more than clothing. It is expression, renewal, and
-                  a reminder that what you wear can reflect who you are becoming.
+                  The name Beauty For Ashes Boutique was inspired by Isaiah 61:3.
+                  Life can bring loss, change, and hard seasons, but God still brings
+                  purpose, confidence, and beauty from it all.
                 </p>
                 <p>
                   We curate pieces that fit real life, from everyday looks to standout

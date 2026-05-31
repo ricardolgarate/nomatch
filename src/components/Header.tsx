@@ -90,6 +90,10 @@ export default function Header() {
 
   return (
     <>
+      <div className="bg-bfab-900 px-3 py-2 text-center text-[10px] font-semibold uppercase tracking-[0.28em] text-white md:text-[11px]">
+        Free shipping over $100
+      </div>
+
       <header
         className={`sticky top-0 z-50 bg-white/90 backdrop-blur-md border-b transition-[border-color,box-shadow] duration-500 ${
           scrolled

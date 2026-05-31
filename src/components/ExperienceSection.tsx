@@ -3,7 +3,7 @@ import { PackageOpen, MessageCircle, Sparkles } from 'lucide-react';
 const features = [
   {
     icon: PackageOpen,
-    title: 'Free Shipping Over $150',
+    title: 'Free Shipping Over $100',
     description:
       'Sent with care from Dallas, Texas. Easy 10-day returns and exchanges.',
   },
@@ -11,7 +11,7 @@ const features = [
     icon: MessageCircle,
     title: 'We Are Real People',
     description:
-      'Questions? Styling help? Reach out any time at shopbfabllc@gmail.com or (469) 297-6359.',
+      'Questions? Styling help? Reach out any time at shopbfabllc@gmail.com or (469)297-6359.',
   },
   {
     icon: Sparkles,

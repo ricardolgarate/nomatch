@@ -13,15 +13,13 @@ const categories = [
     title: 'Shoes',
     blurb: 'Heels, sneakers & everyday pairs',
     path: '/shop/shoes',
-    image:
-      'https://images.pexels.com/photos/1240892/pexels-photo-1240892.jpeg?auto=compress&cs=tinysrgb&w=800',
+    image: '/shoes-category.png',
   },
   {
     title: 'Accessories',
     blurb: 'The little things that say a lot',
     path: '/shop/accessories',
-    image:
-      'https://images.pexels.com/photos/1454171/pexels-photo-1454171.jpeg?auto=compress&cs=tinysrgb&w=800',
+    image: '/accessories-category.png',
   },
   {
     title: "Men's",
@@ -34,8 +32,7 @@ const categories = [
     title: 'Kids',
     blurb: 'Cute finds for the little ones',
     path: '/shop/kids',
-    image:
-      'https://images.pexels.com/photos/3661350/pexels-photo-3661350.jpeg?auto=compress&cs=tinysrgb&w=800',
+    image: '/kids-category.png',
   },
   {
     title: 'Giftables',
