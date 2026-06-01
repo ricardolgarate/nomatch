@@ -10,7 +10,7 @@ const boutiqueHighlights = [
   {
     icon: Heart,
     title: 'Curated Pre-Loved Gems',
-    copy: 'Curated pre-loved gems selected with care, style, and budget in mind.',
+    copy: 'Handpicked pre-loved gems chosen with care, style, and budget in mind.',
   },
   {
     icon: Gift,
@@ -42,7 +42,7 @@ export default function AboutUs() {
                   Catrice Hines, Founder
                 </p>
                 <p className="mt-1 text-sm text-black/65">
-                  Curating BFAB with faith, joy, and a whole lot of love.
+                  Building BFAB with faith, joy, and a whole lot of love.
                 </p>
               </div>
             </div>
@@ -59,7 +59,7 @@ export default function AboutUs() {
                 </p>
                 <p>
                   What started as a vision became a boutique focused on stylish,
-                  affordable pieces for women, men, and kids. I personally curate
+                  affordable pieces for women, men, and kids. I personally handpick
                   items that are trendy, versatile, and easy to wear.
                 </p>
                 <p>
@@ -123,7 +123,7 @@ export default function AboutUs() {
                   purpose, confidence, and beauty from it all.
                 </p>
                 <p>
-                  We curate pieces that fit real life, from everyday looks to standout
+                  We select pieces that fit real life, from everyday looks to standout
                   moments, so you can step into your next season feeling bold,
                   restored, and beautifully made new.
                 </p>
@@ -138,7 +138,7 @@ export default function AboutUs() {
           <div className="max-w-3xl mx-auto text-center mb-12">
             <span className="eyebrow mb-4">Inside the Boutique</span>
             <h2 className="font-display text-4xl md:text-6xl font-medium leading-tight">
-              Curated with <span className="italic text-bfab-600">care.</span>
+              Chosen with <span className="italic text-bfab-600">care.</span>
             </h2>
             <p className="mt-5 text-black/65 text-lg font-light">
               Stylish, wearable finds for real life, real confidence, and real budgets.

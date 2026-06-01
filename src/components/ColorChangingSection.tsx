@@ -20,7 +20,7 @@ export default function ColorChangingSection() {
                 to help you feel pulled together without trying too hard.
               </p>
               <p>
-                Shop small drops, curated pre-loved gems, and easy pieces you can
+                Shop small drops, gently loved gems, and easy pieces you can
                 wear to brunch, church, date night, errands, or wherever life takes you.
               </p>
             </div>

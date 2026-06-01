@@ -8,7 +8,7 @@ const slides = [
     title: 'Wear Your',
     accent: 'Crown.',
     description:
-      'Faith-rooted fashion for every version of you, curated with confidence and love.',
+      'Faith-rooted fashion for every version of you, chosen with confidence and love.',
     image:
       'https://images.pexels.com/photos/8386647/pexels-photo-8386647.jpeg?auto=compress&cs=tinysrgb&w=1920',
     cta: 'SHOP THE COLLECTION',

@@ -1,5 +1,6 @@
-import { Instagram, Mail, Phone, MapPin } from 'lucide-react';
+import { Mail, Phone, MapPin } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import SocialLinks from './SocialLinks';
 
 export default function Footer() {
   return (
@@ -17,7 +18,7 @@ export default function Footer() {
             Beauty For Ashes Boutique
           </p>
           <p className="text-xs tracking-[0.3em] uppercase text-bfab-700 mt-1">
-            Curated with love in Dallas, Texas
+            Handpicked with love in Dallas, Texas
           </p>
           <p className="mt-4 max-w-xl text-sm leading-relaxed text-black/60">
             Faith-rooted fashion for every version of you, inspired by beauty,
@@ -26,15 +27,7 @@ export default function Footer() {
           <div className="divider-ornament w-full max-w-xs mx-auto mt-4 mb-4 text-bfab-400">
             <span>✦</span>
           </div>
-          <a
-            href="https://www.instagram.com/bfabllc/"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-sm text-bfab-600 hover:text-bfab-700 font-medium transition-colors inline-flex items-center gap-2"
-          >
-            <Instagram className="w-4 h-4" />
-            @bfabllc
-          </a>
+          <SocialLinks variant="inline" />
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-4 gap-10 max-w-5xl mx-auto border-t border-bfab-100 pt-12 text-sm">
@@ -98,22 +91,14 @@ export default function Footer() {
                 <MapPin className="w-4 h-4 shrink-0" />
                 <span>Dallas, Texas</span>
               </div>
-              <a
-                href="https://www.instagram.com/bfabllc/"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center gap-2 hover:text-bfab-600 transition-colors"
-              >
-                <Instagram className="w-4 h-4 shrink-0" />
-                <span>@bfabllc</span>
-              </a>
+              <SocialLinks variant="footer-list" />
             </div>
           </div>
         </div>
 
         <div className="mt-14 pt-8 border-t border-bfab-100 flex flex-col md:flex-row items-center justify-between gap-3 text-xs text-black/50">
           <p>© {new Date().getFullYear()} Beauty For Ashes Boutique. All rights reserved.</p>
-          <p className="tracking-widest uppercase">Curated with love</p>
+          <p className="tracking-widest uppercase">Styled with love</p>
         </div>
       </div>
     </footer>

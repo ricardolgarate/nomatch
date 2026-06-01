@@ -102,7 +102,7 @@ export default function Shop() {
         <div className="relative flex min-h-80 flex-col items-center justify-center text-white text-center px-6 py-20">
           <h1 className="font-display text-6xl md:text-7xl font-medium">{currentCategory}</h1>
           <p className="mt-4 max-w-xl text-white/75 font-light">
-            Curated pieces for real life, real confidence, and every season you step into.
+            Handpicked pieces for real life, real confidence, and every season you step into.
           </p>
           {searchQuery && (
             <p className="text-lg text-white/80 mt-3">
@@ -215,7 +215,7 @@ export default function Shop() {
                   <p className="text-black/60 mb-8">
                     {searchQuery
                       ? 'Try searching with different keywords.'
-                      : 'Add your first piece and start curating.'}
+                      : 'Add your first piece and start building the collection.'}
                   </p>
                   <div className="flex flex-wrap gap-3 justify-center">
                     {searchQuery && (

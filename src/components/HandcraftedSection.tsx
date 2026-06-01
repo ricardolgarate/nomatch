@@ -19,7 +19,7 @@ export default function HandcraftedSection() {
               Texas, inspired by Isaiah 61:3: "to give unto them beauty for ashes."
             </p>
             <p>
-              Every piece is selected with real life in mind: new arrivals, curated
+              Every piece is selected with real life in mind: new arrivals, handpicked
               pre-loved gems, shoes, accessories, giftables, and styles for women,
               men, and kids.
             </p>

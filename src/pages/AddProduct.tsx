@@ -276,7 +276,7 @@ export default function AddProduct() {
             <Package className="w-12 h-12 text-bfab-300 mx-auto mb-4" />
             <h2 className="font-display text-2xl text-black mb-2">Nothing here yet</h2>
             <p className="text-black/60 font-light mb-6">
-              Add your first product to start curating the boutique.
+              Add your first product to start building the boutique.
             </p>
             <button onClick={openAdd} className="btn-primary">
               <Plus className="w-4 h-4" /> ADD YOUR FIRST PIECE

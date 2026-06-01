@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import { Instagram, Mail, MapPin, Phone, Send, Loader2, AlertCircle } from 'lucide-react';
+import { Mail, MapPin, Phone, Send, Loader2, AlertCircle } from 'lucide-react';
+import SocialLinks from '../components/SocialLinks';
 import { saveContactMessage } from '../firebase/customers';
 
 export default function Contact() {
@@ -183,17 +184,7 @@ export default function Contact() {
                   <span>(469)297-6359</span>
                 </a>
 
-                <a
-                  href="https://www.instagram.com/bfabllc/"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center gap-3 text-white/85 hover:text-white transition-colors group"
-                >
-                  <div className="w-10 h-10 rounded-full bg-white/10 border border-white/10 flex items-center justify-center group-hover:bg-white transition-colors">
-                    <Instagram className="w-4 h-4 text-bfab-200 group-hover:text-bfab-700 transition-colors" />
-                  </div>
-                  <span>@bfabllc</span>
-                </a>
+                <SocialLinks variant="contact-list" />
 
                 <div className="flex items-start gap-3 text-white/75">
                   <div className="w-10 h-10 rounded-full bg-white/10 border border-white/10 flex items-center justify-center shrink-0">
