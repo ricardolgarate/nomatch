@@ -102,9 +102,9 @@ export default function Header() {
         }`}
       >
         <div className="container mx-auto px-4 md:px-6">
-          {/* Logo row (collapses on scroll) */}
+          {/* Logo row — desktop only; collapses on scroll */}
           <div
-            className={`flex justify-center overflow-hidden transition-[max-height,opacity,transform,margin] duration-[700ms] ease-[cubic-bezier(0.22,1,0.36,1)] ${
+            className={`hidden md:flex justify-center overflow-hidden transition-[max-height,opacity,transform,margin] duration-[700ms] ease-[cubic-bezier(0.22,1,0.36,1)] ${
               scrolled
                 ? 'max-h-0 opacity-0 -translate-y-2 pointer-events-none'
                 : 'max-h-40 opacity-100 translate-y-0 mt-3 md:mt-4'
@@ -125,11 +125,11 @@ export default function Header() {
 
           {/* Controls + nav row */}
           <div
-            className={`grid grid-cols-[auto_1fr_auto] items-center gap-2 md:gap-4 transition-[padding] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] ${
-              scrolled ? 'py-3' : 'pt-2.5 pb-4 md:pt-3 md:pb-5'
+            className={`relative grid grid-cols-[1fr_auto_1fr] items-center gap-2 md:grid-cols-[auto_1fr_auto] md:gap-4 transition-[padding] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] py-3 ${
+              scrolled ? 'md:py-3' : 'md:pt-3 md:pb-5'
             }`}
           >
-            <div className="flex items-center">
+            <div className="flex items-center justify-self-start">
               <button
                 onClick={() => setMobileMenuOpen(true)}
                 className="md:hidden p-2 text-black hover:text-bfab-600 transition-colors"
@@ -146,8 +146,19 @@ export default function Header() {
               </button>
             </div>
 
-            {/* Mobile: show small brand text when logo is hidden.
-                Desktop: show the nav links. */}
+            {/* Mobile: logo stays centered between search and cart */}
+            <Link
+              to="/"
+              aria-label="Beauty For Ashes Boutique home"
+              className="md:hidden justify-self-center z-10"
+            >
+              <img
+                src="/BFABLOGO.png"
+                alt="Beauty For Ashes Boutique"
+                className="h-9 w-auto max-w-[140px] object-contain"
+              />
+            </Link>
+
             <nav className="hidden md:flex items-center justify-center space-x-8 lg:space-x-12">
               <Link to="/" className={navLinkClass()}>
                 Home
@@ -193,24 +204,9 @@ export default function Header() {
               </Link>
             </nav>
 
-            {/* Small mobile-only brand text when logo row is collapsed */}
-            <div
-              className={`md:hidden flex items-center justify-center text-center transition-opacity duration-500 ${
-                scrolled ? 'opacity-100' : 'opacity-0 pointer-events-none'
-              }`}
-            >
-              <Link
-                to="/"
-                aria-label="Beauty For Ashes Boutique home"
-                className="font-display text-lg tracking-wider text-black"
-              >
-                BFAB
-              </Link>
-            </div>
-
             <button
               onClick={openCart}
-              className="p-2 text-black hover:text-bfab-600 transition-colors justify-self-end relative"
+              className="p-2 text-black hover:text-bfab-600 transition-colors justify-self-end relative z-10"
               aria-label="Open cart"
             >
               <ShoppingBag className="w-5 h-5" />

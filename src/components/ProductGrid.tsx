@@ -17,7 +17,12 @@ export default function ProductGrid() {
           }
           return (p.stock || 0) > 0;
         });
-        setProducts(inStock.slice(0, 4));
+        const newest = inStock.sort((a, b) => {
+          const aTime = a.createdAt?.getTime() ?? 0;
+          const bTime = b.createdAt?.getTime() ?? 0;
+          return bTime - aTime;
+        });
+        setProducts(newest.slice(0, 4));
       } catch (err) {
         console.error('Error loading featured products:', err);
       } finally {
@@ -30,13 +35,13 @@ export default function ProductGrid() {
     <section className="bg-[#fbf8ff] py-20 md:py-24 border-y border-bfab-100">
       <div className="container mx-auto px-6">
         <div className="flex flex-col items-center text-center mb-14 max-w-3xl mx-auto">
-          <span className="eyebrow mb-4">The Collection</span>
+          <span className="eyebrow mb-4">New Arrivals</span>
           <h2 className="font-display text-5xl md:text-6xl font-medium text-black leading-[1.05]">
             Fresh finds we're <span className="italic text-bfab-600">loving.</span>
           </h2>
           <p className="mt-5 text-black/65 text-lg font-light">
-            A few favorite pieces from the boutique, hand-picked for style,
-            comfort, and confidence.
+            The newest pieces just added to the boutique — your first look at what just
+            dropped.
           </p>
         </div>
 
@@ -57,7 +62,7 @@ export default function ProductGrid() {
           </div>
         ) : products.length === 0 ? (
           <div className="text-center py-12">
-            <p className="text-black/60 mb-6 text-lg">The collection is coming together.</p>
+            <p className="text-black/60 mb-6 text-lg">New arrivals are on the way.</p>
             <Link to="/add" className="btn-primary">
               <Plus className="w-4 h-4" />
               ADD YOUR FIRST PIECE
@@ -104,7 +109,7 @@ export default function ProductGrid() {
                 to="/shop"
                 className="inline-flex items-center justify-center gap-2 rounded-full border border-bfab-200 bg-white px-7 py-3 text-sm font-medium uppercase tracking-[0.2em] text-black shadow-card transition-all hover:border-bfab-600 hover:text-bfab-600 group"
               >
-                Shop the full collection
+                Shop new arrivals
                 <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
               </Link>
             </div>

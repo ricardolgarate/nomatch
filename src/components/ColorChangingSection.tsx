@@ -33,9 +33,9 @@ export default function ColorChangingSection() {
           <div className="order-1 lg:order-2 relative">
             <div className="relative aspect-[4/5] rounded-[1.75rem] overflow-hidden shadow-soft group border border-white">
               <img
-                src="https://images.pexels.com/photos/1926769/pexels-photo-1926769.jpeg?auto=compress&cs=tinysrgb&w=1200"
-                alt="Statement look"
-                className="w-full h-full object-cover transition-transform duration-[1200ms] group-hover:scale-105"
+                src="/93BF818E-D0C2-400B-82F5-5F6C9480C7E3.png"
+                alt="Confident everyday style"
+                className="w-full h-full object-cover object-top transition-transform duration-[1200ms] group-hover:scale-105"
               />
               <div className="absolute inset-0 ring-1 ring-inset ring-white/20 rounded-2xl" />
             </div>

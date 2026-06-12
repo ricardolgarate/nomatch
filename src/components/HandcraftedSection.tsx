@@ -6,7 +6,7 @@ export default function HandcraftedSection() {
       <div className="absolute inset-0 bg-hero-radial opacity-60 pointer-events-none" />
       <div className="container relative mx-auto px-6">
         <div className="mx-auto max-w-5xl rounded-[2rem] border border-bfab-100 bg-bfab-50/75 p-8 md:p-14 shadow-card text-center">
-          <span className="eyebrow mb-5">Curated With Love</span>
+          <span className="eyebrow mb-5">Curated With Love 💜</span>
 
           <h2 className="font-display text-5xl md:text-6xl font-medium text-black mt-4 mb-8 leading-[1.05] text-balance">
             Pieces chosen for the season you're{' '}

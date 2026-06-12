@@ -6,8 +6,7 @@ const categories = [
     title: "Women's Clothing",
     blurb: 'Everyday outfits and standout pieces',
     path: '/shop/womens-clothing',
-    image:
-      'https://images.pexels.com/photos/7679454/pexels-photo-7679454.jpeg?auto=compress&cs=tinysrgb&w=800',
+    image: '/B1864CBD-AE4D-4FC4-8DDB-1EBE7420C8E2.png',
   },
   {
     title: 'Shoes',
@@ -25,8 +24,7 @@ const categories = [
     title: "Men's",
     blurb: 'Easy pieces for his everyday style',
     path: '/shop/mens',
-    image:
-      'https://images.pexels.com/photos/769749/pexels-photo-769749.jpeg?auto=compress&cs=tinysrgb&w=800',
+    image: '/FAB3857A-2363-4A53-B433-E4C0EBEB20CE.png',
   },
   {
     title: 'Kids',
@@ -38,8 +36,7 @@ const categories = [
     title: 'Giftables',
     blurb: 'Small treasures made to brighten a day',
     path: '/shop/giftables',
-    image:
-      'https://images.pexels.com/photos/264787/pexels-photo-264787.jpeg?auto=compress&cs=tinysrgb&w=800',
+    image: '/0181961D-186E-483C-86B5-EF76DB4573CD.png',
   },
 ];
 
