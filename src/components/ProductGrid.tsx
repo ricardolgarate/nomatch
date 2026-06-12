@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowRight, Plus } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 import { getAllProducts, ProductInventory } from '../firebase/inventory';
 
 export default function ProductGrid() {
@@ -62,11 +62,7 @@ export default function ProductGrid() {
           </div>
         ) : products.length === 0 ? (
           <div className="text-center py-12">
-            <p className="text-black/60 mb-6 text-lg">New arrivals are on the way.</p>
-            <Link to="/add" className="btn-primary">
-              <Plus className="w-4 h-4" />
-              ADD YOUR FIRST PIECE
-            </Link>
+            <p className="text-black/60 text-lg">New arrivals are on the way.</p>
           </div>
         ) : (
           <>

@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { Search, ShoppingBag, ChevronDown, X, Menu } from 'lucide-react';
 import { useCart } from '../context/CartContext';
+import SearchOverlay from './SearchOverlay';
 
 export default function Header() {
   const [shopDropdownOpen, setShopDropdownOpen] = useState(false);
@@ -11,7 +12,6 @@ export default function Header() {
   const [searchQuery, setSearchQuery] = useState('');
   const [scrolled, setScrolled] = useState(false);
   const location = useLocation();
-  const navigate = useNavigate();
   const { getCartCount, openCart } = useCart();
 
   useEffect(() => {
@@ -58,15 +58,6 @@ export default function Header() {
       };
     }
   }, [mobileMenuOpen]);
-
-  const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (searchQuery.trim()) {
-      navigate(`/shop?search=${encodeURIComponent(searchQuery.trim())}`);
-      setSearchOpen(false);
-      setSearchQuery('');
-    }
-  };
 
   const shopCategories = [
     { name: "Women's Clothing", path: '/shop/womens-clothing' },
@@ -218,41 +209,15 @@ export default function Header() {
             </button>
           </div>
 
-          {searchOpen && (
-            <div className="absolute left-0 right-0 top-full bg-white shadow-soft border-t border-black/5 z-40">
-              <div className="container mx-auto px-4 md:px-6 py-5 md:py-8">
-                <form onSubmit={handleSearch} className="flex items-center gap-2 md:gap-3">
-                  <div className="flex-1 relative">
-                    <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-bfab-600" />
-                    <input
-                      type="text"
-                      value={searchQuery}
-                      onChange={(e) => setSearchQuery(e.target.value)}
-                      placeholder="Search…"
-                      className="w-full pl-12 pr-4 py-3 md:py-4 bg-bfab-50/50 border border-black/10 rounded-lg focus:outline-none focus:ring-2 focus:ring-bfab-500 focus:border-bfab-500 text-black placeholder-black/40 transition-all"
-                      autoFocus
-                    />
-                  </div>
-                  <button
-                    type="submit"
-                    className="btn-primary px-5 md:px-8 py-3 md:py-3.5 text-xs md:text-sm"
-                  >
-                    SEARCH
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setSearchOpen(false)}
-                    className="p-3 md:p-4 hover:bg-black/5 rounded-lg transition-colors"
-                    aria-label="Close search"
-                  >
-                    <X className="w-5 h-5 text-black" />
-                  </button>
-                </form>
-              </div>
-            </div>
-          )}
         </div>
       </header>
+
+      <SearchOverlay
+        open={searchOpen}
+        query={searchQuery}
+        onQueryChange={setSearchQuery}
+        onClose={() => setSearchOpen(false)}
+      />
 
       {/* Mobile slide-in menu */}
       <div

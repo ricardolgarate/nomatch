@@ -1,6 +1,14 @@
 import { useState, useEffect } from 'react';
 import { useLocation, Link } from 'react-router-dom';
-import { ChevronRight, Grid3x3, List, AlertCircle, Package, Plus } from 'lucide-react';
+import {
+  AlertCircle,
+  ChevronRight,
+  Grid3x3,
+  List,
+  Package,
+  SlidersHorizontal,
+  X,
+} from 'lucide-react';
 import { getAllProducts, ProductInventory } from '../firebase/inventory';
 
 const categories = [
@@ -18,6 +26,7 @@ export default function Shop() {
   const [currentPage, setCurrentPage] = useState(1);
   const [products, setProducts] = useState<ProductInventory[]>([]);
   const [loading, setLoading] = useState(true);
+  const [mobileCategoriesOpen, setMobileCategoriesOpen] = useState(false);
   const itemsPerPage = 12;
 
   const searchParams = new URLSearchParams(location.search);
@@ -84,11 +93,22 @@ export default function Shop() {
 
   useEffect(() => {
     setCurrentPage(1);
+    setMobileCategoriesOpen(false);
   }, [location.pathname, location.search]);
 
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }, [currentPage]);
+
+  useEffect(() => {
+    if (!mobileCategoriesOpen) return;
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+
+    return () => {
+      document.body.style.overflow = previousOverflow;
+    };
+  }, [mobileCategoriesOpen]);
 
   return (
     <div className="min-h-screen bg-[#fbf8ff]">
@@ -114,7 +134,7 @@ export default function Shop() {
 
       <div className="container mx-auto px-6 py-14 md:py-16">
         <div className="flex flex-col lg:flex-row gap-12">
-          <aside className="lg:w-72 flex-shrink-0">
+          <aside className="hidden lg:block lg:w-72 flex-shrink-0">
             <div className="sticky top-28 rounded-[1.5rem] border border-bfab-100 bg-white p-6 shadow-card">
             <h3 className="text-[11px] font-semibold text-bfab-700 mb-5 tracking-[0.3em] uppercase">
               Categories
@@ -153,20 +173,27 @@ export default function Shop() {
                 </li>
               ))}
             </ul>
-
-            <Link to="/add" className="btn-outline mt-8 w-full">
-              <Plus className="w-4 h-4" /> Add Product
-            </Link>
             </div>
           </aside>
 
           <div className="flex-1">
-            <div className="flex items-center justify-between mb-10">
-              <p className="text-sm text-black/60">
-                {filteredProducts.length === 0 ? 0 : startIndex + 1}–
-                {Math.min(endIndex, filteredProducts.length)} of {filteredProducts.length} item
-                {filteredProducts.length === 1 ? '' : 's'}
-              </p>
+            <div className="flex flex-wrap items-center justify-between gap-4 mb-10">
+              <div className="flex items-center gap-3">
+                <button
+                  type="button"
+                  onClick={() => setMobileCategoriesOpen(true)}
+                  className="inline-flex items-center gap-3 rounded-full border border-bfab-100 bg-white px-4 py-2.5 text-xs font-semibold uppercase tracking-[0.18em] text-black shadow-sm transition-colors hover:border-bfab-400 hover:text-bfab-700 lg:hidden"
+                  aria-label="Open category filters"
+                >
+                  <SlidersHorizontal className="h-4 w-4" />
+                  Filter
+                </button>
+                <p className="text-sm text-black/60">
+                  {filteredProducts.length === 0 ? 0 : startIndex + 1}–
+                  {Math.min(endIndex, filteredProducts.length)} of {filteredProducts.length} item
+                  {filteredProducts.length === 1 ? '' : 's'}
+                </p>
+              </div>
 
               <div className="flex items-center gap-3">
                 <div className="flex gap-0.5 border border-black/10 rounded-md overflow-hidden">
@@ -215,17 +242,18 @@ export default function Shop() {
                   <p className="text-black/60 mb-8">
                     {searchQuery
                       ? 'Try searching with different keywords.'
-                      : 'Add your first piece and start building the collection.'}
+                      : 'New pieces are on the way. Check back soon!'}
                   </p>
                   <div className="flex flex-wrap gap-3 justify-center">
-                    {searchQuery && (
+                    {searchQuery ? (
                       <Link to="/shop" className="btn-primary">
                         VIEW ALL
                       </Link>
+                    ) : (
+                      <Link to="/contact" className="btn-primary">
+                        CONTACT US
+                      </Link>
                     )}
-                    <Link to="/add" className="btn-outline">
-                      ADD PRODUCT
-                    </Link>
                   </div>
                 </div>
               ) : (
@@ -308,6 +336,80 @@ export default function Shop() {
             )}
           </div>
         </div>
+      </div>
+
+      <div
+        className={`fixed inset-0 z-[70] lg:hidden transition-opacity duration-300 ${
+          mobileCategoriesOpen
+            ? 'opacity-100 pointer-events-auto'
+            : 'opacity-0 pointer-events-none'
+        }`}
+        aria-hidden={!mobileCategoriesOpen}
+      >
+        <div
+          className="absolute inset-0 bg-black/45 backdrop-blur-sm"
+          onClick={() => setMobileCategoriesOpen(false)}
+        />
+        <aside
+          className={`absolute left-0 top-0 bottom-0 flex w-[84%] max-w-sm flex-col bg-[#fbf8ff] shadow-2xl transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] ${
+            mobileCategoriesOpen ? 'translate-x-0' : '-translate-x-full'
+          }`}
+        >
+          <div className="flex items-center justify-between border-b border-bfab-100 bg-white px-6 py-5">
+            <div>
+              <span className="eyebrow">Shop</span>
+              <h2 className="mt-1 font-display text-3xl text-black">Categories</h2>
+            </div>
+            <button
+              type="button"
+              onClick={() => setMobileCategoriesOpen(false)}
+              className="flex h-10 w-10 items-center justify-center rounded-full bg-bfab-50 text-black transition-colors hover:text-bfab-700"
+              aria-label="Close category filters"
+            >
+              <X className="h-5 w-5" />
+            </button>
+          </div>
+
+          <nav className="flex-1 overflow-y-auto p-6">
+            <ul className="space-y-2">
+              <li>
+                <Link
+                  to="/shop"
+                  onClick={() => setMobileCategoriesOpen(false)}
+                  className={`flex items-center justify-between rounded-2xl px-4 py-3.5 text-base transition-colors ${
+                    currentCategory === 'Shop'
+                      ? 'bg-white text-bfab-700 shadow-sm font-medium'
+                      : 'text-black hover:bg-white hover:text-bfab-700'
+                  }`}
+                >
+                  <span>All</span>
+                  {currentCategory === 'Shop' && <ChevronRight className="h-4 w-4" />}
+                </Link>
+              </li>
+              {categories.map((category) => (
+                <li key={category.name}>
+                  <Link
+                    to={category.path}
+                    onClick={() => setMobileCategoriesOpen(false)}
+                    className={`flex items-center justify-between rounded-2xl px-4 py-3.5 text-base transition-colors ${
+                      currentCategory === category.name
+                        ? 'bg-white text-bfab-700 shadow-sm font-medium'
+                        : 'text-black hover:bg-white hover:text-bfab-700'
+                    }`}
+                  >
+                    <span>{category.name}</span>
+                    {currentCategory === category.name && <ChevronRight className="h-4 w-4" />}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </nav>
+
+          <div className="border-t border-bfab-100 p-6 text-sm font-light text-black/60">
+            Browse BFAB by women&apos;s clothing, shoes, accessories, men&apos;s,
+            kids, and giftables.
+          </div>
+        </aside>
       </div>
     </div>
   );
