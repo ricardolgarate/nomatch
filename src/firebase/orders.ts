@@ -50,6 +50,8 @@ export interface Order {
   items: OrderItem[];
   customer: CustomerInfo;
   subtotal: number;
+  discount?: number;
+  discountCode?: string;
   shipping: number;
   total: number;
   status: OrderStatus;
@@ -71,6 +73,11 @@ function toOrder(id: string, data: Record<string, unknown>): Order {
     items: (data.items as OrderItem[]) || [],
     customer: data.customer as CustomerInfo,
     subtotal: (data.subtotal as number) || 0,
+    discount: (data.discount as number) || 0,
+    discountCode:
+      typeof data.discountCode === 'string'
+        ? data.discountCode
+        : undefined,
     shipping: (data.shipping as number) || 0,
     total: (data.total as number) || 0,
     status: (data.status as OrderStatus) || 'new',

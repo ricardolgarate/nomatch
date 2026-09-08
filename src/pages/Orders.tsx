@@ -457,6 +457,16 @@ function OrderRow({
                     {currency(order.subtotal)}
                   </span>
                 </div>
+                {Boolean(order.discount) && (
+                  <div className="flex justify-between text-bfab-700">
+                    <span>
+                      Discount{order.discountCode ? ` (${order.discountCode})` : ''}
+                    </span>
+                    <span className="font-medium">
+                      -{currency(order.discount || 0)}
+                    </span>
+                  </div>
+                )}
                 <div className="flex justify-between text-black/70">
                   <span>Shipping</span>
                   <span className="font-medium text-black">

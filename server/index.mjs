@@ -75,6 +75,17 @@ function centsToPrice(cents) {
   return `$${(cents / 100).toFixed(2)}`;
 }
 
+const CATRICE_DISCOUNT_CODE = 'CATRICE#1';
+
+function normalizeDiscountCode(value) {
+  const code = String(value || '').trim().toUpperCase();
+  if (!code) return undefined;
+  if (code !== CATRICE_DISCOUNT_CODE) {
+    throw new Error('That discount code is not valid.');
+  }
+  return CATRICE_DISCOUNT_CODE;
+}
+
 function normalizeQuantity(value) {
   const quantity = Number(value);
   if (!Number.isInteger(quantity) || quantity < 1 || quantity > 99) {
@@ -166,16 +177,20 @@ function assertStock(product, cartItem) {
   }
 }
 
-async function buildCheckoutOrder(cartItems, customer, orderNumber) {
+async function buildCheckoutOrder(cartItems, customer, orderNumber, discountCode) {
+  const appliedDiscountCode = normalizeDiscountCode(discountCode);
   const lineItems = [];
   const orderItems = [];
+  let originalSubtotal = 0;
   let subtotal = 0;
 
   for (const cartItem of cartItems) {
     const product = await getProduct(cartItem.id);
     assertStock(product, cartItem);
 
-    const unitAmount = parsePriceToCents(product.price);
+    const originalUnitAmount = parsePriceToCents(product.price);
+    const unitAmount = appliedDiscountCode ? 100 : originalUnitAmount;
+    originalSubtotal += originalUnitAmount * cartItem.quantity;
     subtotal += unitAmount * cartItem.quantity;
 
     const productName = cartItem.size ? `${product.name} - Size ${cartItem.size}` : product.name;
@@ -216,7 +231,9 @@ async function buildCheckoutOrder(cartItems, customer, orderNumber) {
       orderNumber,
       items: orderItems,
       customer,
-      subtotal: subtotal / 100,
+      subtotal: originalSubtotal / 100,
+      discount: (originalSubtotal - subtotal) / 100,
+      discountCode: appliedDiscountCode,
       shipping: shipping / 100,
       total: total / 100,
       status: 'new',
@@ -321,7 +338,12 @@ app.post('/api/create-checkout-session', async (req, res) => {
     const cartItems = normalizeCartItems(req.body?.items);
     const customer = normalizeCustomer(req.body?.customer);
     const orderNumber = String(req.body?.orderNumber || generateOrderNumber());
-    const { stripeLineItems, order } = await buildCheckoutOrder(cartItems, customer, orderNumber);
+    const { stripeLineItems, order } = await buildCheckoutOrder(
+      cartItems,
+      customer,
+      orderNumber,
+      req.body?.discountCode,
+    );
 
     const siteUrl = siteUrlFromRequest(req);
     const successPath = new URL('/checkout/success', siteUrl).toString();
@@ -337,10 +359,12 @@ app.post('/api/create-checkout-session', async (req, res) => {
       cancel_url: cancelUrl,
       metadata: {
         orderNumber,
+        ...(order.discountCode ? { discountCode: order.discountCode } : {}),
       },
       payment_intent_data: {
         metadata: {
           orderNumber,
+          ...(order.discountCode ? { discountCode: order.discountCode } : {}),
         },
       },
     });

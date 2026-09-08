@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { ShoppingBag, CreditCard, Lock, AlertCircle } from 'lucide-react';
+import { ShoppingBag, CreditCard, Lock, AlertCircle, CheckCircle2, Tag } from 'lucide-react';
 import { Elements, PaymentElement, useElements, useStripe } from '@stripe/react-stripe-js';
 import { loadStripe } from '@stripe/stripe-js';
 import type { StripeElementsOptions } from '@stripe/stripe-js';
@@ -9,6 +9,7 @@ import { createPaymentIntent } from '../lib/checkout';
 
 const stripePublishableKey = import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY as string | undefined;
 const stripePromise = stripePublishableKey ? loadStripe(stripePublishableKey) : null;
+const CATRICE_DISCOUNT_CODE = 'CATRICE#1';
 
 function generateOrderNumber(): string {
   const date = new Date();
@@ -27,6 +28,9 @@ export default function Checkout() {
   const [placing, setPlacing] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [clientSecret, setClientSecret] = useState<string | null>(null);
+  const [discountInput, setDiscountInput] = useState('');
+  const [discountCode, setDiscountCode] = useState<string | null>(null);
+  const [discountError, setDiscountError] = useState<string | null>(null);
 
   const [formData, setFormData] = useState({
     email: '',
@@ -51,7 +55,33 @@ export default function Checkout() {
 
   const subtotal = parseFloat(getCartTotal().replace('$', ''));
   const shipping = 0;
-  const total = subtotal + shipping;
+  const oneDollarSubtotal = cart.reduce((sum, item) => sum + item.quantity, 0);
+  const discount = discountCode
+    ? Math.max(0, subtotal - oneDollarSubtotal)
+    : 0;
+  const total = subtotal - discount + shipping;
+
+  const handleDiscountCode = () => {
+    if (discountCode) {
+      setDiscountCode(null);
+      setDiscountInput('');
+      setDiscountError(null);
+      setClientSecret(null);
+      return;
+    }
+
+    if (discountInput.trim().toUpperCase() !== CATRICE_DISCOUNT_CODE) {
+      setDiscountError('That discount code is not valid.');
+      setDiscountCode(null);
+      setClientSecret(null);
+      return;
+    }
+
+    setDiscountCode(CATRICE_DISCOUNT_CODE);
+    setDiscountInput(CATRICE_DISCOUNT_CODE);
+    setDiscountError(null);
+    setClientSecret(null);
+  };
 
   const handlePlaceOrder = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -78,6 +108,7 @@ export default function Checkout() {
           country: formData.country,
           orderNote: formData.orderNote || undefined,
         },
+        discountCode: discountCode || undefined,
       });
 
       setClientSecret(checkout.clientSecret);
@@ -393,14 +424,70 @@ export default function Checkout() {
                         </p>
                       )}
                       <p className="text-bfab-600 font-medium text-sm mt-1">{item.price}</p>
+                      {discountCode && (
+                        <p className="text-xs font-semibold text-bfab-700 mt-0.5">
+                          Discounted to $1.00 each
+                        </p>
+                      )}
                     </div>
                     <div className="text-right text-sm">
                       <p className="font-semibold text-black">
-                        ${(parseFloat(item.price.replace('$', '')) * item.quantity).toFixed(2)}
+                        ${(
+                          (discountCode ? 1 : parseFloat(item.price.replace('$', ''))) *
+                          item.quantity
+                        ).toFixed(2)}
                       </p>
                     </div>
                   </div>
                 ))}
+              </div>
+
+              <div className="border-t border-black/10 pt-4 mb-4">
+                <label
+                  htmlFor="discount-code"
+                  className="block text-xs tracking-[0.18em] uppercase font-semibold text-black mb-2"
+                >
+                  Discount code
+                </label>
+                <div className="flex gap-2">
+                  <div className="relative flex-1">
+                    <Tag className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-black/40" />
+                    <input
+                      id="discount-code"
+                      type="text"
+                      value={discountInput}
+                      disabled={Boolean(discountCode)}
+                      onChange={(event) => {
+                        setDiscountInput(event.target.value);
+                        setDiscountError(null);
+                      }}
+                      onKeyDown={(event) => {
+                        if (event.key === 'Enter') {
+                          event.preventDefault();
+                          handleDiscountCode();
+                        }
+                      }}
+                      placeholder="Enter code"
+                      className="input-base pl-10 disabled:bg-bfab-50 disabled:text-bfab-700"
+                    />
+                  </div>
+                  <button
+                    type="button"
+                    onClick={handleDiscountCode}
+                    className="px-4 rounded-lg bg-black text-white text-xs tracking-widest uppercase font-semibold hover:bg-bfab-700 transition-colors"
+                  >
+                    {discountCode ? 'Remove' : 'Apply'}
+                  </button>
+                </div>
+                {discountCode && (
+                  <p className="mt-2 flex items-center gap-1.5 text-sm font-medium text-bfab-700">
+                    <CheckCircle2 className="w-4 h-4" />
+                    {CATRICE_DISCOUNT_CODE} applied — every item is $1.
+                  </p>
+                )}
+                {discountError && (
+                  <p className="mt-2 text-sm text-red-600">{discountError}</p>
+                )}
               </div>
 
               <div className="space-y-3 border-t border-black/10 pt-4 text-sm">
@@ -408,6 +495,12 @@ export default function Checkout() {
                   <span>Subtotal</span>
                   <span className="font-semibold text-black">${subtotal.toFixed(2)}</span>
                 </div>
+                {discountCode && (
+                  <div className="flex justify-between text-bfab-700">
+                    <span>Discount ({CATRICE_DISCOUNT_CODE})</span>
+                    <span className="font-semibold">-${discount.toFixed(2)}</span>
+                  </div>
+                )}
                 <div className="flex justify-between text-black/80">
                   <span>Shipping</span>
                   <span className="font-semibold text-bfab-700 uppercase tracking-widest text-xs">

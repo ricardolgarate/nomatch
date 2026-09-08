@@ -10,6 +10,7 @@ interface CreateCheckoutSessionPayload {
   orderNumber: string;
   items: CheckoutLineItem[];
   customer: CustomerInfo;
+  discountCode?: string;
 }
 
 interface CreateCheckoutSessionResponse {
